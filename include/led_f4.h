@@ -12,40 +12,18 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
-
+#ifndef LED_F4_H_INCLUDED
+#define LED_F4_H_INCLUDED
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
 //_________> system includes
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 //_________> project includes
 //_________> local includes
 //_________> forward includes
 
-#include <libopencm3/stm32/gpio.h>
-
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-#include <sys/unistd.h>
-#include <sys/types.h>
-
-#include <stdio.h>
-#include <stddef.h>
-
-//#include <string.h>
-
-#include "defines.h"
-#include "led_f4.h"
-#include "dev_serial.h"
-
-// LCD
-#include "dev_LCD_HD44780.h"
-#include "LCD_HD44780.h"
-
-#include "dev_ultrasonic.h"
-#include "waitin.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -53,6 +31,23 @@
 //constants (user-defined)
 //____________________________________________________
 //constants (do not change)
+// for STM32-F4-DISCOVERY KIT
+#define PLED        GPIOD
+#define RCC_PLED    RCC_GPIOD
+
+#define LED0 GPIO12
+#define LED1 GPIO13
+#define LED2 GPIO14
+#define LED3 GPIO15
+
+#define LEDS (LED0|LED1|LED2|LED3)
+#define LED_ALL LEDS
+
+#define LEDGREEN0 LED0
+#define LEDORANGE1 LED1
+#define LEDRED2 LED2
+#define LEDBLUE3 LED3
+
 //____________________________________________________
 // macro functions (do not use often!)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,10 +68,14 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS
-int main(void);
+/****************
+ \brief
+ \param
+ \returns
+ ****************/
+void INIT_leds(void);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
-
-#endif // MAIN_H_INCLUDED
+#endif // LED_F4_H_INCLUDED

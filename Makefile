@@ -27,17 +27,18 @@ INTERMEDIATE_DIR= tmp/
 OUTPUT_DIR	= bin/
 SRC_DIR		= src/
 
-#PRINTF	= scripts/fancyprint.sh
-
 CPPFLAGS	+= -Iinclude
+
+LDLIBS += -lm
 
 ###############################################################################
 # End of user config.
 
 # Append all sources in the src directory
 SRCS += $(patsubst $(SRC_DIR)%,%,$(wildcard $(SRC_DIR)*.c) $(wildcard $(SRC_DIR)*.cpp))
+SRCS += $(patsubst $(SRC_DIR)primitives/%,%,$(wildcard $(SRC_DIR)primitives/*.c) $(wildcard $(SRC_DIR)primitives/*.cpp))
 
-VPATH	+= src
+VPATH	+= src src/primitives
 
 V ?= 0
 # silent mode

@@ -1,42 +1,129 @@
+/***********
+\project    MRBT - Robotický den 2014
+\author 	xdavid10, xslizj00, xdvora0u @ FEEC-VUTBR
+\filename	.c
+\contacts	Bc. Daniel DAVIDEK	<danieldavidek@gmail.com>
+            Bc. Jiri SLIZ       <xslizj00@stud.feec.vutbr.cz>
+            Bc. Michal Dvorak   <xdvora0u@stud.feec.vutbr.cz>
+\date		2014_03_30
+\brief
+\descrptn
+\license    LGPL License Terms \ref lgpl_license
+***********/
+/* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 /*
- * This file is part of the stm32-template project.
- *
- * This library is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library.  If not, see <http://www.gnu.org/licenses/>.
- */
+TODO:
+[x] udelat jmennou konvenci a coding style
+[] rozchodit interrupt
+- od tlacitka
+- od timeru
+- od adc
+[] rozchodit pwm
+[] vytvorit mu projekt na gitu
+[] dat ho jako subprojekt
+[] lcd
+- dodelat seek
+- vynechat mswait a dat to na pocet asmwait podle clocku procesoru!
+*/
 
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// INCLUDES
+//_________> project includes
+#include "main.h"
+// move to headerfile
 
-static void gpio_setup(void)
-{
-	rcc_periph_clock_enable(RCC_GPIOD);
-	gpio_mode_setup(GPIOD, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO12);
-}
 
+#define LCD_DBUFSZ 1024
+#define RBUFSZ 1024
+#define TBUFSZ 1024
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// TYPE DEFINITIONS
+//____________________________________________________
+// enumerations
+//____________________________________________________
+// structs
+//____________________________________________________
+// unions
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// VARIABLE DEFINITIONS
+//____________________________________________________
+// static variables
+static uint8_t rbuf[RBUFSZ];
+static uint8_t tbuf[TBUFSZ];
+static uint8_t lcd_dbuf[LCD_DBUFSZ];
+//____________________________________________________
+// other variables
+FILE *fus;
+FILE *flcd;
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// EXTERNAL VARIABLE DECLARATIONS
+extern S_lcdDevice lcds[];
+extern ultra_sensor_t ultras[];
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// INLINE FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 int main(void)
 {
-	int i;
+    uint8_t i_ultra = 0;
+    uint8_t ilcd = 0;
 
-	gpio_setup();
+    INIT_clk();
 
-	/* Blink the LED (PC8) on the board. */
+    fus = fopenserial(3, 9600, tbuf, TBUFSZ, rbuf, RBUFSZ); // uarts[3] = UART4 = tC10,rC11
+    //lcd = fopenlcd(1, 9600, tbuf,1024,rbuf,1024);
+
+    flcd = fopenLCD(ilcd, 16,
+                   LCD_C_8BIT_2L_5x7_LIGHT, //0x38,//0x30, //LCD_C_8BIT_2L_5x7_LIGHT, //LCD_C_8BIT_1L_5x7_LIGHT,//
+                   LCD_C_ENTRY_RIGHT_CMOVE,
+                   LCD_C_CUR_VIS_STATIC,
+                   lcd_dbuf, LCD_DBUFSZ);
+
+    //ultra_sensor_t* ultra1 = 0;
+    INIT_leds();
+    INIT_ultra(i_ultra ,0);
+
+
+    S_lcdDevice* lcd_dev = &(lcds[ilcd]);
+    ultra_sensor_t* ultra = &(ultras[i_ultra]);
 	while (1) {
-		/* Using API function gpio_toggle(): */
-		gpio_toggle(GPIOD, GPIO12);	/* LED on/off */
-		for (i = 0; i < 1000000; i++)	/* Wait a bit. */
-			__asm__("nop");
+        gpio_toggle(PLED,LED0);
+
+        ULTRA_signalSend(ultra);
+
+        ultra->dist = 0;
+        while( !gpio_get(ultra->rxport,ultra->rxpin) )
+        {
+            __asm__("nop");
+        }
+        while( gpio_get(ultra->rxport,ultra->rxpin) )
+        {
+            (ultra->dist)++;
+        }
+
+        //u30+4;u10+1
+        ultra->dist *= 1.1;//1.111;//1.33333333;//(1 + 4.0/30);
+
+        LCD_clear(lcd_dev);
+        fprintf(flcd, "dist[cm]=%.2f", ultra->dist/100);//ULTRA_getDist(i_ultra));
+        mswait(500);
+
+        //TRY_buzzer();
+/*
+        LCD_displayWriteCheck(lcd_dev);
+        dev_LCD_checkSeek(flcd);
+        */
 	}
 
 	return 0;
 }
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// EXTERNAL REFERENCES
+
+
+

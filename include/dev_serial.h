@@ -12,8 +12,8 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
+#ifndef DEV_SERIAL_H_INCLUDED
+#define DEV_SERIAL_H_INCLUDED
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,30 +22,27 @@
 //_________> project includes
 //_________> local includes
 //_________> forward includes
-
-#include <libopencm3/stm32/gpio.h>
-
+#include <stdio.h>
 #include <errno.h>
+#include <stddef.h>
+#include <sys/types.h>
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/usart.h>
+
+#include "primitives/ringbuf.h"
+//#include "led.h"
+
+#include <sys/unistd.h>
 #include <sys/stat.h>
 #include <sys/times.h>
-#include <sys/unistd.h>
-#include <sys/types.h>
 
-#include <stdio.h>
-#include <stddef.h>
 
-//#include <string.h>
-
-#include "defines.h"
 #include "led_f4.h"
 #include "dev_serial.h"
+#include "defines.h"
 
-// LCD
-#include "dev_LCD_HD44780.h"
-#include "LCD_HD44780.h"
-
-#include "dev_ultrasonic.h"
-#include "waitin.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -61,6 +58,7 @@
 // enumerations
 //____________________________________________________
 // structs
+
 //____________________________________________________
 // unions
 
@@ -73,10 +71,25 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS
-int main(void);
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+FILE *fopenserial(uint8_t index, uint32_t baudrate, uint8_t *tbuf, size_t tbufsz, uint8_t *rbuf, size_t rbufsz);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+struct ringbuf *ser_txbuf(uint8_t index);
+
+
+    //____________________________________________________
+    // ..
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
-
-#endif // MAIN_H_INCLUDED
+#endif // DEV_SERIAL_H_INCLUDED

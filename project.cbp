@@ -7,6 +7,14 @@
 		<Option pch_mode="2" />
 		<Option compiler="armelfgcc" />
 		<Option extended_obj_names="1" />
+		<MakeCommands>
+			<Build command="$make -j 5 -f $makefile images" />
+			<CompileFile command="$make -j 5 -f $makefile $file" />
+			<Clean command="$make -j 5 -f $makefile clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="$make -q -f $makefile images" />
+			<SilentBuild command="$make -j 5 -f $makefile images &gt; $(CMD_NULL)" />
+		</MakeCommands>
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/$(PROJECT_NAME).elf" prefix_auto="0" extension_auto="0" />
@@ -14,12 +22,12 @@
 				<Option type="5" />
 				<Option compiler="armelfgcc" />
 				<MakeCommands>
-					<Build command="$make -j 5 -f $makefile images" />
-					<CompileFile command="$make -j 5 -f $makefile $file" />
-					<Clean command="$make -j 5 -f $makefile clean" />
+					<Build command="$make  -f $makefile images" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -j 5 -q -f $makefile $target" />
-					<SilentBuild command="$make -j 5 -f $makefile images &gt; $(CMD_NULL)" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make  -f $makefile images &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 			<Target title="Release">
@@ -37,10 +45,17 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="LICENSE" />
 		<Unit filename="Makefile" />
-		<Unit filename="README.md" />
+		<Unit filename="include/LCD_HD44780.h" />
+		<Unit filename="include/defines.h" />
+		<Unit filename="include/dev_LCD_HD44780.h" />
+		<Unit filename="include/dev_serial.h" />
+		<Unit filename="include/dev_ultrasonic.h" />
+		<Unit filename="include/led_f4.h" />
 		<Unit filename="include/main.h" />
+		<Unit filename="include/primitives/llist.h" />
+		<Unit filename="include/primitives/ringbuf.h" />
+		<Unit filename="include/waitin.h" />
 		<Unit filename="lib/libopencm3/include/libopencm3/cm3/assert.h" />
 		<Unit filename="lib/libopencm3/include/libopencm3/cm3/common.h" />
 		<Unit filename="lib/libopencm3/include/libopencm3/cm3/cortex.h" />
@@ -839,11 +854,6 @@
 		<Unit filename="lib/libopencm3/lib/usb/usb_standard.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="lib/libopencm3/mk/README" />
-		<Unit filename="lib/libopencm3/mk/gcc-config.mk" />
-		<Unit filename="lib/libopencm3/mk/gcc-rules.mk" />
-		<Unit filename="lib/libopencm3/mk/genlink-config.mk" />
-		<Unit filename="lib/libopencm3/mk/genlink-rules.mk" />
 		<Unit filename="lib/libopencm3/scripts/data/lpc43xx/adc.yaml" />
 		<Unit filename="lib/libopencm3/scripts/data/lpc43xx/atimer.yaml" />
 		<Unit filename="lib/libopencm3/scripts/data/lpc43xx/ccu.yaml" />
@@ -864,8 +874,34 @@
 		<Unit filename="mk/common.mk" />
 		<Unit filename="mk/libopencm3-config.mk" />
 		<Unit filename="mk/libopencm3-rules.mk" />
-		<Unit filename="scripts/fancyprint.sh" />
+		<Unit filename="src/LCD_HD44780.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dev_LCD_HD44780.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dev_serial.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dev_ultrasonic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/led_f4.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/primitives/llist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/primitives/ringbuf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/tests.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/waitin.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
@@ -876,7 +912,7 @@
 					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor connect_srst enable&#x0A;monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;b main&#x0A;run" extended_remote="1" />
 				</remote_debugging>
 				<remote_debugging target="Release">
-					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor connect_srst enable&#x0A;monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;run" extended_remote="1" />
+					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;run" extended_remote="1" />
 				</remote_debugging>
 			</debugger>
 			<lib_finder disable_auto="1" />

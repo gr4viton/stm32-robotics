@@ -12,40 +12,23 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
-
+#ifndef DEV_ULTRASONIC_H_INCLUDED
+#define DEV_ULTRASONIC_H_INCLUDED
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
 //_________> system includes
+#include <libopencm3/stm32/timer.h>
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 //_________> project includes
+#include "main.h"
 //_________> local includes
 //_________> forward includes
 
-#include <libopencm3/stm32/gpio.h>
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-#include <sys/unistd.h>
-#include <sys/types.h>
 
-#include <stdio.h>
-#include <stddef.h>
-
-//#include <string.h>
-
-#include "defines.h"
-#include "led_f4.h"
-#include "dev_serial.h"
-
-// LCD
-#include "dev_LCD_HD44780.h"
-#include "LCD_HD44780.h"
-
-#include "dev_ultrasonic.h"
-#include "waitin.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -61,6 +44,24 @@
 // enumerations
 //____________________________________________________
 // structs
+typedef struct
+{
+    // VOLATILE !!!!!!!!!!!
+    uint32_t clk;
+    uint8_t irq;
+    uint32_t txport;
+    uint32_t rxport;
+    uint16_t txpin;
+    uint16_t rxpin;
+
+    double dist;
+    double proportion;
+    uint32_t nOverflows;
+    uint32_t ticksStart;
+    uint32_t ticksEnd;
+    uint32_t nTicks;
+
+} ultra_sensor_t;
 //____________________________________________________
 // unions
 
@@ -73,10 +74,38 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS
-int main(void);
+/****************
+ \brief Initializes MCU ports for ultrasensor
+ \param[in]
+ \retval
+ ****************/
+ultra_sensor_t* INIT_ultra(uint8_t index, double prop);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+double ULTRA_getDist(uint8_t index);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+void ULTRA_signalSend(ultra_sensor_t *dev);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+void ULTRA_signalAcquired(ultra_sensor_t *dev);
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
 
-#endif // MAIN_H_INCLUDED
+
+#endif // DEV_ULTRASONIC_H_INCLUDED

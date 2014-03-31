@@ -12,9 +12,8 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
-
+#ifndef WAITIN_H_INCLUDED
+#define WAITIN_H_INCLUDED
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
@@ -22,35 +21,21 @@
 //_________> project includes
 //_________> local includes
 //_________> forward includes
-
-#include <libopencm3/stm32/gpio.h>
-
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-#include <sys/unistd.h>
-#include <sys/types.h>
-
-#include <stdio.h>
-#include <stddef.h>
-
-//#include <string.h>
-
-#include "defines.h"
-#include "led_f4.h"
-#include "dev_serial.h"
-
-// LCD
-#include "dev_LCD_HD44780.h"
-#include "LCD_HD44780.h"
-
-#include "dev_ultrasonic.h"
-#include "waitin.h"
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/cm3/systick.h>
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
 //____________________________________________________
 //constants (user-defined)
+
+
+#define WAITIN_SYSCLK_1MS
+//#define WAITIN_SYSCLK_100NS
+
+// for using of wwait and twait
+#define LEGACY_WAITIN
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -73,10 +58,54 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS
-int main(void);
+    //____________________________________________________
+    // ..
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
+/****************
+ \brief
+ \param
+ \returns
+ ****************/
+void INIT_clk(void);
 
+/****************
+ \brief
+ \param
+ \returns
+ ****************/
+void mswait(uint32_t delay);
 
+#ifdef LEGACY_WAITIN
+/****************
+ \brief
+ \param
+ \returns
+ ****************/
+void wwait(void);
 
-#endif // MAIN_H_INCLUDED
+/****************
+ \brief
+ \param
+ \returns
+ ****************/
+void twait(uint32_t times);
+
+/****************
+ \brief
+ \param
+ \returns
+ ****************/
+void tnop(uint32_t times);
+#endif // LEGACY_WAITIN
+
+#ifdef WAITIN_SYSCLK_100NS
+/****************
+ \brief
+ \param
+ \returns
+ ****************/
+void ns100(uint32_t times);
+#endif // WAITIN_SYSCLK_100NS
+
+#endif // WAITIN_H_INCLUDED

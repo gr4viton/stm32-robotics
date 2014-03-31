@@ -12,8 +12,8 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
+#ifndef _DEFINES_H_INCLUDED_
+#define _DEFINES_H_INCLUDED_
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,29 +23,6 @@
 //_________> local includes
 //_________> forward includes
 
-#include <libopencm3/stm32/gpio.h>
-
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-#include <sys/unistd.h>
-#include <sys/types.h>
-
-#include <stdio.h>
-#include <stddef.h>
-
-//#include <string.h>
-
-#include "defines.h"
-#include "led_f4.h"
-#include "dev_serial.h"
-
-// LCD
-#include "dev_LCD_HD44780.h"
-#include "LCD_HD44780.h"
-
-#include "dev_ultrasonic.h"
-#include "waitin.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -53,6 +30,19 @@
 //constants (user-defined)
 //____________________________________________________
 //constants (do not change)
+
+#define UNUSED(x) (void)(x);
+
+#define __NOT_IMPLEMENTED_YET 0
+#define __NOT_IMPORTANT 0
+#define __NOT_USED_ANYMORE 0
+#define __LEGACY 0
+#define __IS_BUGGY 0
+
+// later for interrupt timer wait contra current not active noping
+#define __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE 0
+
+
 //____________________________________________________
 // macro functions (do not use often!)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,10 +63,11 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS
-int main(void);
+    //____________________________________________________
+    // ..
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
 
-#endif // MAIN_H_INCLUDED
+#endif // _DEFINES_H_INCLUDED_
