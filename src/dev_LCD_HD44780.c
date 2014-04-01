@@ -228,7 +228,7 @@ void LCD_displayWriteCheck(S_lcdDevice *dev)
     while(1){
         LCD_gotoxy(dev,x,y);
         LCD_writeChar(dev,'0'+x);
-        gpio_toggle(PLED,LED0);
+        //gpio_toggle(PLED,LED0);
         if(x == xmax)
         {
             y++; x=0;

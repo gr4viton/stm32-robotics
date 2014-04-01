@@ -40,19 +40,10 @@ TODO:
 //_________> local includes
 //_________> forward includes
 #include <stdio.h>
-#include <stddef.h>
-#include <sys/types.h>
-#include <sys/unistd.h>
-
 #include <errno.h>
-#include <sys/stat.h>
-#include <sys/times.h>
 
 #include <libopencm3/stm32/gpio.h>
 
-//#include <string.h>
-
-#include "led_f4.h"
 #include "defines.h"
 #include "primitives/ringbuf.h"
 

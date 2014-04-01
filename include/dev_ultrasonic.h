@@ -1,7 +1,7 @@
 /***********
 \project    MRBT - Robotický den 2014
 \author 	xdavid10, xslizj00, xdvora0u @ FEEC-VUTBR
-\filename	.h
+\filename	dev_ultrasonic.h
 \contacts	Bc. Daniel DAVIDEK	<danieldavidek@gmail.com>
             Bc. Jiri SLIZ       <xslizj00@stud.feec.vutbr.cz>
             Bc. Michal Dvorak   <xdvora0u@stud.feec.vutbr.cz>
@@ -44,9 +44,12 @@
 // enumerations
 //____________________________________________________
 // structs
+/****************
+ @brief Structure encapsulating ultrasonic sensor
+ ****************/
 typedef struct
 {
-    // VOLATILE !!!!!!!!!!!
+    // VOLATILE !!!!!!!!!!! ??????
     uint32_t clk;
     uint8_t irq;
     uint32_t txport;

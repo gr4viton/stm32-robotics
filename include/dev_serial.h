@@ -22,22 +22,15 @@
 //_________> project includes
 //_________> local includes
 //_________> forward includes
-#include <stdio.h>
-#include <errno.h>
-#include <stddef.h>
-#include <sys/types.h>
+#include <stdio.h> // FILE
+#include <errno.h> // EINVAL
+
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 
 #include "primitives/ringbuf.h"
-//#include "led.h"
-
-#include <sys/unistd.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-
 
 #include "led_f4.h"
 #include "dev_serial.h"

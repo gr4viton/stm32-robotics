@@ -69,11 +69,10 @@ Read/Write ASCII to the Display
 //_________> local includes
 //_________> forward includes
 
-#include <stdio.h>
+//#include <stdio.h>
 #include <libopencm3/stm32/gpio.h>
 
 #include "primitives/ringbuf.h"
-#include "main.h"
 #include "waitin.h"
 
 #include "dev_LCD_HD44780.h"
