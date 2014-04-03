@@ -1,51 +1,40 @@
 /***********
 \project    MRBT - Robotický den 2014
 \author 	xdavid10, xslizj00, xdvora0u @ FEEC-VUTBR
-\filename	.h
+\filename	sensor_button.h
 \contacts	Bc. Daniel DAVIDEK	<danieldavidek@gmail.com>
             Bc. Jiri SLIZ       <xslizj00@stud.feec.vutbr.cz>
             Bc. Michal Dvorak   <xdvora0u@stud.feec.vutbr.cz>
 \date		2014_03_30
-\brief
+\brief      Initialization of start button, game selecting shortcut etc.
 \descrptn
 \license    LGPL License Terms \ref lgpl_license
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef MAIN_H_INCLUDED
-#define MAIN_H_INCLUDED
-
+#ifndef SENSOR_BUTTON_H_INCLUDED
+#define SENSOR_BUTTON_H_INCLUDED
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
 //_________> system includes
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 //_________> project includes
+#include "main.h"
 //_________> local includes
 //_________> forward includes
-#include <libopencm3/stm32/gpio.h>
 
-#include "dev_LCD_HD44780.h"
-#include "LCD_HD44780.h"
 
-#include "defines.h"
-#include "led_f4.h"
-#include "waitin.h"
-#include "sensor_button.h"
 
-#include "main_debug.h"
-#include "main_line.h"
-#include "main_sumo.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
 //____________________________________________________
 //constants (user-defined)
-// USART recieve buffer size
-#define RBUFSZ 1024
-// USART transmission buffer size
-#define TBUFSZ 1024
-// LCD data buffer size
-#define LCD_DBUFSZ 1024
+//#define RCC_BUTTON RCC_GPIOA
+//#define
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -54,20 +43,43 @@
 // TYPE DEFINITIONS
 //____________________________________________________
 // enumerations
+/****************
+ @brief Enumeration of programmed behaviour of robot
+ ****************/
+typedef enum _E_lifeStyleSelector
+{
+    IAM_BUGGED_ROBOT =0,            // for debugging and development
+    IAM_SUMO_WARRIOR ,              // for mini-sumo competition
+    IAM_SHEEP_FOLLOWING_THE_LINE    // for line-follower
+} E_lifeStyleSelector;
 //____________________________________________________
 // structs
+/****************
+ @brief Structure defining one button
+ ****************/
+typedef struct _S_sensor_button
+{
+    uint32_t pclk; // button port RCC
+    uint32_t port; // button port address
+    uint8_t pull; // button pull resistor
+    uint16_t pin; // button pin
+    uint16_t state; // state of the button 0 or 1
+}S_sensor_button;
+
+/****************
+ @brief Structure defining all input buttons of this project
+ ****************/
+typedef struct _S_sensor_buttonsInput
+{
+    S_sensor_button start_btn;
+    S_sensor_button sumo_btn;
+    S_sensor_button line_btn;
+}S_sensor_buttonsInput;
 //____________________________________________________
 // unions
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-    //____________________________________________________
-    // from main.c
-extern FILE *fus;
-extern uint8_t rbuf[RBUFSZ];
-extern uint8_t tbuf[TBUFSZ];
-extern FILE *flcd;
-extern uint8_t lcd_dbuf[LCD_DBUFSZ];
+extern S_sensor_buttonsInput btns;
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS
@@ -76,24 +88,31 @@ extern uint8_t lcd_dbuf[LCD_DBUFSZ];
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS
 /****************
- \brief   Selects with of the programs should be started depending on buttons
+ \brief   Initializes all buttons of the project
  ****************/
-int main(void);
+void INIT_buttons(void);
 
 /****************
- \brief  Initializes lcd display
- \retval pointer to the LCD display devic - maybe for debug only in future
+ \brief   Activates clock and pin in port defined in btn
+ \param   btn Structure of the button
  ****************/
-S_dev_lcd* INIT_dev_dipslay(void);
+void ACTIVATE_button(S_sensor_button* btn);
 
 /****************
- \brief  Initializes usart communication
+ \brief   Refreshes the state of the button
+ \param   btn Structure of the button
  ****************/
-void INIT_dev_usart(void);
+void REFRESH_buttonState(S_sensor_button* btn);
 
+/****************
+ \brief   Finds out which life should be lived by pushed "buttons"
+ \returns life Selected lifestyle
+ ****************/
+E_lifeStyleSelector GET_lifeStyle(void);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
 
-#endif // MAIN_H_INCLUDED
+
+#endif // SENSOR_GPIO

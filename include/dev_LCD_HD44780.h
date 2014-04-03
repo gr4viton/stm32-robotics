@@ -97,7 +97,7 @@ typedef struct _S_lcdDevice{
 
     uint32_t stats_rxoverruns;
     uint32_t stats_rxerrors;
-} S_lcdDevice;
+} S_dev_lcd;
 
 #if __NOT_USED_ANYMORE
 // define used data_port pins
@@ -124,6 +124,7 @@ typedef struct {
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
+extern S_dev_lcd lcds[];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS
@@ -136,21 +137,21 @@ typedef struct {
  \param
  \retval
  ****************/
-void LCD_setDataPins(uint8_t index, S_lcdDevice *dev);
+void LCD_setDataPins(uint8_t index, S_dev_lcd *dev);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-uint16_t LCD_getMaskDataPins(S_lcdDevice *dev);
+uint16_t LCD_getMaskDataPins(S_dev_lcd *dev);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-void LCD_displayWriteCheck(S_lcdDevice *dev);
+void LCD_displayWriteCheck(S_dev_lcd *dev);
 
 /****************
  \brief

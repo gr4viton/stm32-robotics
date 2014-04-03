@@ -43,7 +43,7 @@ static uint16_t lcd_device_data_predef[][8] =
  \brief Predefined LCD ports & clocks for CMD(control-command) and DATA buses
  ****************/
 // later on this could be static as you probably want to use the LCD only through cookie
-S_lcdDevice lcds[] =
+S_dev_lcd lcds[] =
 {
     { .cmd_port=GPIOD, .cmdp_clk=RCC_GPIOD, .data_port=GPIOE,  .datap_clk=RCC_GPIOE },
     { .cmd_port=GPIOB, .cmdp_clk=RCC_GPIOB, .data_port=GPIOE,  .datap_clk=RCC_GPIOE }
@@ -80,7 +80,7 @@ static int _ioseek(void *_cookie, off_t *_off,int _whence);
 static int _ioclose(void *_cookie);
 static void _txsignal(struct ringbuf *rb);
 #if __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
-static void _isru(S_lcdDevice *dev);
+static void _isru(S_dev_lcd *dev);
 #endif // __NOT_IMPLEMENTED_YET__BUSY_WAITING
 
 void usa_rxb(uint8_t ch);
@@ -98,7 +98,7 @@ static inline size_t min(const size_t a,const size_t b)
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
     //____________________________________________________
     // DATAPINS
-void LCD_setDataPins(uint8_t index, S_lcdDevice *dev){
+void LCD_setDataPins(uint8_t index, S_dev_lcd *dev){
     uint16_t _data_pins_all  = 0x0000;
     uint8_t i = 0;
     for(;i<8;i++) {
@@ -107,20 +107,21 @@ void LCD_setDataPins(uint8_t index, S_lcdDevice *dev){
     }
 }
 
-uint16_t LCD_getMaskDataPins(S_lcdDevice *dev){
+uint16_t LCD_getMaskDataPins(S_dev_lcd *dev){
     uint16_t _data_pins_all = 0x0000;
     uint8_t i = 0;
     for(;i<8;i++)
         _data_pins_all |= dev->data_pins[i];
     return(_data_pins_all);
 }
-
+    //____________________________________________________
+    // cookie - file access to lcd
 FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
                uint8_t functionSet, uint8_t entryMode, uint8_t cursorMode,\
                uint8_t *dbuf, size_t dbufsz)
 {
     // rewrite for shortness!
-    S_lcdDevice *dev = &lcds[index];
+    S_dev_lcd *dev = &lcds[index];
 
     uint8_t i=0;
     // initialize ring buffers
@@ -174,9 +175,9 @@ FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
 
     // init lcd
     LCD_writeCmd(dev,LCD_C_INIT);
-    LCD_wait(sendCmd);
+    LCD_waitBusy(sendCmd);
     LCD_writeCmd(dev,LCD_C_INIT);
-    LCD_wait(sendData);
+    LCD_waitBusy(sendData);
     LCD_writeCmd(dev,LCD_C_INIT);
 
     // set initial params
@@ -215,7 +216,7 @@ FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
 }
     //____________________________________________________
     // testin'
-void LCD_displayWriteCheck(S_lcdDevice *dev)
+void LCD_displayWriteCheck(S_dev_lcd *dev)
 {
 
     uint8_t xmax = dev->nCharsPerLine - 1;
@@ -224,7 +225,7 @@ void LCD_displayWriteCheck(S_lcdDevice *dev)
     uint8_t y = 0;
 
     LCD_clear(dev);
-    LCD_wait(dispCheck);
+    LCD_waitBusy(dispCheck);
     while(1){
         LCD_gotoxy(dev,x,y);
         LCD_writeChar(dev,'0'+x);
@@ -239,7 +240,7 @@ void LCD_displayWriteCheck(S_lcdDevice *dev)
         }
         if(y == ymax) break;
     }
-    LCD_wait(dispCheck);
+    LCD_waitBusy(dispCheck);
 }
     //____________________________________________________
     // low level
@@ -260,7 +261,7 @@ static ssize_t _iowr(void *_cookie, const char *_buf, size_t _n)
     // pomoci fopencookie nebude možné nastavovat LCD -> pouze psát data
     // možná pøi initu se dá aj init všeho -> dvì možnosti, init bez zmìny
     // -> a druhá init s nastavením
-    S_lcdDevice *dev = (S_lcdDevice *)_cookie;
+    S_dev_lcd *dev = (S_dev_lcd *)_cookie;
     // prozatím vynechám buffer
     int written = 0;
     //int c = 0;
@@ -296,7 +297,7 @@ static ssize_t _iowr(void *_cookie, const char *_buf, size_t _n)
 
 static int _ioseek(void *_cookie, off_t *_off,int _whence)
 {
-    S_lcdDevice *dev = (S_lcdDevice *)_cookie;
+    S_dev_lcd *dev = (S_dev_lcd *)_cookie;
 
     uint16_t pos = 0;
     switch(_whence){

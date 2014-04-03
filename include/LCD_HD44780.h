@@ -155,7 +155,7 @@ typedef enum _E_waitType{
  \param
  \retval
  ****************/
-void LCD_wait(E_waitType wType);
+void LCD_waitBusy(E_waitType wType);
 
 /****************
  \brief
@@ -166,18 +166,25 @@ void INIT_LCD(void);
     //____________________________________________________
     // conrol
 /****************
- \brief
+ \brief  Clears display and saved graphical characters, moves cursor to 0,0
  \param
  \retval
  ****************/
-void LCD_clear(S_lcdDevice *dev);
+void LCD_clear(S_dev_lcd *dev);
+
+/****************
+ \brief  Writes blank spaces on [lineNum]-th line of LCD
+ \param
+ \retval
+ ****************/
+void LCD_clearLine(S_dev_lcd *dev, uint8_t lineNum);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-uint8_t LCD_gotoxy(S_lcdDevice *dev, uint8_t x, uint8_t y);
+uint8_t LCD_gotoxy(S_dev_lcd *dev, uint8_t x, uint8_t y);
 #if __NOT_IMPLEMENTED_YET
 void LCD_printChar(char c);
 void LCD_printString(char *s);
@@ -189,35 +196,35 @@ void LCD_printString(char *s);
  \param
  \retval
  ****************/
-void LCD_write(S_lcdDevice *dev, uint8_t data, E_waitType wType);
+void LCD_write(S_dev_lcd *dev, uint8_t data, E_waitType wType);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-void LCD_writeChar(S_lcdDevice *dev, uint8_t ch);
+void LCD_writeChar(S_dev_lcd *dev, uint8_t ch);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-void LCD_writeCmd(S_lcdDevice *dev, uint8_t cmd_data);
+void LCD_writeCmd(S_dev_lcd *dev, uint8_t cmd_data);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-void LCD_writePort(S_lcdDevice *dev, uint8_t data);
+void LCD_writePort(S_dev_lcd *dev, uint8_t data);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-void LCD_writeByte(S_lcdDevice *dev, uint8_t data, E_waitType wType);
+void LCD_writeByte(S_dev_lcd *dev, uint8_t data, E_waitType wType);
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

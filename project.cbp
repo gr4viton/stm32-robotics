@@ -50,11 +50,17 @@
 		<Unit filename="include/defines.h" />
 		<Unit filename="include/dev_LCD_HD44780.h" />
 		<Unit filename="include/dev_serial.h" />
-		<Unit filename="include/dev_ultrasonic.h" />
 		<Unit filename="include/led_f4.h" />
 		<Unit filename="include/main.h" />
+		<Unit filename="include/main_debug.h" />
+		<Unit filename="include/main_line.h" />
+		<Unit filename="include/main_sumo.h" />
 		<Unit filename="include/primitives/llist.h" />
 		<Unit filename="include/primitives/ringbuf.h" />
+		<Unit filename="include/sablona_headerfile.h" />
+		<Unit filename="include/sensor_button.h" />
+		<Unit filename="include/sensor_infrared.h" />
+		<Unit filename="include/sensor_ultrasonic.h" />
 		<Unit filename="include/waitin.h" />
 		<Unit filename="lib/libopencm3/include/libopencm3/cm3/assert.h" />
 		<Unit filename="lib/libopencm3/include/libopencm3/cm3/common.h" />
@@ -883,19 +889,37 @@
 		<Unit filename="src/dev_serial.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/dev_ultrasonic.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="src/led_f4.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/main_debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/main_line.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/main_sumo.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/primitives/llist.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/primitives/ringbuf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sablona_sourcefile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sensor_button.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sensor_infrared.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sensor_ultrasonic.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/tests.c">
@@ -908,11 +932,11 @@
 			<code_completion />
 			<envvars />
 			<debugger>
-				<remote_debugging target="Debug">
-					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor connect_srst enable&#x0A;monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;b main&#x0A;run" extended_remote="1" />
-				</remote_debugging>
 				<remote_debugging target="Release">
 					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;run" extended_remote="1" />
+				</remote_debugging>
+				<remote_debugging target="Debug">
+					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor connect_srst enable&#x0A;monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;b main&#x0A;run" extended_remote="1" />
 				</remote_debugging>
 			</debugger>
 			<lib_finder disable_auto="1" />

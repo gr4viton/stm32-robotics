@@ -3,7 +3,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/adc.h>
 
-#include "dev_infrared.h"
+#include "sensor_infrared.h"
 
 void current_init(void)
 {
@@ -74,6 +74,11 @@ static uint16_t _adc_counter[3] = { 0,0,0 };
 
 void adc_finish(uint16_t values[]);
 
+void adc_finish(uint16_t values[])
+{
+    DBG_adc_finish(values);
+}
+
 void adc_isr(void)
 {
     if (adc_eoc_injected(ADC1))
@@ -103,7 +108,7 @@ void adc_isr(void)
     if ((_adc_counter[0] >= 16) && (_adc_counter[1] >= 16) && (_adc_counter[2] >= 16))
     {
         // measurement cycle end
-        //adc_finish(_adc_value);
+        adc_finish(_adc_value);
         _adc_counter[0] = _adc_counter[1] = _adc_counter[2] = 0;
         _adc_value[0] = _adc_value[1] = _adc_value[2] = 0;
     }

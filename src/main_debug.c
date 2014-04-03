@@ -11,33 +11,14 @@
 \license    LGPL License Terms \ref lgpl_license
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
-/*
-TODO:
-[x] udelat jmennou konvenci a coding style
-[] rozchodit interrupt
-- od tlacitka
-- od timeru
-- od adc
-[] ultras serials_predef
-[] rozchodit pwm
-[] vytvorit mu projekt na gitu
-[] dat ho jako subprojekt
-[] pridat output do repraku
-[] lcd
-- dodelat seek
-- vynechat mswait a dat to na pocet asmwait podle clocku procesoru!
-*/
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
 //_________> project includes
-#include "main.h"
+#include "main_debug.h"
 // move to headerfile
 
 
-#define LCD_DBUFSZ 1024
-#define RBUFSZ 1024
-#define TBUFSZ 1024
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // TYPE DEFINITIONS
 //____________________________________________________
@@ -46,26 +27,13 @@ TODO:
 // structs
 //____________________________________________________
 // unions
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // VARIABLE DEFINITIONS
 //____________________________________________________
 // static variables
 //____________________________________________________
 // other variables
-/****************
- @brief FILE USART - pointer to usart device to write strings to
- ****************/
-FILE *fus;
-uint8_t rbuf[RBUFSZ]; // recieve buffer (using ring buffer logic)
-uint8_t tbuf[TBUFSZ]; // transmission buffer (using ring buffer logic)
-
-/****************
- @brief FILE LCD - pointer to lcd device display to write strings to
- ****************/
-FILE *flcd;
-uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
-
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -74,48 +42,56 @@ uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
 // STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
-int main(void)
+int main_debug(void)
 {
-    INIT_clk();
-    INIT_buttons();
+    uint8_t ilcd = 0;
 
-    // Chose a program to run
-    E_lifeStyleSelector life = GET_lifeStyle();
-    switch(life)
-    {
-        case(IAM_BUGGED_ROBOT):
-            main_debug(); break;
-        case(IAM_SUMO_WARRIOR):
-            //main_sumo(); break;
-        case(IAM_SHEEP_FOLLOWING_THE_LINE):
-            //main_line(); break;
-        default:
-            main_debug();
-    }
-
-    // followin' code could not ever been executed
     INIT_leds();
-	while (1) {
-        gpio_toggle(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
-        mswait(500);
+    //INIT_
+
+    S_dev_lcd* lcd_dev = &(lcds[ilcd]);
+	while (1)
+    {
+        int a = 10;
+        while(a-->0)
+        {
+            REFRESH_buttonState(&(btns.start_btn));
+            REFRESH_buttonState(&(btns.line_btn));
+            REFRESH_buttonState(&(btns.sumo_btn));
+            gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
+
+            LCD_clear(lcd_dev);
+            fprintf(flcd, "%x|%x|%x",
+                    btns.start_btn.state,
+                    btns.line_btn.state,
+                    btns.sumo_btn.state
+                     );
+            if(btns.start_btn.state)
+                gpio_set(PLED,LEDGREEN0);
+            if(btns.line_btn.state)
+                gpio_set(PLED,LEDBLUE3);
+            if(btns.sumo_btn.state)
+                gpio_set(PLED,LEDRED2);
+            mswait(500);
+
+        }
+        ULTRA_debug_try();
+
+        gpio_toggle(PLED,LED0);
+
+
+        //TRY_buzzer();
+/*
+        LCD_displayWriteCheck(lcd_dev);
+        dev_LCD_checkSeek(flcd);
+        */
 	}
 
 	return 0;
 }
-S_dev_lcd* INIT_dev_dipslay(void)
+void DBG_adc_finish(uint16_t values[])
 {
-    int ilcd = 1;
-    flcd = fopenLCD(ilcd, 16,
-                   LCD_C_8BIT_2L_5x7_LIGHT,
-                   LCD_C_ENTRY_RIGHT_CMOVE,
-                   LCD_C_CUR_VIS_STATIC,
-                   lcd_dbuf, LCD_DBUFSZ);
-    return &(lcds[ilcd]);
-}
-void INIT_dev_usart(void)
-{
-    // uarts[3] = UART4 = tC10,rC11
-    fus = fopenserial(3, 9600, tbuf, TBUFSZ, rbuf, RBUFSZ);
+    UNUSED(values);
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

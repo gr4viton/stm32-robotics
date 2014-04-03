@@ -1,7 +1,7 @@
 /***********
 \project    MRBT - Robotický den 2014
 \author 	xdavid10, xslizj00, xdvora0u @ FEEC-VUTBR
-\filename	dev_ultrasonic.c
+\filename	sensor_ultrasonic.c
 \contacts	Bc. Daniel DAVIDEK	<danieldavidek@gmail.com>
             Bc. Jiri SLIZ       <xslizj00@stud.feec.vutbr.cz>
             Bc. Michal Dvorak   <xdvora0u@stud.feec.vutbr.cz>
@@ -15,7 +15,7 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
 //_________> project includes
-#include "dev_ultrasonic.h"
+#include "sensor_ultrasonic.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // TYPE DEFINITIONS
@@ -34,7 +34,7 @@
 /****************
  \brief Predefined ultrasonic sensors ports & clocks [tx=out;rx=in]
  ****************/
-ultra_sensor_t ultras[3] = {
+S_sensor_ultra ultras_predef[3] = {
     {.clk=RCC_GPIOE, .txport=GPIOE, .rxport=GPIOE, .txpin=GPIO4, .rxpin=GPIO5 }
     ,{.clk=RCC_GPIOH, .txport=GPIOH, .rxport=GPIOH, .txpin=GPIO0, .rxpin=GPIO1 }
     ,{.clk=RCC_GPIOB, .txport=GPIOB, .rxport=GPIOB, .txpin=GPIO0, .rxpin=GPIO1 }
@@ -47,9 +47,9 @@ ultra_sensor_t ultras[3] = {
 // STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
-ultra_sensor_t* INIT_ultra(uint8_t index, double prop)
+S_sensor_ultra* INIT_ultra(uint8_t index, double prop)
 {
-    ultra_sensor_t* dev = &ultras[index];
+    S_sensor_ultra* dev = &ultras_predef[index];
 
     dev->proportion = prop;
 
@@ -95,10 +95,10 @@ ultra_sensor_t* INIT_ultra(uint8_t index, double prop)
 
 double ULTRA_getDist(uint8_t index)
 {
-    return ultras[index].dist;
+    return ultras_predef[index].dist;
 }
 
-void ULTRA_signalSend(ultra_sensor_t *dev)
+void ULTRA_signalSend(S_sensor_ultra *dev)
 {
     gpio_set(dev->txport, dev->txpin);
     //dev->ticksStart = timer5;
@@ -107,20 +107,51 @@ void ULTRA_signalSend(ultra_sensor_t *dev)
     gpio_clear(dev->txport, dev->txpin);
 }
 
-void ULTRA_signalAcquired(ultra_sensor_t *dev)
+void ULTRA_signalAcquired(S_sensor_ultra *dev)
 {
     // proportion
     dev->nTicks = (dev->ticksEnd - dev->ticksStart); //+ (dev->nOverflow * dev->..;
     dev->dist = dev->proportion * ( dev->nTicks / dev->clk );
 }
 
+void ULTRA_debug_try(void)
+{
+
+    uint8_t i_ultra = 0;
+    INIT_ultra(i_ultra ,0);
+    uint8_t ilcd = 0;
+    S_dev_lcd* lcd_dev = &(lcds[ilcd]);
+
+    S_sensor_ultra* ultra = &(ultras_predef[i_ultra]);
+    ULTRA_signalSend(ultra);
+    while(1)
+    {
+        ultra->dist = 0;
+        while( !gpio_get(ultra->rxport,ultra->rxpin) )
+        {
+            __asm__("nop");
+        }
+        while( gpio_get(ultra->rxport,ultra->rxpin) )
+        {
+            (ultra->dist)++;
+        }
+
+        //u30+4;u10+1
+        ultra->dist *= 1.1;//1.111;//1.33333333;//(1 + 4.0/30);
+
+        LCD_clear(lcd_dev);
+        fprintf(flcd, "dist[cm]=%.2f", ultra->dist/100);//ULTRA_getDist(i_ultra));
+        mswait(500);
+    }
+
+}
 #if __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
 void gpiod_isr(void)
 {
-    ultra_sensor_t *dev;
+    S_sensor_ultra *dev;
     //switch(INTERRUPTED_PIN){
     //case(ultras[0]):
-        dev=&ultras[0];
+        dev=&ultras_predef[0];
     //}
 
     //!!!!
@@ -139,6 +170,8 @@ void tim5_isr(void)
         //}
     }
 }
+
+
 
 #if __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
 void timer3a_isr(){
