@@ -120,12 +120,12 @@ void ULTRA_debug_try(void)
     uint8_t i_ultra = 0;
     INIT_ultra(i_ultra ,0);
     uint8_t ilcd = 0;
-    S_dev_lcd* lcd_dev = &(lcds[ilcd]);
 
+    S_dev_lcd* lcd_dev = &(lcds[ilcd]);
     S_sensor_ultra* ultra = &(ultras_predef[i_ultra]);
-    ULTRA_signalSend(ultra);
     while(1)
     {
+        ULTRA_signalSend(ultra);
         ultra->dist = 0;
         while( !gpio_get(ultra->rxport,ultra->rxpin) )
         {

@@ -156,13 +156,14 @@ typedef enum _E_waitType{
  \retval
  ****************/
 void LCD_waitBusy(E_waitType wType);
-
+#if __NOT_USED_ANYMORE
 /****************
  \brief
  \param
  \retval
  ****************/
 void INIT_LCD(void);
+#endif // __NOT_USED_ANYMORE
     //____________________________________________________
     // conrol
 /****************

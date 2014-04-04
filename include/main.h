@@ -84,7 +84,7 @@ int main(void);
  \brief  Initializes lcd display
  \retval pointer to the LCD display devic - maybe for debug only in future
  ****************/
-S_dev_lcd* INIT_dev_dipslay(void);
+S_dev_lcd* INIT_dev_LCD(void);
 
 /****************
  \brief  Initializes usart communication

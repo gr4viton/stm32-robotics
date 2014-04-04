@@ -158,7 +158,7 @@ void LCD_writeByte(S_dev_lcd *dev, uint8_t data, E_waitType wType){
 
 
 
-
+#if __NOT_USED_ANYMORE
 void INIT_LCD(void)
 {
     // write something here? - i.e the initialization from <dev_LCD_HD44780.c> ??
@@ -206,6 +206,7 @@ void INIT_LCD(void)
     LCD_writeCmd(0x06); // Display Shift :OFF, Increment Address Counter
     */
 }
+#endif // __NOT_USED_ANYMORE
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES

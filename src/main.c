@@ -102,9 +102,9 @@ int main(void)
 
 	return 0;
 }
-S_dev_lcd* INIT_dev_dipslay(void)
+S_dev_lcd* INIT_dev_LCD(void)
 {
-    int ilcd = 1;
+    int ilcd = 0;
     flcd = fopenLCD(ilcd, 16,
                    LCD_C_8BIT_2L_5x7_LIGHT,
                    LCD_C_ENTRY_RIGHT_CMOVE,

@@ -60,7 +60,7 @@ void INIT_buttons(void)
 
     // line follower button selector - PC8
     btn = &(btns.line_btn);
-    btn->pin=GPIO8; btn->port=GPIOC; btn->pclk=RCC_GPIOC; btn->pull=GPIO_PUPD_PULLUP;
+    btn->pin=GPIO6; btn->port=GPIOC; btn->pclk=RCC_GPIOC; btn->pull=GPIO_PUPD_PULLUP;
     ACTIVATE_button(btn);
 }
 
@@ -73,6 +73,17 @@ void ACTIVATE_button(S_sensor_button* btn)
 void REFRESH_buttonState(S_sensor_button* btn)
 {
     btn->state = GPIO_IDR(btn->port) & btn->pin;
+    // maybe add variable active_zero / active_one to S_sensor_button
+    if(btn->pull == GPIO_PUPD_PULLUP)
+    {
+        btn->state = btn->state > 0 ? 0: 1;
+    }
+    else
+    {
+        btn->state = btn->state > 0 ? 1: 0;
+    }
+
+
 }
 
 E_lifeStyleSelector GET_lifeStyle(void)
@@ -81,14 +92,23 @@ E_lifeStyleSelector GET_lifeStyle(void)
     REFRESH_buttonState(&(btns.line_btn));
     REFRESH_buttonState(&(btns.sumo_btn));
     gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
-    if(btns.start_btn.state != 0)
-        gpio_set(PLED,LEDGREEN0);
-    if(btns.line_btn.state != 0)
-        gpio_set(PLED,LEDBLUE3);
-    if(btns.sumo_btn.state != 0)
-        gpio_set(PLED,LEDRED2);
+    if(btns.start_btn.state != 0) gpio_set(PLED,LEDGREEN0);
+    if(btns.line_btn.state != 0) gpio_set(PLED,LEDBLUE3);
+    if(btns.sumo_btn.state != 0) gpio_set(PLED,LEDRED2);
 
-    return(IAM_BUGGED_ROBOT);
+    if(btns.line_btn.state != 0 && btns.sumo_btn.state == 0)
+    {
+        return IAM_SHEEP_FOLLOWING_THE_LINE;
+    }
+    else if(btns.line_btn.state == 0 && btns.sumo_btn.state != 0)
+    {
+        return IAM_SUMO_WARRIOR;
+    }
+    else
+    {
+        return IAM_BUGGED_ROBOT;
+    }
+
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
