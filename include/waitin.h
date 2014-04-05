@@ -65,14 +65,14 @@
 /****************
  \brief
  \param
- \returns
+ \retval
  ****************/
 void INIT_clk(void);
 
 /****************
  \brief
  \param
- \returns
+ \retval
  ****************/
 void mswait(uint32_t delay);
 
@@ -80,21 +80,21 @@ void mswait(uint32_t delay);
 /****************
  \brief
  \param
- \returns
+ \retval
  ****************/
 void wwait(void);
 
 /****************
  \brief
  \param
- \returns
+ \retval
  ****************/
 void twait(uint32_t times);
 
 /****************
  \brief
  \param
- \returns
+ \retval
  ****************/
 void tnop(uint32_t times);
 #endif // LEGACY_WAITIN
@@ -103,7 +103,7 @@ void tnop(uint32_t times);
 /****************
  \brief
  \param
- \returns
+ \retval
  ****************/
 void ns100(uint32_t times);
 #endif // WAITIN_SYSCLK_100NS

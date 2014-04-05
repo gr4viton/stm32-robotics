@@ -18,6 +18,7 @@ TODO:
 - od tlacitka
 - od timeru
 - od adc
+[] rename main_line na robot_line a to same sumo
 [] ultras serials_predef
 [] rozchodit pwm
 [] vytvorit mu projekt na gitu
@@ -52,18 +53,6 @@ TODO:
 // static variables
 //____________________________________________________
 // other variables
-/****************
- @brief FILE USART - pointer to usart device to write strings to
- ****************/
-FILE *fus;
-uint8_t rbuf[RBUFSZ]; // recieve buffer (using ring buffer logic)
-uint8_t tbuf[TBUFSZ]; // transmission buffer (using ring buffer logic)
-
-/****************
- @brief FILE LCD - pointer to lcd device display to write strings to
- ****************/
-FILE *flcd;
-uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,21 +65,22 @@ uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 int main(void)
 {
+    S_robot* r = &R; // global= extern S_robot R;
     INIT_clk();
-    INIT_buttons();
+    ROBOT_initButtons(r);
 
     // Chose a program to run
-    E_lifeStyleSelector life = GET_lifeStyle();
+    E_lifeStyleSelector life = ROBOT_getLifeStyle(&R);
     switch(life)
     {
         case(IAM_BUGGED_ROBOT):
-            main_debug(); break;
+            main_debug(r); break;
         case(IAM_SUMO_WARRIOR):
             //main_sumo(); break;
         case(IAM_SHEEP_FOLLOWING_THE_LINE):
             //main_line(); break;
         default:
-            main_debug();
+            main_debug(r);
     }
 
     // followin' code could not ever been executed
@@ -101,21 +91,6 @@ int main(void)
 	}
 
 	return 0;
-}
-S_dev_lcd* INIT_dev_LCD(void)
-{
-    int ilcd = 0;
-    flcd = fopenLCD(ilcd, 16,
-                   LCD_C_8BIT_2L_5x7_LIGHT,
-                   LCD_C_ENTRY_RIGHT_CMOVE,
-                   LCD_C_CUR_VIS_STATIC,
-                   lcd_dbuf, LCD_DBUFSZ);
-    return &(lcds[ilcd]);
-}
-void INIT_dev_usart(void)
-{
-    // uarts[3] = UART4 = tC10,rC11
-    fus = fopenserial(3, 9600, tbuf, TBUFSZ, rbuf, RBUFSZ);
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

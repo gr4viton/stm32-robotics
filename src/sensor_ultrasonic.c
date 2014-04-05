@@ -49,20 +49,20 @@ S_sensor_ultra ultras_predef[3] = {
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 S_sensor_ultra* INIT_ultra(uint8_t index, double prop)
 {
-    S_sensor_ultra* dev = &ultras_predef[index];
+    S_sensor_ultra* ult = &ultras_predef[index];
 
-    dev->proportion = prop;
+    ult->proportion = prop;
 
     // get RCC from port and enable
-    //rcc_periph_clock_enable(GET_rcc_from_port(dev->txport))); //????
-	rcc_periph_clock_enable(dev->clk);
-	gpio_mode_setup(dev->txport, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, dev->txpin);
-	gpio_mode_setup(dev->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, dev->rxpin);
-	gpio_clear(dev->txport, dev->txpin);
+    //rcc_periph_clock_enable(GET_rcc_from_port(ult->txport))); //????
+	rcc_periph_clock_enable(ult->clk);
+	gpio_mode_setup(ult->txport, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, ult->txpin);
+	gpio_mode_setup(ult->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, ult->rxpin);
+	gpio_clear(ult->txport, ult->txpin);
 
-//gpio_enable_interrupts(dev->rxport,dev->rxpin);
+//gpio_enable_interrupts(ult->rxport,ult->rxpin);
 	// txport interrupt enable
-    //gpio_enable_interrupts(dev->txport,dev->txpin);
+    //gpio_enable_interrupts(ult->txport,ult->txpin);
 
 // which timer to use?
 // ie TIM5
@@ -90,61 +90,33 @@ S_sensor_ultra* INIT_ultra(uint8_t index, double prop)
     timer_enable_counter(TIM1);
     nvic_enable_irq(NVIC_TIM5_IRQ);
 */
-    return dev;
+    return ult;
 }
 
-double ULTRA_getDist(uint8_t index)
+double ULTRA_getDist(S_sensor_ultra* ult)
 {
-    return ultras_predef[index].dist;
+    // in future there may be linearization or preprocessing
+    return ult->dist;
 }
 
-void ULTRA_signalSend(S_sensor_ultra *dev)
+void ULTRA_signalSend(S_sensor_ultra *ult)
 {
-    gpio_set(dev->txport, dev->txpin);
-    //dev->ticksStart = timer5;
+    gpio_set(ult->txport, ult->txpin);
+    //ult->ticksStart = timer5;
     // wait
-    twait(100);
-    gpio_clear(dev->txport, dev->txpin);
+    mswait(10);
+    gpio_clear(ult->txport, ult->txpin);
 }
 
-void ULTRA_signalAcquired(S_sensor_ultra *dev)
+void ULTRA_signalAcquired(S_sensor_ultra *ult)
 {
     // proportion
-    dev->nTicks = (dev->ticksEnd - dev->ticksStart); //+ (dev->nOverflow * dev->..;
-    dev->dist = dev->proportion * ( dev->nTicks / dev->clk );
+    ult->nTicks = (ult->ticksEnd - ult->ticksStart); //+ (ult->nOverflow * ult->..; in 49 days
+    ult->dist = ult->proportion * ( ult->nTicks / ult->clk );
 }
 
-void ULTRA_debug_try(void)
-{
 
-    uint8_t i_ultra = 0;
-    INIT_ultra(i_ultra ,0);
-    uint8_t ilcd = 0;
 
-    S_dev_lcd* lcd_dev = &(lcds[ilcd]);
-    S_sensor_ultra* ultra = &(ultras_predef[i_ultra]);
-    while(1)
-    {
-        ULTRA_signalSend(ultra);
-        ultra->dist = 0;
-        while( !gpio_get(ultra->rxport,ultra->rxpin) )
-        {
-            __asm__("nop");
-        }
-        while( gpio_get(ultra->rxport,ultra->rxpin) )
-        {
-            (ultra->dist)++;
-        }
-
-        //u30+4;u10+1
-        ultra->dist *= 1.1;//1.111;//1.33333333;//(1 + 4.0/30);
-
-        LCD_clear(lcd_dev);
-        fprintf(flcd, "dist[cm]=%.2f", ultra->dist/100);//ULTRA_getDist(i_ultra));
-        mswait(500);
-    }
-
-}
 #if __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
 void gpiod_isr(void)
 {
@@ -166,7 +138,7 @@ void tim5_isr(void)
     {
         //if (++counter == 0)
         //{
-            gpio_toggle(PLED,LEDBLUE3);
+            //gpio_toggle(PLED,LEDBLUE3);
         //}
     }
 }

@@ -22,7 +22,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 //_________> project includes
-#include "main.h"
+#include "defines.h"
 //_________> local includes
 //_________> forward includes
 
@@ -64,22 +64,13 @@ typedef struct _S_sensor_button
     uint8_t pull; // button pull resistor
     uint16_t pin; // button pin
     uint16_t state; // state of the button 0 or 1
+    // activeZero?
 }S_sensor_button;
-
-/****************
- @brief Structure defining all input buttons of this project
- ****************/
-typedef struct _S_sensor_buttonsInput
-{
-    S_sensor_button start_btn;
-    S_sensor_button sumo_btn;
-    S_sensor_button line_btn;
-}S_sensor_buttonsInput;
 //____________________________________________________
 // unions
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-extern S_sensor_buttonsInput btns;
+extern S_sensor_button buttons_predef[3];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS
@@ -93,10 +84,10 @@ extern S_sensor_buttonsInput btns;
 void INIT_buttons(void);
 
 /****************
- \brief   Activates clock and pin in port defined in btn
+ \brief   Activates clock and pin in port defined in buttons_predef
  \param   btn Structure of the button
  ****************/
-void ACTIVATE_button(S_sensor_button* btn);
+S_sensor_button* INIT_button(uint8_t index);
 
 /****************
  \brief   Refreshes the state of the button
@@ -105,10 +96,11 @@ void ACTIVATE_button(S_sensor_button* btn);
 void REFRESH_buttonState(S_sensor_button* btn);
 
 /****************
- \brief   Finds out which life should be lived by pushed "buttons"
- \returns life Selected lifestyle
+ \brief   Refreshes and returnes the state of the button
+ \param   btn Structure of the button
  ****************/
-E_lifeStyleSelector GET_lifeStyle(void);
+uint8_t GET_buttonState(S_sensor_button* btn);
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

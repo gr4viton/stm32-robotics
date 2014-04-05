@@ -12,8 +12,8 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef MAIN_DEBUG_H_INCLUDED
-#define MAIN_DEBUG_H_INCLUDED
+#ifndef _MAIN_DEBUG_H_
+#define _MAIN_DEBUG_H_
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,6 +23,8 @@
 //_________> local includes
 //_________> forward includes
 
+#include "robot_config.h"
+/*
 #include <libopencm3/stm32/gpio.h>
 
 #include <errno.h>
@@ -37,6 +39,8 @@
 //#include <string.h>
 
 #include "defines.h"
+#include "robot_config.h"
+
 #include "led_f4.h"
 #include "dev_serial.h"
 
@@ -47,7 +51,9 @@
 
 #include "sensor_ultrasonic.h"
 #include "waitin.h"
-#include "main.h" // externs & macros of LCD, USART
+*/
+
+//#include "main.h" // externs & macros of LCD, USART
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -76,12 +82,20 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS
-int main_debug(void);
+
+int main_debug(S_robot* r);
+/****************
+ @brief
+ ****************/
+void DBG_ultraTest(void);
 void DBG_adc_finish(uint16_t values[]);
+
+void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms);
+void DBG_testUltraDistance(S_robot* r,uint32_t repeats);
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
 
-#endif // MAIN_DEBUG_H_INCLUDED
+#endif // _MAIN_DEBUG_H_

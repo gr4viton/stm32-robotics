@@ -23,7 +23,8 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 //_________> project includes
-#include "main.h"
+#include "defines.h"
+#include "waitin.h"
 //_________> local includes
 //_________> forward includes
 
@@ -66,18 +67,6 @@ typedef struct
 
 } S_sensor_ultra;
 
-/****************
- @brief
- ****************/
-typedef struct _S_sensor_ultrasAll
-{
-    S_sensor_ultra ultraFL;
-    S_sensor_ultra ultraFR;
-    S_sensor_ultra ultraL;
-    S_sensor_ultra ultraR;
-} S_sensor_ultrasAll;
-
-
 //____________________________________________________
 // unions
 
@@ -102,7 +91,7 @@ S_sensor_ultra* INIT_ultra(uint8_t index, double prop);
  \param
  \retval
  ****************/
-double ULTRA_getDist(uint8_t index);
+double ULTRA_getDist(S_sensor_ultra* ult);
 
 /****************
  \brief

@@ -47,7 +47,7 @@ FILE *flcd;
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-extern S_dev_lcd lcds[];
+extern S_dev_lcd lcds_predef[];
 extern S_sensor_ultra ultras_predef[];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -77,7 +77,7 @@ int main_sumo(void)
     INIT_ultra(i_ultra ,0);
 
 
-    S_dev_lcd* lcd_dev = &(lcds[ilcd]);
+    S_dev_lcd* lcd_dev = &(lcds_predef[ilcd]);
     S_sensor_ultra* ultra = &(ultras_predef[i_ultra]);
 	while (1) {
         gpio_toggle(PLED,LED0);

@@ -31,9 +31,12 @@
 // static variables
 //____________________________________________________
 // other variables
-S_sensor_buttonsInput btns;
-
-
+S_sensor_button buttons_predef[3] =
+{
+    {.pin=GPIO0, .port=GPIOA, .pclk=RCC_GPIOA, .pull=GPIO_PUPD_NONE, .state=0},
+    {.pin=GPIO7, .port=GPIOC, .pclk=RCC_GPIOC, .pull=GPIO_PUPD_PULLUP, .state=0},
+    {.pin=GPIO6, .port=GPIOC, .pclk=RCC_GPIOC, .pull=GPIO_PUPD_PULLUP, .state=0}
+};
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,31 +46,14 @@ S_sensor_buttonsInput btns;
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 
-void INIT_buttons(void)
+
+S_sensor_button* INIT_button(uint8_t index)
 {
-    S_sensor_button* btn;
+    S_sensor_button* btn = &(buttons_predef[index]);
 
-    // start button - PA0
-    btn = &(btns.start_btn);
-	// Set GPIO0 (in GPIO port A) = blue button to 'input open-drain'
-    btn->pin=GPIO0; btn->port=GPIOA; btn->pclk=RCC_GPIOA; btn->pull=GPIO_PUPD_NONE;
-    ACTIVATE_button(btn);
-
-    // sumobot button selector - PC7
-    btn = &(btns.sumo_btn);
-    btn->pin=GPIO7; btn->port=GPIOC; btn->pclk=RCC_GPIOC; btn->pull=GPIO_PUPD_PULLUP;
-    ACTIVATE_button(btn);
-
-    // line follower button selector - PC8
-    btn = &(btns.line_btn);
-    btn->pin=GPIO6; btn->port=GPIOC; btn->pclk=RCC_GPIOC; btn->pull=GPIO_PUPD_PULLUP;
-    ACTIVATE_button(btn);
-}
-
-void ACTIVATE_button(S_sensor_button* btn)
-{
     rcc_periph_clock_enable(btn->pclk);
 	gpio_mode_setup(btn->port, GPIO_MODE_INPUT, btn->pull, btn->pin);
+	return btn;
 }
 
 void REFRESH_buttonState(S_sensor_button* btn)
@@ -82,33 +68,8 @@ void REFRESH_buttonState(S_sensor_button* btn)
     {
         btn->state = btn->state > 0 ? 1: 0;
     }
-
-
 }
 
-E_lifeStyleSelector GET_lifeStyle(void)
-{
-    REFRESH_buttonState(&(btns.start_btn));
-    REFRESH_buttonState(&(btns.line_btn));
-    REFRESH_buttonState(&(btns.sumo_btn));
-    gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
-    if(btns.start_btn.state != 0) gpio_set(PLED,LEDGREEN0);
-    if(btns.line_btn.state != 0) gpio_set(PLED,LEDBLUE3);
-    if(btns.sumo_btn.state != 0) gpio_set(PLED,LEDRED2);
 
-    if(btns.line_btn.state != 0 && btns.sumo_btn.state == 0)
-    {
-        return IAM_SHEEP_FOLLOWING_THE_LINE;
-    }
-    else if(btns.line_btn.state == 0 && btns.sumo_btn.state != 0)
-    {
-        return IAM_SUMO_WARRIOR;
-    }
-    else
-    {
-        return IAM_BUGGED_ROBOT;
-    }
-
-}
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES

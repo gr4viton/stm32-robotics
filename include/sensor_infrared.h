@@ -22,6 +22,12 @@
 //_________> project includes
 //_________> local includes
 //_________> forward includes
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/adc.h>
+
+#include "defines.h"
 #include "main_debug.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,9 +60,11 @@ extern uint32_t current[4];
 // OTHER FUNCTION DEFINITIONS
 void current_init(void);
 void current_update(void);
+void adc_finish(uint16_t values[]);
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
+
 
 #endif  // _SENSOR_INFRARED_H_

@@ -137,7 +137,7 @@ size_t ringbuf_read_available(struct ringbuf *rb)
  *
  * @param[in] rb     Ringbuf structure
  * \param[out] data Buffer to hold the result
- * \returns true, if success
+ * \retval true, if success
  *
  */
 

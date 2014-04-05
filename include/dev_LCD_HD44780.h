@@ -124,7 +124,7 @@ typedef struct {
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-extern S_dev_lcd lcds[];
+extern S_dev_lcd lcds_predef[];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS

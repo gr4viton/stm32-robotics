@@ -1,9 +1,54 @@
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/adc.h>
+/***********
+\project    MRBT - Robotický den 2014
+\author 	xdavid10, xslizj00, xdvora0u @ FEEC-VUTBR
+\filename	.c
+\contacts	Bc. Daniel DAVIDEK	<danieldavidek@gmail.com>
+            Bc. Jiri SLIZ       <xslizj00@stud.feec.vutbr.cz>
+            Bc. Michal Dvorak   <xdvora0u@stud.feec.vutbr.cz>
+\date		2014_03_30
+\brief
+\descrptn
+\license    LGPL License Terms \ref lgpl_license
+***********/
+/* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// INCLUDES
+//_________> project includes
 #include "sensor_infrared.h"
+
+
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// TYPE DEFINITIONS
+//____________________________________________________
+// enumerations
+//____________________________________________________
+// structs
+//____________________________________________________
+// unions
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// VARIABLE DEFINITIONS
+//____________________________________________________
+// static variables
+static uint16_t _adc_value[3] = { 0,0,0 };
+static uint16_t _adc_counter[3] = { 0,0,0 };
+
+//____________________________________________________
+// other variables
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// EXTERNAL VARIABLE DECLARATIONS
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// STATIC FUNCTION DECLARATIONS
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// INLINE FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+    //____________________________________________________
+    // ..
 
 void current_init(void)
 {
@@ -69,10 +114,6 @@ void current_init(void)
 
 }
 
-static uint16_t _adc_value[3] = { 0,0,0 };
-static uint16_t _adc_counter[3] = { 0,0,0 };
-
-void adc_finish(uint16_t values[]);
 
 void adc_finish(uint16_t values[])
 {
@@ -113,3 +154,6 @@ void adc_isr(void)
         _adc_value[0] = _adc_value[1] = _adc_value[2] = 0;
     }
 }
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// EXTERNAL REFERENCES
+
