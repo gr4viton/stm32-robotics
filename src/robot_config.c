@@ -137,11 +137,11 @@ void gpioa_isr()
     // others
 E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r)
 {
-    REFRESH_buttonState(r->btns.bStart);
+    //REFRESH_buttonState(r->btns.bStart);
     REFRESH_buttonState(r->btns.line_btn);
     REFRESH_buttonState(r->btns.sumo_btn);
     gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
-    if(r->btns.bStart->state!= 0) gpio_set(PLED,LEDGREEN0);
+    //if(r->btns.bStart->state!= 0) gpio_set(PLED,LEDGREEN0);
     if(r->btns.line_btn->state!= 0) gpio_set(PLED,LEDBLUE3);
     if(r->btns.sumo_btn->state!= 0) gpio_set(PLED,LEDRED2);
 
