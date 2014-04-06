@@ -24,7 +24,30 @@
 // enumerations
 //____________________________________________________
 // structs
+#if __NOT_USED_ANYMORE
+struct _S_robot
+{
+    // sensors
+    S_robot_buttons btns;
+    S_robot_ultras ults;
+    //S_robot_infras infs;
 
+    // devices
+    S_dev_lcd* lcd;
+    S_robot_buzzers buzs;
+
+    // state machine
+    //-> future: maybe in separate state structure
+    uint8_t STARTED; // 1= when the STARTbutton was pushed - program has started
+    // usart
+    FILE *fus; // FILE USART - pointer to usart device to write strings to
+    uint8_t rbuf[RBUFSZ]; // recieve buffer (using ring buffer logic)
+    uint8_t tbuf[TBUFSZ]; // transmission buffer (using ring buffer logic)
+    // lcd
+    FILE *flcd; // FILE LCD - pointer to lcd device display to write strings to
+    uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
+};
+#endif // __NOT_USED_ANYMORE
 //____________________________________________________
 // unions
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,6 +106,11 @@ void ROBOT_initUsart(S_robot* r)
 {
     // uarts[3] = UART4 = tC10,rC11
     r->fus = fopenserial(3, 9600, r->tbuf, TBUFSZ, r->rbuf, RBUFSZ);
+}
+
+void ROBOT_initBuzzers(S_robot* r)
+{
+    r->buzs.bz1 = INIT_buzzer(0);
 }
 
 

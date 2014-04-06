@@ -34,12 +34,14 @@
 #include "dev_serial.h"
 #include "dev_LCD_HD44780.h"
 #include "LCD_HD44780.h"
+#include "dev_buzzer.h"
 
 #include "led_f4.h"
 
 // sensors
 #include "sensor_button.h"
 #include "sensor_ultrasonic.h"
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -87,8 +89,18 @@ typedef struct _S_robot_ultras
 } S_robot_ultras;
 
 /****************
+ @brief Structure defining all buzzers of the robot
+ ****************/
+typedef struct _S_robot_buzzers
+{
+    S_dev_buzzer* bz1;
+} S_robot_buzzers;
+
+/****************
  @brief Structure defining all modules of the robot
  ****************/
+//typedef struct _S_robot S_robot;
+
 typedef struct _S_robot
 {
     // sensors
@@ -96,10 +108,9 @@ typedef struct _S_robot
     S_robot_ultras ults;
     //S_robot_infras infs;
 
-    uint8_t aaa;
-
     // devices
     S_dev_lcd* lcd;
+    S_robot_buzzers buzs;
 
     // state machine
     //-> future: maybe in separate state structure
@@ -112,6 +123,7 @@ typedef struct _S_robot
     FILE *flcd; // FILE LCD - pointer to lcd device display to write strings to
     uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
 }S_robot;
+
 //____________________________________________________
 // unions
 
@@ -136,6 +148,11 @@ void ROBOT_initUltras(S_robot* r);
  \brief   Initializes all buttons of the robot
  ****************/
 void ROBOT_initButtons(S_robot* r);
+
+/****************
+ \brief   Initializes all buzzers of the robot
+ ****************/
+void ROBOT_initBuzzers(S_robot* r);
 
 /****************
  \brief  Initializes lcd display

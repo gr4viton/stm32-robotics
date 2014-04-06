@@ -55,7 +55,6 @@ int main_debug(S_robot* r)
 
         gpio_toggle(PLED,LED0);
 
-
         //TRY_buzzer();
 /*
         LCD_displayWriteCheck(r->lcd);

@@ -49,6 +49,7 @@
 		<Unit filename="include/LCD_HD44780.h" />
 		<Unit filename="include/defines.h" />
 		<Unit filename="include/dev_LCD_HD44780.h" />
+		<Unit filename="include/dev_buzzer.h" />
 		<Unit filename="include/dev_serial.h" />
 		<Unit filename="include/led_f4.h" />
 		<Unit filename="include/main.h" />
@@ -887,6 +888,9 @@
 		<Unit filename="src/dev_LCD_HD44780.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/dev_buzzer.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/dev_serial.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -936,11 +940,11 @@
 			<code_completion />
 			<envvars />
 			<debugger>
-				<remote_debugging target="Release">
-					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;run" extended_remote="1" />
-				</remote_debugging>
 				<remote_debugging target="Debug">
 					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor connect_srst enable&#x0A;monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;b main&#x0A;run" extended_remote="1" />
+				</remote_debugging>
+				<remote_debugging target="Release">
+					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;run" extended_remote="1" />
 				</remote_debugging>
 			</debugger>
 			<lib_finder disable_auto="1" />
