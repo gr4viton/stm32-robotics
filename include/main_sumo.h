@@ -25,29 +25,10 @@
 
 #include <libopencm3/stm32/gpio.h>
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-#include <sys/unistd.h>
-#include <sys/types.h>
-
-#include <stdio.h>
-#include <stddef.h>
-
-//#include <string.h>
-
 #include "defines.h"
-#include "led_f4.h"
-#include "dev_serial.h"
-
-// LCD
-#include "dev_LCD_HD44780.h"
-#include "LCD_HD44780.h"
-
-#include "sensor_ultrasonic.h"
 #include "waitin.h"
+#include "robot_config.h"
 
-#if __NOT_IMPLEMENTED_YET
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
 //____________________________________________________
@@ -73,12 +54,12 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DEFINITIONS
-int main_sumo(void);
+// OTHER FUNCTION DECLARATIONS
+int main_sumo(S_robot* r);
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
 
 #endif // MAIN_H_INCLUDED
-#endif

@@ -1,7 +1,7 @@
 /***********
 \project    MRBT - Robotický den 2014
 \author 	xdavid10, xslizj00, xdvora0u @ FEEC-VUTBR
-\filename	.h
+\filename	actuator_dcmotor.h
 \contacts	Bc. Daniel DAVIDEK	<danieldavidek@gmail.com>
             Bc. Jiri SLIZ       <xslizj00@stud.feec.vutbr.cz>
             Bc. Michal Dvorak   <xdvora0u@stud.feec.vutbr.cz>
@@ -12,16 +12,23 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef _DEFINES_H_INCLUDED_
-#define _DEFINES_H_INCLUDED_
+#ifndef _ACTUATOR_DCMOTOR_H_
+#define _ACTUATOR_DCMOTOR_H_
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
 //_________> system includes
+#include <libopencm3/stm32/timer.h>
+#include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/gpio.h>
 //_________> project includes
+#include "defines.h"
+#include "waitin.h"
 //_________> local includes
 //_________> forward includes
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -29,19 +36,6 @@
 //constants (user-defined)
 //____________________________________________________
 //constants (do not change)
-
-#define UNUSED(x) (void)(x);
-
-#define __NOT_IMPLEMENTED_YET 0
-#define __NOT_IMPORTANT 0
-#define __NOT_USED_ANYMORE 0
-#define __LEGACY 0
-#define __IS_BUGGY 0
-
-// later for interrupt timer wait contra current not active noping
-#define __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE 0
-
-
 //____________________________________________________
 // macro functions (do not use often!)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,23 +44,36 @@
 // enumerations
 //____________________________________________________
 // structs
+typedef struct _S_actuator_dcmotor
+{
+    uint32_t pclk; // button port RCC
+    uint32_t port; // button port address
+    uint8_t pull; // button pull resistor
+    uint16_t pin; // button pin
+
+    uint16_t dutyCycle; // will be used?
+    uint32_t pwm; // not sure yet
+}S_actuator_dcmotor;
 //____________________________________________________
 // unions
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
 
+extern S_actuator_dcmotor dcmotor_predef[4];
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// INLINE FUNCTION DEFINITIONS
+// INLINE FUNCTION DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// STATIC FUNCTION DEFINITIONS
+// STATIC FUNCTION DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DECLARATIONS
     //____________________________________________________
     // ..
+S_actuator_dcmotor* INIT_dcmotor(uint8_t index);
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
+#endif  // _ACTUATOR_DCMOTOR_H_
 
-
-#endif // _DEFINES_H_INCLUDED_

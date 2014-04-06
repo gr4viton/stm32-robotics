@@ -131,7 +131,7 @@ extern S_dev_lcd lcds_predef[];
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DEFINITIONS
+// OTHER FUNCTION DECLARATIONS
 /****************
  \brief
  \param

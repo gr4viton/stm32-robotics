@@ -148,7 +148,7 @@ typedef enum _E_waitType{
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DEFINITIONS
+// OTHER FUNCTION DECLARATIONS
 
 /****************
  \brief

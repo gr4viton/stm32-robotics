@@ -77,7 +77,7 @@ extern S_sensor_button buttons_predef[3];
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DEFINITIONS
+// OTHER FUNCTION DECLARATIONS
 /****************
  \brief   Initializes all buttons of the project
  ****************/

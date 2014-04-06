@@ -113,11 +113,24 @@ void ROBOT_initBuzzers(S_robot* r)
     r->buzs.bz1 = INIT_buzzer(0);
 }
 
+void ROBOT_initDcmotors(S_robot* r)
+{
+    r->dcs.mFL = INIT_dcmotor(0);
+    r->dcs.mFR = INIT_dcmotor(1);
+    r->dcs.mBL = INIT_dcmotor(2);
+    r->dcs.mBR = INIT_dcmotor(3);
+}
 
 void ROBOT_initAll(S_robot* r)
 {
+    INIT_leds();
     r->STARTED = 0;
     ROBOT_initButtons(r);
+    ROBOT_initBuzzers(r);
+    ROBOT_initLcd(r);
+    ROBOT_initUltras(r);
+    ROBOT_initUsart(r);
+    ROBOT_initDcmotors(r);
 
 }
 

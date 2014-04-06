@@ -71,7 +71,7 @@ extern S_dev_buzzer buzzer_predef[3];
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DEFINITIONS
+// OTHER FUNCTION DECLARATIONS
 /****************
  \brief     Initializes MCU ports for ultrasensor
  \param[in]

@@ -26,8 +26,8 @@
 #include "robot_config.h"
 
 #include "main_debug.h"
-#include "main_line.h"
 #include "main_sumo.h"
+#include "main_line.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -55,7 +55,7 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DEFINITIONS
+// OTHER FUNCTION DECLARATIONS
 /****************
  \brief   Selects with of the programs should be started depending on buttons
  ****************/

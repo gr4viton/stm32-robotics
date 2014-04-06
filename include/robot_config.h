@@ -42,6 +42,9 @@
 #include "sensor_button.h"
 #include "sensor_ultrasonic.h"
 
+// actuators
+#include "actuator_dcmotor.h"
+
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // MACRO DEFINITIONS
@@ -96,6 +99,13 @@ typedef struct _S_robot_buzzers
     S_dev_buzzer* bz1;
 } S_robot_buzzers;
 
+typedef struct _S_robot_dcmotors
+{
+    S_actuator_dcmotor* mFL; // motor front left
+    S_actuator_dcmotor* mFR; // motor front right
+    S_actuator_dcmotor* mBL; // motor back left
+    S_actuator_dcmotor* mBR; // motor back right
+}S_robot_dcmotors;
 /****************
  @brief Structure defining all modules of the robot
  ****************/
@@ -111,6 +121,10 @@ typedef struct _S_robot
     // devices
     S_dev_lcd* lcd;
     S_robot_buzzers buzs;
+
+    // actuators
+    S_robot_dcmotors dcs;
+
 
     // state machine
     //-> future: maybe in separate state structure
@@ -135,7 +149,7 @@ extern S_robot R;
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DEFINITIONS
+// OTHER FUNCTION DECLARATIONS
     //____________________________________________________
     // INITS
 
@@ -164,6 +178,13 @@ void ROBOT_initLcd(S_robot* r);
  \brief  Initializes usart communication
  ****************/
 void ROBOT_initUsart(S_robot* r);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+void ROBOT_initDcmotors(S_robot* r);
 
 /****************
  @brief Initializes whole robot
