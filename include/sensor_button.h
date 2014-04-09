@@ -21,6 +21,8 @@
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/exti.h>
+
 //_________> project includes
 #include "defines.h"
 //_________> local includes
@@ -63,6 +65,12 @@ typedef struct _S_sensor_button
     uint32_t port; // button port address
     uint8_t pull; // button pull resistor
     uint16_t pin; // button pin
+
+    uint8_t nvic; // button NVIC
+    uint8_t exti; // button EXTI
+    enum exti_trigger_type exti_trigger; // button interrupt triger - rising / falling / both
+
+
     uint16_t state; // state of the button 0 or 1
     // activeZero?
 }S_sensor_button;
@@ -82,6 +90,13 @@ extern S_sensor_button buttons_predef[3];
  \brief   Initializes all buttons of the project
  ****************/
 void INIT_buttons(void);
+
+/****************
+ \brief   Initializes interrupt (exti & nvic) of a button
+ \param
+ \retval
+ ****************/
+void INIT_buttonInterrupt(S_sensor_button* b);
 
 /****************
  \brief   Activates clock and pin in port defined in buttons_predef

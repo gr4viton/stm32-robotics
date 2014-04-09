@@ -33,7 +33,8 @@
 // other variables
 S_sensor_button buttons_predef[3] =
 {
-    {.pin=GPIO0, .port=GPIOA, .pclk=RCC_GPIOA, .pull=GPIO_PUPD_NONE, .state=0},
+    {.pin=GPIO0, .port=GPIOA, .pclk=RCC_GPIOA, .pull=GPIO_PUPD_NONE, .state=0,
+     .nvic=NVIC_EXTI0_IRQ, .exti=EXTI0,  .exti_trigger=EXTI_TRIGGER_RISING},
     {.pin=GPIO7, .port=GPIOC, .pclk=RCC_GPIOC, .pull=GPIO_PUPD_PULLUP, .state=0},
     {.pin=GPIO6, .port=GPIOC, .pclk=RCC_GPIOC, .pull=GPIO_PUPD_PULLUP, .state=0}
 };
@@ -54,6 +55,20 @@ S_sensor_button* INIT_button(uint8_t index)
     rcc_periph_clock_enable(btn->pclk);
 	gpio_mode_setup(btn->port, GPIO_MODE_INPUT, btn->pull, btn->pin);
 	return btn;
+}
+
+
+void INIT_buttonInterrupt(S_sensor_button* b)
+{
+    // Initialize IRQ for button b
+	nvic_enable_irq(b->nvic); // Enable b->exti interrupt.
+
+
+	// Configure the EXTI subsystem.
+	exti_select_source(b->exti, b->port);
+	exti_set_trigger(b->exti, b->exti_trigger);
+	exti_enable_request(b->exti);
+	// extiX_isr (i.e exti0_isr) is now called on every interrupt
 }
 
 void REFRESH_buttonState(S_sensor_button* btn)

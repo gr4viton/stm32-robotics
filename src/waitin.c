@@ -99,6 +99,21 @@ void INIT_clk()
     // Set STM32 to 168 MHz.
 	rcc_clock_setup_hse_3v3(&hse_8mhz_3v3[CLOCK_3V3_168MHZ]);
 	systick_setup();
+
+#if __NOT_IMPORTANT
+	// how about like this??
+	clock_scale_t myclock_config = {
+		.hpre = RCC_CFGR_HPRE_SYSCLK_NODIV,
+		.ppre1 = RCC_CFGR_PPRE1_HCLK_NODIV,
+		.ppre2 = RCC_CFGR_PPRE2_HCLK_NODIV,
+		.voltage_scale = RANGE2,
+		.flash_config = FLASH_ACR_LATENCY_0WS,
+		.apb1_frequency = 4194000,
+		.apb2_frequency = 4194000,
+		.msi_range = RCC_ICSCR_MSIRANGE_4MHZ,
+	};
+	rcc_clock_setup_msi(&myclock_config);
+#endif // __NOT_IMPORTANT
 }
 
 void systick_setup(void)

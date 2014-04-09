@@ -24,30 +24,6 @@
 // enumerations
 //____________________________________________________
 // structs
-#if __NOT_USED_ANYMORE
-struct _S_robot
-{
-    // sensors
-    S_robot_buttons btns;
-    S_robot_ultras ults;
-    //S_robot_infras infs;
-
-    // devices
-    S_dev_lcd* lcd;
-    S_robot_buzzers buzs;
-
-    // state machine
-    //-> future: maybe in separate state structure
-    uint8_t STARTED; // 1= when the STARTbutton was pushed - program has started
-    // usart
-    FILE *fus; // FILE USART - pointer to usart device to write strings to
-    uint8_t rbuf[RBUFSZ]; // recieve buffer (using ring buffer logic)
-    uint8_t tbuf[TBUFSZ]; // transmission buffer (using ring buffer logic)
-    // lcd
-    FILE *flcd; // FILE LCD - pointer to lcd device display to write strings to
-    uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
-};
-#endif // __NOT_USED_ANYMORE
 //____________________________________________________
 // unions
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,11 +59,16 @@ void ROBOT_initUltras(S_robot* r)
 }
 void ROBOT_initButtons(S_robot* r)
 {
-    r->btns.btnStartEnabled = 0;
+    S_robot_buttons* b = &(r->btns);
 
-    r->btns.bStart = INIT_button(0);
-    r->btns.sumo_btn = INIT_button(1);
-    r->btns.line_btn = INIT_button(2);
+    b->btnStartEnabled = 0;
+    // Initialize gpio for buttons
+    b->bStart = INIT_button(0);
+    b->bSumo = INIT_button(1);
+    b->bLine = INIT_button(2);
+
+    // Initialize IRQ for button bStart
+    INIT_buttonInterrupt(b->bStart);
 }
 
 void ROBOT_initLcd(S_robot* r)
@@ -146,23 +127,24 @@ void gpioa_isr()
     }
     #endif // __NOT_IMPLEMENTED_YET
 }
+
     //____________________________________________________
     // others
 E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r)
 {
     //REFRESH_buttonState(r->btns.bStart);
-    REFRESH_buttonState(r->btns.line_btn);
-    REFRESH_buttonState(r->btns.sumo_btn);
+    REFRESH_buttonState(r->btns.bLine);
+    REFRESH_buttonState(r->btns.bSumo);
     gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
     //if(r->btns.bStart->state!= 0) gpio_set(PLED,LEDGREEN0);
-    if(r->btns.line_btn->state!= 0) gpio_set(PLED,LEDBLUE3);
-    if(r->btns.sumo_btn->state!= 0) gpio_set(PLED,LEDRED2);
+    if(r->btns.bLine->state!= 0) gpio_set(PLED,LEDBLUE3);
+    if(r->btns.bSumo->state!= 0) gpio_set(PLED,LEDRED2);
 
-    if(r->btns.line_btn->state!= 0 && r->btns.sumo_btn->state== 0)
+    if(r->btns.bLine->state!= 0 && r->btns.bSumo->state== 0)
     {
         return IAM_SHEEP_FOLLOWING_THE_LINE;
     }
-    else if(r->btns.line_btn->state== 0 && r->btns.sumo_btn->state!= 0)
+    else if(r->btns.bLine->state== 0 && r->btns.bSumo->state!= 0)
     {
         return IAM_SUMO_WARRIOR;
     }
@@ -172,5 +154,15 @@ E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r)
     }
 
 }
+
+    //____________________________________________________
+    // interrupts request handlers
+void btnStart_isr(void)
+{
+    // btnStart was pressed
+	exti_reset_request(R.btns.bStart->exti); // reset flag
+	R.STARTED = 1;
+}
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES

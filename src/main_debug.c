@@ -78,21 +78,21 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
         S_robot_buttons * b = &(r->btns);
 
         REFRESH_buttonState(b->bStart);
-        REFRESH_buttonState(b->line_btn);
-        REFRESH_buttonState(b->sumo_btn);
+        REFRESH_buttonState(b->bLine);
+        REFRESH_buttonState(b->bSumo);
         gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
 
         LCD_clear(r->lcd);
         LCD_gotoxy(r->lcd,0,0);
         fprintf(R.flcd, "%x|%x|%x",
                 b->bStart->state,
-                b->line_btn->state,
-                b->sumo_btn->state
+                b->bLine->state,
+                b->bSumo->state
                  );
 
         if(b->bStart->state) gpio_set(PLED,LEDGREEN0);
-        if(b->line_btn->state) gpio_set(PLED,LEDBLUE3);
-        if(b->sumo_btn->state) gpio_set(PLED,LEDRED2);
+        if(b->bLine->state) gpio_set(PLED,LEDBLUE3);
+        if(b->bSumo->state) gpio_set(PLED,LEDRED2);
         mswait(ms);
     }
     gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);

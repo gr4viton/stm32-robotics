@@ -24,8 +24,9 @@
 //_________> local includes
 //_________> forward includes
 
-#include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/exti.h>
 
 #include "defines.h"
 #include "waitin.h"
@@ -58,6 +59,7 @@
 #define LCD_DBUFSZ 1024
 //____________________________________________________
 //constants (do not change)
+#define btnStart_isr exti0_isr
 //____________________________________________________
 // macro functions (do not use often!)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,8 +75,8 @@
 typedef struct _S_robot_buttons
 {
     S_sensor_button* bStart;
-    S_sensor_button* sumo_btn;
-    S_sensor_button* line_btn;
+    S_sensor_button* bSumo;
+    S_sensor_button* bLine;
 
     //-> future: maybe in separate state structure
     uint8_t btnStartEnabled; // 1=for accepting interrupts
@@ -197,6 +199,8 @@ void ROBOT_initAll(S_robot* r);
  \retval life Selected lifestyle
  ****************/
 E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r);
+
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

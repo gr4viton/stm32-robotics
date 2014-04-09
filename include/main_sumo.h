@@ -55,8 +55,19 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DECLARATIONS
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
 int main_sumo(S_robot* r);
 
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+void SUMO_wait5sec(void);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

@@ -44,13 +44,32 @@
 int main_sumo(S_robot* r)
 {
     ROBOT_initAll(r);
+    // waitin for button
+    while(r->STARTED==0) __asm__("nop");
+    // 5sec waitin
+    SUMO_wait5sec();
 	while (1) {
-        gpio_toggle(PLED,LED0);
-
-
+        gpio_toggle(PLED,LED1);
+        mswait(1000);
 	}
 
 	return 0;
+}
+
+void SUMO_wait5sec(void)
+{
+    uint16_t one_sec = 970;
+        gpio_clear(PLED,LEDS);
+            mswait(one_sec);
+        gpio_set(PLED,LEDS);
+            mswait(one_sec);
+        gpio_clear(PLED,LED3);
+            mswait(one_sec);
+        gpio_clear(PLED,LED2);
+            mswait(one_sec);
+        gpio_clear(PLED,LED1);
+            mswait(one_sec);
+        gpio_clear(PLED,LED0);
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
