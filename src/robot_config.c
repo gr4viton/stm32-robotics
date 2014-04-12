@@ -57,6 +57,7 @@ void ROBOT_initUltras(S_robot* r)
     r->ults.uL = INIT_ultra(2,1.1);
     r->ults.uR = INIT_ultra(3,1.1);
 }
+
 void ROBOT_initButtons(S_robot* r)
 {
     S_robot_buttons* b = &(r->btns);
@@ -102,61 +103,77 @@ void ROBOT_initDcmotors(S_robot* r)
     r->dcs.mBR = INIT_dcmotor(3);
 }
 
+void ROBOT_initLinCam(S_robot* r)
+{
+    if(r->life == IAM_SHEEP_FOLLOWING_THE_LINE)
+        r->cam = INIT_lincam(0);
+}
+
+void ROBOT_initInfras(S_robot* r)
+{
+    if(r->life == IAM_SUMO_WARRIOR)
+    {
+        // init 4 corner infra sensors
+        r->infs.iFL = INIT_infra(0);
+        r->infs.iFR = INIT_infra(1);
+        r->infs.iBL = INIT_infra(2);
+        r->infs.iBR = INIT_infra(3);
+    }
+    else if(r->life == IAM_SHEEP_FOLLOWING_THE_LINE)
+    {
+        #if __NOT_IMPLEMENTED_YET
+        // init "100" infra sensors strip
+        uint8_t a=0;
+        for(;a<20;a++)
+            r->infs.i[a] = INIT_infra(a);
+        #endif // __NOT_IMPLEMENTED_YET
+    }
+}
+
 void ROBOT_initAll(S_robot* r)
 {
     INIT_leds();
     r->STARTED = 0;
-    ROBOT_initButtons(r);
     ROBOT_initBuzzers(r);
-    ROBOT_initLcd(r);
-    ROBOT_initUltras(r);
     ROBOT_initUsart(r);
+    ROBOT_initLcd(r);
+
+    // sensors
+    ROBOT_initButtons(r);
+    ROBOT_initUltras(r);
+    ROBOT_initInfras(r);
+    ROBOT_initLinCam(r);
+
     ROBOT_initDcmotors(r);
-
-}
-
-    //____________________________________________________
-    // interrupt handler functions
-    //____________________________________________________
-void gpioa_isr()
-{
-    #if __NOT_IMPLEMENTED_YET
-    if(R.btns.btnStartEnabled == 1)
-    {
-        if(GET_buttonState(R.btns.bStart)) R.STARTED = 1;
-    }
-    #endif // __NOT_IMPLEMENTED_YET
 }
 
     //____________________________________________________
     // others
 E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r)
 {
-    //REFRESH_buttonState(r->btns.bStart);
+    E_lifeStyleSelector newLife;
+
     REFRESH_buttonState(r->btns.bLine);
     REFRESH_buttonState(r->btns.bSumo);
-    gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
-    //if(r->btns.bStart->state!= 0) gpio_set(PLED,LEDGREEN0);
-    if(r->btns.bLine->state!= 0) gpio_set(PLED,LEDBLUE3);
-    if(r->btns.bSumo->state!= 0) gpio_set(PLED,LEDRED2);
 
     if(r->btns.bLine->state!= 0 && r->btns.bSumo->state== 0)
     {
-        return IAM_SHEEP_FOLLOWING_THE_LINE;
+        newLife = IAM_SHEEP_FOLLOWING_THE_LINE;
     }
     else if(r->btns.bLine->state== 0 && r->btns.bSumo->state!= 0)
     {
-        return IAM_SUMO_WARRIOR;
+        newLife = IAM_SUMO_WARRIOR;
     }
     else
     {
-        return IAM_BUGGED_ROBOT;
+        newLife = IAM_BUGGED_ROBOT;
     }
+    return newLife;
 
 }
 
     //____________________________________________________
-    // interrupts request handlers
+    // interrupts request handlers = interrupt handler functions
 void btnStart_isr(void)
 {
     // btnStart was pressed

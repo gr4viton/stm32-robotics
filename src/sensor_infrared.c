@@ -37,6 +37,15 @@ static uint16_t _adc_counter[3] = { 0,0,0 };
 
 //____________________________________________________
 // other variables
+/****************
+ \brief Predefined infra sensors ports & clocks [tx=out;rx=in]
+ ****************/
+S_sensor_infra infras_predef[4] = {
+    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO6 },
+    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO7 },
+    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO8 },
+    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO9 }
+};
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,6 +58,19 @@ static uint16_t _adc_counter[3] = { 0,0,0 };
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
     //____________________________________________________
     // ..
+
+S_sensor_infra* INIT_infra(uint8_t index)
+{
+    S_sensor_infra* inf = &infras_predef[index];
+
+	rcc_periph_clock_enable(inf->clk);
+	#if __NOT_IMPLEMENTED_YET
+	// ADC SETTINGS
+	gpio_mode_setup(inf->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, inf->rxpin);
+	gpio_clear(inf->txport, inf->txpin);
+	#endif // __NOT_IMPLEMENTED_YET
+	return inf;
+}
 
 void current_init(void)
 {
@@ -117,7 +139,9 @@ void current_init(void)
 
 void adc_finish(uint16_t values[])
 {
-    DBG_adc_finish(values);
+    UNUSED(values)
+    // from main_debug
+    //DBG_adc_finish(values);
 }
 
 void adc_isr(void)

@@ -48,16 +48,16 @@
 /****************
  @brief Structure encapsulating ultrasonic sensor
  ****************/
-typedef struct
+typedef struct _S_sensor_ultra
 {
     // VOLATILE !!!!!!!!!!! ??????
     uint32_t clk;
-    uint8_t irq;
     uint32_t txport;
     uint32_t rxport;
     uint16_t txpin;
     uint16_t rxpin;
 
+    uint8_t irq;
     double dist;
     double proportion;
     uint32_t nOverflows;

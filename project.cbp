@@ -47,6 +47,7 @@
 		</Build>
 		<Unit filename="Makefile" />
 		<Unit filename="include/LCD_HD44780.h" />
+		<Unit filename="include/actuator_dcmotor.h" />
 		<Unit filename="include/defines.h" />
 		<Unit filename="include/dev_LCD_HD44780.h" />
 		<Unit filename="include/dev_buzzer.h" />
@@ -62,6 +63,7 @@
 		<Unit filename="include/sablona_headerfile.h" />
 		<Unit filename="include/sensor_button.h" />
 		<Unit filename="include/sensor_infrared.h" />
+		<Unit filename="include/sensor_lineCamera.h" />
 		<Unit filename="include/sensor_ultrasonic.h" />
 		<Unit filename="include/waitin.h" />
 		<Unit filename="lib/libopencm3/include/libopencm3/cm3/assert.h" />
@@ -885,6 +887,9 @@
 		<Unit filename="src/LCD_HD44780.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/actuator_dcmotor.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/dev_LCD_HD44780.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -927,6 +932,9 @@
 		<Unit filename="src/sensor_infrared.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/sensor_lineCamera.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/sensor_ultrasonic.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -940,11 +948,11 @@
 			<code_completion />
 			<envvars />
 			<debugger>
-				<remote_debugging target="Debug">
-					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor connect_srst enable&#x0A;monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;b main&#x0A;run" extended_remote="1" />
-				</remote_debugging>
 				<remote_debugging target="Release">
 					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;run" extended_remote="1" />
+				</remote_debugging>
+				<remote_debugging target="Debug">
+					<options conn_type="2" serial_port="COM3" serial_baud="115200" ip_address="localhost" ip_port="3333" additional_cmds="monitor connect_srst enable&#x0A;monitor swdp_scan&#x0A;attach 1&#x0A;load&#x0A;b main&#x0A;run" extended_remote="1" />
 				</remote_debugging>
 			</debugger>
 			<lib_finder disable_auto="1" />

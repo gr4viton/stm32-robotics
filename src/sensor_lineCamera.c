@@ -1,7 +1,7 @@
 /***********
 \project    MRBT - Robotický den 2014
 \author 	xdavid10, xslizj00, xdvora0u @ FEEC-VUTBR
-\filename	sensor_infrared.h
+\filename	sensor_lineCamera.c
 \contacts	Bc. Daniel DAVIDEK	<danieldavidek@gmail.com>
             Bc. Jiri SLIZ       <xslizj00@stud.feec.vutbr.cz>
             Bc. Michal Dvorak   <xdvora0u@stud.feec.vutbr.cz>
@@ -12,97 +12,58 @@
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
 
-#ifndef _SENSOR_INFRARED_H_
-#define _SENSOR_INFRARED_H_
-
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
-#include <libopencm3/stm32/timer.h>
-#include <libopencm3/cm3/nvic.h>
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/adc.h>
 //_________> project includes
-#include "defines.h"
-#include "waitin.h"
-//_________> local includes
-//_________> forward includes
+#include "sensor_lineCamera.h"
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// MACRO DEFINITIONS
-//____________________________________________________
-//constants (user-defined)
-//____________________________________________________
-//constants (do not change)
-//____________________________________________________
-// macro functions (do not use often!)
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // TYPE DEFINITIONS
 //____________________________________________________
 // enumerations
 //____________________________________________________
 // structs
-/****************
- @brief Structure encapsulating ultrasonic sensor
- ****************/
-typedef struct _S_sensor_infra
-{
-    uint32_t clk;
-    uint32_t port;
-    uint16_t pin;
-#if __NOT_IMPLEMENTED_YET
-    uint8_t adc_setting;
-#endif // __NOT_IMPLEMENTED_YET
-} S_sensor_infra;
 //____________________________________________________
 // unions
-
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// VARIABLE DEFINITIONS
+//____________________________________________________
+// static variables
+//____________________________________________________
+// other variables
+/****************
+ \brief Predefined line camera sensors ports & clocks []
+ ****************/
+S_sensor_lincam lincams_predef[1] = {
+    {.clk=RCC_GPIOD, .txport=GPIOD, .rxport=GPIOD, .txpin=GPIO4, .rxpin=GPIO5 }
+};
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-extern uint32_t vbus;
-extern uint32_t current[4];
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// INLINE FUNCTION DEFINITIONS
+// STATIC FUNCTION DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// STATIC FUNCTION DEFINITIONS
+// STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// OTHER FUNCTION DECLARATIONS
+// INLINE FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+    //____________________________________________________
 
+S_sensor_lincam* INIT_lincam(uint8_t index)
+{
+    S_sensor_lincam* lcam = &lincams_predef[index];
 
+    for(index=0; index<LINECAM_PIXELS; index++)
+        lcam->vals[index] = 0;
 
-/****************
- \brief Initializes MCU ports for ultrasensor
- \param[in]
- \retval
- ****************/
- S_sensor_infra* INIT_infra(uint8_t index);
-
-/****************
- \brief
- \param
- \retval
- ****************/
-void current_init(void);
-
-/****************
- \brief
- \param
- \retval
- ****************/
-void current_update(void);
-
-/****************
- \brief
- \param
- \retval
- ****************/
-void adc_finish(uint16_t values[]);
-
+	rcc_periph_clock_enable(lcam->clk);
+//	gpio_mode_setup(lcam->txport, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, lcam->txpin);
+//  gpio_clear(lcam->txport, lcam->txpin);
+	gpio_mode_setup(lcam->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, lcam->rxpin);
+	return lcam;
+}
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
-
-
-#endif  // _SENSOR_INFRARED_H_
