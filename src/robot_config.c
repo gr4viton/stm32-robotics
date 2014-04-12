@@ -76,11 +76,10 @@ void ROBOT_initLcd(S_robot* r)
 {
     uint8_t ilcd = 1;
     uint8_t iPins = 0;
-    r->flcd = fopenLCD(ilcd, iPins, 16,
-                   LCD_C_8BIT_2L_5x7_LIGHT,
-                   LCD_C_ENTRY_RIGHT_CMOVE,
-                   LCD_C_CUR_VIS_STATIC,
-                   r->lcd_dbuf, ROB_LCD_DBUFSZ);
+    r->flcd = fopenLCD(ilcd, iPins, 16, 1, (two_lines|font_5x7|bus_4bit), //|bus_8bit),
+        (writes2right_cursorMovesOnScreen),
+        (display_on | cursor_on | cursor_notBlinking),
+         r->lcd_dbuf, ROB_LCD_DBUFSZ);
 
     r->lcd = &(lcds_predef[ilcd]);
 }

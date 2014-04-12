@@ -74,7 +74,7 @@ int main(void)
     */
 
     S_robot* r = &R; // global= extern S_robot R;
-    INIT_clk();
+      INIT_clk();
     ROBOT_initButtons(r);
     // Chose a program to run
     E_lifeStyleSelector life = ROBOT_getLifeStyle(&R);

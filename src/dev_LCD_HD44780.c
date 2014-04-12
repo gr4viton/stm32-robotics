@@ -119,8 +119,9 @@ uint16_t LCD_getMaskDataPins(S_dev_lcd *dev)
 }
     //____________________________________________________
     // cookie - file access to lcd
-FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t a_nCharsPerLine,\
-               uint8_t functionSet, uint8_t entryMode, uint8_t cursorMode,\
+FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t nCharsPerLine,
+               uint8_t writeInsideOnly, uint8_t functionSet,
+               uint8_t entryMode, uint8_t cursorMode,
                uint8_t *dbuf, size_t dbufsz)
 {
     S_dev_lcd *dev = &lcds_predef[index];
@@ -131,10 +132,12 @@ FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t a_nCharsPerLine,\
     dev->data_ring.signal = _txsignal;
 
     //____________________________________________________
-    // cursor position
+    // SW interface
     dev->actY = 0;
     dev->actX = 0;
-    dev->nCharsPerLine = a_nCharsPerLine;
+    dev->nCharsPerLine = nCharsPerLine;
+    dev->nLines = (functionSet & nBit_two_lines) != 0 ? 2: 1;
+    dev->i_writeInsideOnly = writeInsideOnly;
 
     //____________________________________________________
     // PORTS
@@ -169,19 +172,20 @@ FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t a_nCharsPerLine,\
 
     //____________________________________________________
     // INIT LCD
-    // initial sequence for buggy response
-    LCD_writeCmd(dev,LCD_C_INIT);
+    // initial sequence for buggy response - cheap china lcds ready flag bug fix
+    LCD_writeCmd(dev,init_functionSet);
     LCD_waitBusy(sendCmd);
-    LCD_writeCmd(dev,LCD_C_INIT);
+    LCD_writeCmd(dev,init_functionSet);
     LCD_waitBusy(sendData);
-    LCD_writeCmd(dev,LCD_C_INIT);
+    LCD_writeCmd(dev,init_functionSet);
 
     // set initial params
-    LCD_writeCmd(dev,functionSet);
+    LCD_writeCmd(dev,functionSet); // written in 8bit mode
+    //dev->i_functionSet = functionSet; // not able to change within LCD_setFunctionSet..
+
+    LCD_writeCmd(dev,functionSet); // written in 4bit mode (if selected)
     LCD_writeCmd(dev,entryMode);
     LCD_writeCmd(dev,cursorMode);
-
-    LCD_clear(dev);
 
     // init irqs
 	//usart_enable_rx_interrupt(dev->device);
@@ -248,20 +252,7 @@ static ssize_t _iowr(void *_cookie, const char *_buf, size_t _n)
     //int c = 0;
     uint8_t i = 0;
     do {
-        uint8_t ch = (uint8_t)_buf[i];
-        if( (ch == '\n') || (ch == '\r') )
-        {
-            LCD_nextLine(dev);
-        }
-        else
-        {
-            LCD_writeChar(dev,(uint8_t)_buf[i]);
-        }
-        //if lcd->writeInsideOnly
-            if(dev->actX > dev->nCharsPerLine)
-            {
-                LCD_nextLine(dev);
-            }
+        LCD_printChar(dev,(uint8_t)_buf[i]);
         _n--;
         written++;
     } while(_n>0);//_buf[i]!='\0');

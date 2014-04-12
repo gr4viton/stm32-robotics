@@ -84,8 +84,8 @@ Read/Write ASCII to the Display
 //constants (user-defined)
 
 // HD44780 physical parameters
-#define LCD_8DATA_BIT
-//#define LCD_4DATA_BIT
+//#define LCD_8DATA_BIT
+#define LCD_4DATA_BIT
 #define HD44780_P_XMAX      16
 #define HD44780_P_YMAX      2
 //____________________________________________________
@@ -95,6 +95,7 @@ Read/Write ASCII to the Display
 #define LCD_C_CLR0                  0x01
 #define LCD_C_POS0                  0x02
 
+#if __NOT_USED_ANYMORE
 #define LCD_C_ENTRY_LEFT_CMOVE      0x04
 #define LCD_C_ENTRY_RIGHT_CSTAY     0x05
 #define LCD_C_ENTRY_RIGHT_CMOVE     0x06
@@ -106,23 +107,29 @@ Read/Write ASCII to the Display
 #define LCD_C_CUR_VIS_STATIC        0x0E
 #define LCD_C_CUR_VIS_BLINK         0x0F
 
-#define LCD_C_CUR_ADDRESS_L1        0x80
-#define LCD_C_CUR_ADDRESS_L2        0xC0
-#define LCD_C_CHAR_GENERATOR_ADD    0x40
-
-#define LCD_C_INIT                  0x30
-
 #define LCD_C_8BIT_1L_5x7_LIGHT     0x30
 #define LCD_C_8BIT_1L_5x10_LIGHT    0x34
 #define LCD_C_8BIT_1L_5x7           0x38
 #define LCD_C_8BIT_1L_5x10          0x3C
 
 #define LCD_C_8BIT_2L_5x7_LIGHT     0x3A
-#define LCD_C_8BIT_2L_DARK         0x38
+#define LCD_C_8BIT_2L_DARK          0x38
+
+#define LCD_C_4BIT_2L_5x7_LIGHT     0x32
+
+
+
+#define LCD_C_CUR_ADDRESS_L1        0x80
+#define LCD_C_CUR_ADDRESS_L2        0xC0
+#define LCD_C_CHAR_GENERATOR_ADD    0x40
+
+// REWRITE TO ENUMS
+//#define LCD_C_INIT                  0x30
 
 #define LCD_C_DISP_BLANK        0x08
 #define LCD_C_SCROLL_LEFT       0x18
 #define LCD_C_SCROLL_RIGHT      0x1E
+#endif // __NOT_USED_ANYMORE
 
 //____________________________________________________
 // macro functions (do not use often!)
@@ -131,9 +138,10 @@ Read/Write ASCII to the Display
 //____________________________________________________
 // enumerations
 typedef enum _E_waitType{
-    sendCmd, // after enable clear when sending command
-    sendData, // after enable clear when sending data
+    sendCmd,   // after enable clear when sending command
+    sendData,  // after enable clear when sending data
     setEnable, // after enable set
+    setRS,     // after change of RS
     dispCheck  // in function LCD_displayWriteCheck
     }E_waitType;
 //____________________________________________________
@@ -152,81 +160,91 @@ typedef enum _E_waitType{
 // OTHER FUNCTION DECLARATIONS
 
 /****************
- \brief
+ \brief  Busy waiting for interval defined by type of operation
+  Times are set according to datasheet
  \param
  \retval
  ****************/
 void LCD_waitBusy(E_waitType wType);
-#if __NOT_USED_ANYMORE
-/****************
- \brief
- \param
- \retval
- ****************/
-void INIT_LCD(void);
-#endif // __NOT_USED_ANYMORE
     //____________________________________________________
     // conrol
 /****************
  \brief  Clears display and saved graphical characters, moves cursor to 0,0
  \param
- \retval
  ****************/
 void LCD_clear(S_dev_lcd *dev);
+/****************
+ \brief   Returns cursor to start position 0,0 and changes nothing else
+ \param
+ ****************/
+void LCD_home(S_dev_lcd *dev);
 
 /****************
- \brief
+ \brief  Set cursor to next line
  \param
- \retval
  ****************/
 void LCD_nextLine(S_dev_lcd *dev);
 
 /****************
  \brief  Writes blank spaces on [lineNum]-th line of LCD
  \param
- \retval
  ****************/
 void LCD_clearLine(S_dev_lcd *dev, uint8_t lineNum);
 
 /****************
- \brief
+ \brief Set cursor to position x,y of the display register
  \param
- \retval
  ****************/
 uint8_t LCD_gotoxy(S_dev_lcd *dev, uint8_t x, uint8_t y);
-#if __NOT_IMPLEMENTED_YET
-void LCD_printChar(char c);
-void LCD_printString(char *s);
-#endif // __NOT_IMPLEMENTED_YET
+
     //____________________________________________________
     // write
+
+#if __NOT_IMPLEMENTED_YET
+void LCD_printString(char *s);
+#endif // __NOT_IMPLEMENTED_YET
+
 /****************
- \brief
+ \brief   Prints char to the display - additional preprocessing
+ on newline character, tab, writeInsideOnly - handling
+ \param
+ ****************/
+void LCD_printChar(S_dev_lcd *dev, char ch);
+
+/****************
+ \brief  Write byte with data/control bit set = wType
  \param
  \retval
  ****************/
 void LCD_write(S_dev_lcd *dev, uint8_t data, E_waitType wType);
 
 /****************
- \brief
+ \brief  Write char with data bit set
  \param
  \retval
  ****************/
 void LCD_writeChar(S_dev_lcd *dev, uint8_t ch);
 
 /****************
- \brief
+ \brief  Write byte with control bit set
  \param
  \retval
  ****************/
 void LCD_writeCmd(S_dev_lcd *dev, uint8_t cmd_data);
 
 /****************
- \brief
+ \brief  Exposes port value and clocks with ENable control pin
  \param
  \retval
  ****************/
-void LCD_writePort(S_dev_lcd *dev, uint8_t data);
+void LCD_writePort(S_dev_lcd *dev, uint8_t data, E_waitType wType);
+
+/****************
+ \brief  Exposes individual pin values on lcd output port
+ \param
+ \retval
+ ****************/
+void LCD_exposePortValue(S_dev_lcd *dev, uint8_t data);
 
 /****************
  \brief
@@ -235,51 +253,14 @@ void LCD_writePort(S_dev_lcd *dev, uint8_t data);
  ****************/
 void LCD_writeByte(S_dev_lcd *dev, uint8_t data, E_waitType wType);
 
+/****************
+ \brief Refresh i_functionSet, i_entryMode & cursorMode from actual command
+ \param
+ ****************/
+void LCD_saveSettings(S_dev_lcd* dev, uint8_t data);
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
 
 #endif // LCD_HD44780_H_INCLUDED
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#if __NOT_USED_ANYMORE
-// not used anymore whilst using fopencmd and lcd_device_t
-#define PLCD_DATA GPIOE
-#define PLCD_CMD GPIOD
-
-#define RCC_LCD_DATA RCC_GPIOE
-#define RCC_LCD_CMD RCC_GPIOD
-
-// "R/S" Register Select ( 1 for Data Write, 0 for Command Write)
-#define LCD_RS GPIO11
-
-// "R/W" Read/Write (1 for Read, 0 for Write)
-#define LCD_RW GPIO13
-
-// "EN" Enable line (Pulsing high latches a command or data _|"|_ )
-#define LCD_EN GPIO15
-
-//#define LCD_4DATA_BIT
-#define LCD_8DATA_BIT
-
-// control pins
-#define LCD_CMD_ALL  (LCD_RW|LCD_RS|LCD_EN)
-
-//Data Pins (D0-D7) D0 is LSB, in 4-bit mode only D4-D7 are used
-#define LCD_D4 GPIO7
-#define LCD_D5 GPIO9
-#define LCD_D6 GPIO11
-#define LCD_D7 GPIO13
-#define LCD_DATA_ALL       (LCD_D4|LCD_D5|LCD_D6|LCD_D7)
-
-#ifdef LCD_8DATA_BIT
-    #define LCD_D0 GPIO8
-    #define LCD_D1 GPIO10
-    #define LCD_D2 GPIO12
-    #define LCD_D3 GPIO14
-    #undef LCD_DATA_ALL
-    #define LCD_DATA_ALL (LCD_D0|LCD_D1|LCD_D2|LCD_D3)|(LCD_D4|LCD_D5|LCD_D6|LCD_D7)
-#endif // LCD_8DATA_BIT
-
-#endif // __NOT_USED_ANYMORE

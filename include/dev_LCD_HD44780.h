@@ -63,15 +63,153 @@ TODO:
 // TYPE DEFINITIONS
 //____________________________________________________
 // enumerations
+#if __NOT_USED_ANYMORE
+/****************
+ @brief
+ ****************/
+typedef enum _E_lcdBaseAddresses
+{
+    bAdd_functionSet    = 0x20, // = 1<<5
+    b_functionSet       = 5,
+    ba_entryMode        = 0x04,
+    ba_cursorMode       = 0x08
+}E_lcdBaseAddresses;
+#endif // __NOT_USED_ANYMORE
+
+
+/****************
+ @brief LCD function set bit predefs
+ ****************/
+typedef enum _E_lcdFunctionSetBits
+{
+    zeroBits_functionSet = 0xC0, //=0b1100 0000
+    nBit_functionSet = 1<<5,     //=0b1110 0000
+    nBit_font_5x10   = 1<<2, //=0x04
+    nBit_two_lines   = 1<<3, //=0x08
+    nBit_bus_8bit    = 1<<4  //=0x10
+}E_lcdFunctionSetBits;
+
+/****************
+ @brief LCD function set parameters
+  Prepared to be bit-wise logical or-ed
+  (font_5x8 | two_lines | bus_4bit)
+  (two_lines|font_5x7|bus_4bit)
+  0x20|0x28|0x20
+  base address = 0x20
+ ****************/
+typedef enum _E_lcdFunctionSet
+{
+    // 5x8 is counted with a line of pixels for cursor line
+    font_5x8  = nBit_functionSet,                     //=0x20
+    font_5x7  = nBit_functionSet,                     //=0x20
+    font_5x10 = nBit_functionSet|nBit_font_5x10,      //=0x24
+    one_line  = nBit_functionSet,                     //=0x20
+    two_lines = nBit_functionSet|nBit_two_lines,      //=0x28
+    bus_4bit  = nBit_functionSet,                     //=0x20
+    bus_8bit  = nBit_functionSet|nBit_bus_8bit,       //=0x30
+    init_functionSet = bus_8bit                       //=0x30
+}E_lcdFunctionSet;
+
+/****************
+ @brief LCD entry mode set bit predefs
+ ****************/
+typedef enum _E_lcdEntryModeBits
+{
+    zeroBits_entryMode      = 0xF8, //=0b1111 1000
+    nBit_entryMode          = 1<<2, //=0b0000 0100
+    nBit_displayShifts      = 1<<0, //=0x01
+    nBit_incrementingCursor = 1<<1  //=0x02
+}E_lcdEntryModeBits;
+
+/****************
+ @brief LCD entry mode selection
+ base address = 0x04
+ ****************/
+ typedef enum _E_lcdEntryMode
+ {
+    decrCursor_NoShiftDisp    = nBit_entryMode,                         //=0x04
+    decrCursor_ShiftDisp      = nBit_entryMode|nBit_displayShifts,      //=0x05
+    incrCursor_NoShiftDisp    = nBit_entryMode|nBit_incrementingCursor, //=0x06
+    incrCursor_ShiftDisp      = nBit_entryMode|nBit_incrementingCursor|nBit_displayShifts, //=0x07
+
+    writes2left_cursorMovesOnScreen     = nBit_entryMode,                         //=0x04
+    writes2left_displayMovesWithCursor  = nBit_entryMode|nBit_displayShifts,      //=0x05
+    writes2right_cursorMovesOnScreen    = nBit_entryMode|nBit_incrementingCursor, //=0x06
+    writes2right_displayMovesWithCursor = nBit_entryMode|nBit_incrementingCursor|nBit_displayShifts //=0x07
+
+ }E_lcdEntryMode;
+
+ /****************
+  @brief LCD cursor mode set bit predefs
+  ****************/
+ typedef enum _E_lcdCursorModeBits
+ {
+    zeroBits_cursorMode      = 0xF0, //=0b1111 0000
+    nBit_cursorMode          = 1<<3, //=0b0000 1000
+    nBit_display_on          = 1<<2, //=0x02
+    nBit_cursor_on           = 1<<1, //=0x01
+    nBit_cursor_blinking     = 1<<0 //=0x00
+ }E_lcdCursorModeBits;
+
+ /****************
+  @brief LCD cursor mode selection
+  Prepared to be bit-wise logical or-ed
+  (display_on | cursor_on | cursor_notBlinking)
+  base address = 0x08
+  ****************/
+ typedef enum _E_lcdCursorMode
+ {
+    display_on         = nBit_cursorMode|nBit_display_on,      //=0x0C
+    display_off        = nBit_cursorMode,                      //=0x08
+    cursor_on          = nBit_cursorMode|nBit_cursor_on,       //=0x0A
+    cursor_off         = nBit_cursorMode,                      //=0x08
+    cursor_blinking    = nBit_cursorMode|nBit_cursor_blinking, //=0x09
+    cursor_notBlinking = nBit_cursorMode                       //=0x08
+ }E_lcdCursorMode;
+
+/****************
+ @brief LCD function basic function addresses
+ ****************/
+typedef enum _E_lcdBasicFunctionAddresses
+{
+
+#define LCD_C_CUR_ADDRESS_L1        0x80
+#define LCD_C_CUR_ADDRESS_L2        0xC0
+#define LCD_C_CHAR_GENERATOR_ADD    0x40
+
+// REWRITE TO ENUMS
+//#define LCD_C_INIT                  0x30
+
+#define LCD_C_DISP_BLANK        0x08
+#define LCD_C_SCROLL_LEFT       0x18
+#define LCD_C_SCROLL_RIGHT      0x1E
+    lcd_add_line1   = 1<<7, //=0x80,
+    lcd_add_line2   = 0xC0, //=1<<7|1<<6
+    lcd_add_chargen = 1<<6, //=0x40 //=64
+
+    lcd_cmd_clearAllReturn = 1<<0,
+    lcd_cmd_cursorHome = 1<<1,
+    lcd_cmd_displayBlank = display_off,
+
+    nBit_shiftin = 1<<4,
+    nBit_shiftDisplay = 1<<3,
+    nBit_shiftRight = 1<<2,
+
+    lcd_cmd_shiftDisplayRight = nBit_shiftin|nBit_shiftDisplay|nBit_shiftRight,
+    lcd_cmd_shiftDisplayLeft = nBit_shiftin|nBit_shiftDisplay,
+    lcd_cmd_moveCursorRight = nBit_shiftin|nBit_shiftRight,
+    lcd_cmd_moveCursorLeft = nBit_shiftin
+
+}E_lcdBasicFunctionAddresses;
+
 //____________________________________________________
 // structs
-
+/****************
+ @brief
+ ****************/
 typedef struct _S_lcdDevice{
-    //uint32_t device;
     uint32_t cmd_port;
     uint32_t data_port;
-    //uint8_t irq;
-    //uint8_t af;
     uint32_t cmdp_clk;
     uint32_t datap_clk;
 
@@ -83,48 +221,33 @@ typedef struct _S_lcdDevice{
     uint16_t cmdEN;
     uint16_t cmd_pins_all;
 
-    //lcd_device_cmd_port_t cmd;
-    //uint32_t txport;
-    //uint32_t rxport;
-    //uint16_t txpin;
-    //uint16_t rxpin;
 
+    struct ringbuf data_ring;
+    //struct ringbuf rx_ring;
+    //____________________________________________________
+    // interface = prefix i_
     // write only inside the visible frame
-    //uint8_t writeInsideOnly;
+    uint8_t i_writeInsideOnly;
 
-    uint8_t nCharsPerLine;
-    uint8_t nLines;
+    volatile uint8_t i_functionSet;
+    volatile uint8_t i_cursorMode;
+    volatile uint8_t i_entryMode;
 
     uint8_t actX;
     uint8_t actY;
 
-    struct ringbuf data_ring;
-    //struct ringbuf rx_ring;
+    //____________________________________________________
+    // HW&SW
+    uint8_t nCharsPerLine;
+    uint8_t nLines;
+    uint16_t dportVal;
+
+    //uint8_t irq;
+    //uint8_t af;
 
     uint32_t stats_rxoverruns;
     uint32_t stats_rxerrors;
 } S_dev_lcd;
-
-#if __NOT_USED_ANYMORE
-// define used data_port pins
-typedef struct {
-    uint16_t D0;
-    uint16_t D1;
-    uint16_t D2;
-    uint16_t D3;
-    uint16_t D4;
-    uint16_t D5;
-    uint16_t D6;
-    uint16_t D7;
-} lcd_device_data_port_t;
-// define used cmd_port pins
-typedef struct {
-    uint16_t RS;
-    uint16_t RW;
-    uint16_t EN;
-} lcd_device_cmd_port_t;
-#endif // __NOT_USED_ANYMORE
-
 //____________________________________________________
 // unions
 
@@ -166,8 +289,9 @@ void LCD_displayWriteCheck(S_dev_lcd *dev);
  \param
  \retval
  ****************/
-FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t a_nCharsPerLine,
-               uint8_t functionSet, uint8_t entryMode, uint8_t cursorMode,
+FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t nCharsPerLine,
+               uint8_t writeInsideOnly, uint8_t functionSet,
+               uint8_t entryMode, uint8_t cursorMode,
                uint8_t *dbuf, size_t dbufsz);
 
 /****************
