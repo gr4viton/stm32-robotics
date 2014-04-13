@@ -48,22 +48,28 @@ int main_sumo(S_robot* r)
     _tocPrint(r->flcd);
     // waitin for button
     while(r->STARTED==0) __asm__("nop");
-
+/*
     while(1)
     {
         _tic();
         uint8_t a=0;
         for(a=0; a<5; a++) SUMO_waitSec(970, a);
         _tocPrint(r->flcd);
-    }
+        mswait(300);
+    }*/
+
     uint32_t here = _tic();
     // 5sec waitin
     SUMO_wait5secAndSample(r);
     _tocPrintFrom(r->flcd, here );
+    mswait(500);
 
 	while (1) {
-        gpio_toggle(PLED,LED1);
-        mswait(1000);
+        //gpio_toggle(PLED,LED1);
+        LCD_clear(r->lcd);
+        fprintf(r->flcd, "%d|%.1f\n", r->infs.iFR->free, r->infs.iFR->val );
+        fprintf(r->flcd, "%.1f|%.1f", r->infs.iFR->triggerVal, r->infs.iFR->nStds * r->infs.iFR->stdev);
+        mswait(300);
 	}
 
 	return 0;
@@ -82,8 +88,10 @@ void SUMO_wait5secAndSample(S_robot* r)
     so we only need to grab the final value
     - in SUMO, the interrupt should be triggered on white line around the arena
     */
+    double trigger_add = 666; // value offset from measured free space voltage
+    // = used in case that standard deviation is too small (<100)
     for(a=0; a<r->infs.nInfs; a++)
-        INFRA_setTresholdLastValue(r->infs.i[a], interruptOn_white);
+        INFRA_setTresholdLastValue(r->infs.i[a], trigger_add);
 
     SUMO_waitSec(one_sec, 3);
     SUMO_waitSec(one_sec, 4);

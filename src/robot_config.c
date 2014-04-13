@@ -115,16 +115,32 @@ void ROBOT_initInfraArrayAndChannels(S_robot* r, const uint8_t nInfras)
     S_robot_infras* in = &(r->infs);
     in->nInfs = nInfras;
 
-    // allocate space - dendent on number of infras
-    //*(in->i) = (S_sensor_infra*) malloc(in->nInfs);
     for(a=0; a < in->nInfs; a++)
         in->i[a] = INIT_infraPredef(a);
 
     // Select the channels we want to convert.
-    // for injected sampling, 4 channels max, for regular, 16 max
+    // for injected sampling [max 4 channels], for regular [max 16 ch]
+    E_infraBrightVoltage bv;
+    E_infraInterruptBrightness ib;
+    switch(r->life)
+    {
+        case(IAM_SUMO_WARRIOR):
+            bv = white_highVoltage;
+            ib = interruptOn_white;
+            break;
+        case(IAM_BUGGED_ROBOT):
+        case(IAM_SHEEP_FOLLOWING_THE_LINE):
+        default:
+            bv = white_highVoltage;
+            ib = interruptOn_black;
+    }
+
     for(a=0;a<nInfras;a++)
     {
         in->channelArray[a] = in->i[a]->channel;
+        in->i[a]->brightVolt = bv;
+        in->i[a]->treshInterruptBright = ib;
+        INFRA_refreshTriggerType(in->i[a]);
     }
 }
 

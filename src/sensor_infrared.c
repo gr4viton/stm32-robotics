@@ -191,25 +191,24 @@ void INFRA_setupInjectedADC1wTIM2(uint8_t* channel_array, uint8_t nChannels)
 
 }
 
-void INFRA_setTresholdLastValue(S_sensor_infra* inf, E_infraInterruptBrightness interruptOn)
+void INFRA_refreshTriggerType(S_sensor_infra* inf)
 {
-    //____________________________________________________
-    // find out if the interrupt is generated on higher voltage from treshold or vice versa
-    // this is done, because of the setting of adc watchdog (not sure yet..)
-    inf->treshInterruptOn = interruptOn;
     // white generates higher voltages from CNY70, if it is not connected inversed
     switch(inf->brightVolt)
     {
         case(white_highVoltage): // == black_lowVoltage
-            if(interruptOn == interruptOn_white) inf->treshVoltage = treshVoltage_high;
-            if(interruptOn == interruptOn_black) inf->treshVoltage = treshVoltage_low;
+            if(inf->treshInterruptBright == interruptOn_white) inf->treshVoltage = treshVoltage_high;
+            if(inf->treshInterruptBright == interruptOn_black) inf->treshVoltage = treshVoltage_low;
             break;
         case(white_lowVoltage): // == black_highVoltage
-            if(interruptOn == interruptOn_white) inf->treshVoltage = treshVoltage_low;
-            if(interruptOn == interruptOn_black) inf->treshVoltage = treshVoltage_high;
+            if(inf->treshInterruptBright == interruptOn_white) inf->treshVoltage = treshVoltage_low;
+            if(inf->treshInterruptBright == interruptOn_black) inf->treshVoltage = treshVoltage_high;
             break;
         default: return;
     }
+}
+void INFRA_setTresholdLastValue(S_sensor_infra* inf, double trigger_add)
+{
     //____________________________________________________
     // set treshold value from the last value
     // future-> maybe to have it as a mean value of samples
@@ -219,14 +218,28 @@ void INFRA_setTresholdLastValue(S_sensor_infra* inf, E_infraInterruptBrightness 
     // -> to be sure the trigger is different enaugh
     inf->stdev = 0; // standard deviation
     inf->nStds = 5; // number of standard deviations added
+
     uint8_t a=0;
     for(a=0; a<INFRA_SAMPLES; a++)
     {
         inf->stdev += (inf->valuesADC[a] - inf->val) * (inf->valuesADC[a] - inf->val);
     }
     inf->stdev = sqrt(inf->stdev / (INFRA_SAMPLES-1) );
-    if(inf->treshVoltage == treshVoltage_high) inf->triggerVal = inf->val + inf->nStds * inf->stdev;
-    if(inf->treshVoltage == treshVoltage_low) inf->triggerVal = inf->val - inf->nStds * inf->stdev;
+
+    // starting on free space
+    double sign = 1;
+    if(inf->treshVoltage == treshVoltage_high)
+    { // we are on free space and we know that this value
+        // is triggger which is higher than on not-free space
+        // so we must substract some of the freeVoltage
+        // to get the triggerinVoltage
+        sign = -1;
+    }
+
+    if(inf->nStds * inf->stdev < 100) trigger_add = 666;
+    else trigger_add = inf->nStds * inf->stdev;
+
+    inf->triggerVal = inf->val + sign * trigger_add;
 }
 
     //____________________________________________________
@@ -299,14 +312,31 @@ void adc_isr(void)
         // the order of channels in adc channelArray is the same as in array inf->i[]
         for(a=0; a<R.infs.nInfs; a++)
         {
-            //gpio_toggle(PLED,LEDRED2);
             sample = adc_read_injected(ADC1, a+1); // indexed from 1
             INFRA_addSampleCountMean(R.infs.i[a], sample);
+            INFRA_refreshFree(R.infs.i[a]);
         }
         ADC_SR(ADC1) = ~ADC_SR_JEOC; // clean the flag
     }
 }
 
+void INFRA_refreshFree(S_sensor_infra* inf)
+{
+    inf->free = true;
+    switch(inf->treshVoltage)
+    {
+        default:
+        case(treshVoltage_low):
+            if(inf->triggerVal <= inf->val)
+                inf->free = false;
+            break;
+        case(treshVoltage_high):
+            if(inf->triggerVal >= inf->val)
+                inf->free = false;
+            break;
+    }
+
+}
 #if __NOT_USED_ANYMORE
 void adc_finish(uint16_t values[])
 {

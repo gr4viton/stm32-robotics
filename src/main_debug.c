@@ -102,6 +102,18 @@ void DBG_tryADC(S_robot* r)
     //fprintf(r->flcd,"ADC=%u", r->infs.iFL->val);
 }
 
+void DBG_ticTocSumoWait(S_robot* r)
+{
+    while(1)
+    {
+        _tic();
+        uint8_t a=0;
+        for(a=0; a<5; a++) SUMO_waitSec(970, a);
+        _tocPrint(r->flcd);
+        mswait(300);
+    }
+}
+
 void DBG_adc_finish(void)
 {
     //R.infs.iFL->val=values[0];

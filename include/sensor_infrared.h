@@ -91,6 +91,7 @@ typedef enum _E_infraVoltageTresholdType
 
 //____________________________________________________
 // structs
+#if __NOT_USED_ANYMORE
 /****************
  @brief
  ****************/
@@ -102,7 +103,7 @@ typedef struct _S_sensor_blackNwhite
     // rewrite to use the values bit-wise (with mapping)
     volatile bool values[BLACKWHITE_SAMPLES];
 }S_sensor_blackNwhite;
-
+#endif // __NOT_USED_ANYMORE
 
 /****************
  @brief Structure encapsulating ultrasonic sensor
@@ -113,13 +114,15 @@ typedef struct _S_sensor_infra
     uint32_t port;
     uint16_t pin;
 
-    E_infraBrightVoltage brightVolt;          // depends on connection of infra sensor
-    E_infraInterruptBrightness treshInterruptOn; // depends on lifeStyle (SUMO->interrupt on white)
+// rename all treshold and trigger to Bound!
+    E_infraBrightVoltage brightVolt;             // depends on connection of infra sensor
+    E_infraInterruptBrightness treshInterruptBright; // depends on lifeStyle (SUMO->interrupt on white)
     E_infraVoltageTresholdType treshVoltage;     // this is conjuction of the 2 above -> watchdog settings
 
-    uint16_t triggerVal; // value of the adc watchdog trigger interupt
+    //S_sensor_blackOwhite bnw;
+    double triggerVal; // value of the adc watchdog trigger interupt
+    volatile bool free; // true if the sensor is over a free space (SUMO-black,LINE-white)
 
-    S_sensor_blackNwhite bnw;
 #if __NOT_IMPLEMENTED_YET
     uint8_t adc_setting;
 #endif // __NOT_IMPLEMENTED_YET
@@ -193,14 +196,21 @@ void INFRA_countMean(S_sensor_infra* inf);
 void INFRA_addSampleCountMean(S_sensor_infra* inf, uint16_t sample);
 
 /****************
- \brief Sets interrupt trigger treshold value and orientation
- find out if the interrupt is generated on higher voltage from treshold or vice versa
- and set the treshold value to the last value masured
+ \brief Sets the treshold value to the last value masured + or - X*std deviation
  this is done, because of the setting of adc watchdog (not sure yet..)
  \param
  \retval
  ****************/
-void INFRA_setTresholdLastValue(S_sensor_infra* inf, E_infraInterruptBrightness interruptOn);
+void INFRA_setTresholdLastValue(S_sensor_infra* inf, double trigger_add);
+
+/****************
+ \brief   Refreshes on which voltage value (Hi/Lo) the trigger would be set
+ Sets interrupt trigger treshold value and orientation
+ find out if the interrupt is generated on higher voltage from treshold or vice versa
+ \param
+ \retval
+ ****************/
+void INFRA_refreshTriggerType(S_sensor_infra* inf);
 
 /****************
  \brief
@@ -208,6 +218,13 @@ void INFRA_setTresholdLastValue(S_sensor_infra* inf, E_infraInterruptBrightness 
  \retval
  ****************/
 void adc_finish(uint16_t values[]);
+
+/****************
+ \brief   Refreshes the value of free - true if the sensor is over free space
+ \param
+ \retval
+ ****************/
+void INFRA_refreshFree(S_sensor_infra* inf);
 
 #if __NOT_USED_ANYMORE
 void current_init(void);
