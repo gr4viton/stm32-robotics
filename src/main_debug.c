@@ -48,18 +48,35 @@ int main_debug(S_robot* r)
     //ROBOT_initLcd(r);
     ROBOT_initAll(r);
     //S_robot_buttons * b = &(r->btns);
+
+	int j = 0;
+
 	while (1)
     {
-        DBG_testButtonState(r,100,10);
-        DBG_testUltraDistance(r,100);
+//        DBG_testButtonState(r,100,10);
+//        DBG_testUltraDistance(r,100);
+        //TRY_buzzer();
+        //LCD_displayWriteCheck(r->lcd);
+        //dev_LCD_checkSeek(flcd);
+
+
+
+		uint16_t input_adc0 = INFRA_readNaiive(10);
+
+		uint16_t input_adc1 = INFRA_readNaiive(11);
+
+		LCD_clear(r->lcd);
+		fprintf(r->flcd,"0=%u|1=%d", input_adc0, input_adc1);
+
+
 
         gpio_toggle(PLED,LED0);
+        mswait(500);
 
-        //TRY_buzzer();
-/*
-        LCD_displayWriteCheck(r->lcd);
-        dev_LCD_checkSeek(flcd);
-        */
+        //fprintf(r->fus,"ADC=%u\n\r", r->infs.iFL->val);
+        //LCD_clear(r->lcd);
+        //fprintf(r->flcd,"ADC=%u", r->infs.iFL->val);
+
 	}
 
 	return 0;
@@ -67,7 +84,7 @@ int main_debug(S_robot* r)
 
 void DBG_adc_finish(uint16_t values[])
 {
-    UNUSED(values);
+    R.infs.iFL->val=values[0];
 }
 
 void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
@@ -136,7 +153,7 @@ void DBG_debug_try(void)
 {
 
     uint8_t i_ultra = 0;
-    INIT_ultra(i_ultra ,0);
+    INIT_ultraPredef(i_ultra ,0);
     uint8_t ilcd = 0;
 
     S_dev_lcd* lcd_dev = &(lcds_predef[ilcd]);

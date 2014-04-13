@@ -77,7 +77,7 @@ typedef struct _S_sensor_lincam
  \param
  \retval
  ****************/
-S_sensor_lincam* INIT_lincam(uint8_t index);
+S_sensor_lincam* INIT_lincamPredef(uint8_t index);
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES

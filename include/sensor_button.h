@@ -86,10 +86,6 @@ extern S_sensor_button buttons_predef[3];
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DECLARATIONS
-/****************
- \brief   Initializes all buttons of the project
- ****************/
-void INIT_buttons(void);
 
 /****************
  \brief   Initializes interrupt (exti & nvic) of a button
@@ -102,7 +98,7 @@ void INIT_buttonInterrupt(S_sensor_button* b);
  \brief   Activates clock and pin in port defined in buttons_predef
  \param   btn Structure of the button
  ****************/
-S_sensor_button* INIT_button(uint8_t index);
+S_sensor_button* INIT_buttonPredef(uint8_t index);
 
 /****************
  \brief   Refreshes the state of the button

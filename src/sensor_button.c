@@ -48,7 +48,7 @@ S_sensor_button buttons_predef[3] =
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 
 
-S_sensor_button* INIT_button(uint8_t index)
+S_sensor_button* INIT_buttonPredef(uint8_t index)
 {
     S_sensor_button* btn = &(buttons_predef[index]);
 
@@ -62,7 +62,6 @@ void INIT_buttonInterrupt(S_sensor_button* b)
 {
     // Initialize IRQ for button b
 	nvic_enable_irq(b->nvic); // Enable b->exti interrupt.
-
 
 	// Configure the EXTI subsystem.
 	exti_select_source(b->exti, b->port);

@@ -11,7 +11,10 @@
 \license    LGPL License Terms \ref lgpl_license
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
-
+/*
+  For precaution of cyclical dependency error, there are forward structure
+  typedef declarations
+*/
 
 #ifndef _ROBOT_CONFIG_H_
 #define _ROBOT_CONFIG_H_
@@ -29,6 +32,7 @@
 #include <libopencm3/stm32/exti.h>
 
 #include "defines.h"
+struct S_robot;
 #include "waitin.h"
 
 // devices = I/O
@@ -98,6 +102,7 @@ typedef struct _S_robot_ultras
 /****************
  @brief Structure defining all buzzers of the robot
  ****************/
+typedef struct _S_dev_buzzer S_dev_buzzer; // forward declaration
 typedef struct _S_robot_buzzers
 {
     S_dev_buzzer* bz1;
@@ -106,6 +111,7 @@ typedef struct _S_robot_buzzers
 /****************
  @brief Structure defining all dcmotors of the robot
  ****************/
+typedef struct _S_actuator_dcmotor S_actuator_dcmotor; // forward declaration
 typedef struct _S_robot_dcmotors
 {
     S_actuator_dcmotor* mFL; // motor front left
@@ -114,7 +120,7 @@ typedef struct _S_robot_dcmotors
     S_actuator_dcmotor* mBR; // motor back right
 } S_robot_dcmotors;
 
-
+typedef struct _S_sensor_infra S_sensor_infra;
 typedef struct _S_robot_infras
 {
     S_sensor_infra* iFL; // infra front left

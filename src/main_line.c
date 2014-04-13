@@ -73,7 +73,7 @@ int main_line(void)
 
     //ultra_sensor_t* ultra1 = 0;
     INIT_leds();
-    INIT_ultra(i_ultra ,0);
+    INIT_ultraPredef(i_ultra ,0);
 
 
     S_dev_lcd* lcd_dev = &(lcds_predef[ilcd]);

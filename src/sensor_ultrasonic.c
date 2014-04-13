@@ -47,7 +47,7 @@ S_sensor_ultra ultras_predef[3] = {
 // STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
-S_sensor_ultra* INIT_ultra(uint8_t index, double prop)
+S_sensor_ultra* INIT_ultraPredef(uint8_t index, double prop)
 {
     S_sensor_ultra* ult = &ultras_predef[index];
 

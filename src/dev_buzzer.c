@@ -66,7 +66,7 @@ uint16_t SONG_r2d2[100][2] =
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 
-S_dev_buzzer* INIT_buzzer(uint8_t index)
+S_dev_buzzer* INIT_buzzerPredef(uint8_t index)
 {
     S_dev_buzzer* buz = &buzzer_predef[index];
 

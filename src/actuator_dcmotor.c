@@ -46,7 +46,7 @@ S_actuator_dcmotor dcmotor_predef[4] = {};
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
     //____________________________________________________
     // ..
-S_actuator_dcmotor* INIT_dcmotor(uint8_t index)
+S_actuator_dcmotor* INIT_dcmotorPredef(uint8_t index)
 {
     S_actuator_dcmotor* dc = &(dcmotor_predef[index]);
 

@@ -52,10 +52,10 @@ S_robot R;
 
 void ROBOT_initUltras(S_robot* r)
 {
-    r->ults.uFL = INIT_ultra(0,1.1);
-    r->ults.uFR = INIT_ultra(1,1.1);
-    r->ults.uL = INIT_ultra(2,1.1);
-    r->ults.uR = INIT_ultra(3,1.1);
+    r->ults.uFL = INIT_ultraPredef(0,1.1);
+    r->ults.uFR = INIT_ultraPredef(1,1.1);
+    r->ults.uL = INIT_ultraPredef(2,1.1);
+    r->ults.uR = INIT_ultraPredef(3,1.1);
 }
 
 void ROBOT_initButtons(S_robot* r)
@@ -64,9 +64,9 @@ void ROBOT_initButtons(S_robot* r)
 
     b->btnStartEnabled = 0;
     // Initialize gpio for buttons
-    b->bStart = INIT_button(0);
-    b->bSumo = INIT_button(1);
-    b->bLine = INIT_button(2);
+    b->bStart = INIT_buttonPredef(0);
+    b->bSumo = INIT_buttonPredef(1);
+    b->bLine = INIT_buttonPredef(2);
 
     // Initialize IRQ for button bStart
     INIT_buttonInterrupt(b->bStart);
@@ -92,41 +92,51 @@ void ROBOT_initUsart(S_robot* r)
 
 void ROBOT_initBuzzers(S_robot* r)
 {
-    r->buzs.bz1 = INIT_buzzer(0);
+    r->buzs.bz1 = INIT_buzzerPredef(0);
 }
 
 void ROBOT_initDcmotors(S_robot* r)
 {
-    r->dcs.mFL = INIT_dcmotor(0);
-    r->dcs.mFR = INIT_dcmotor(1);
-    r->dcs.mBL = INIT_dcmotor(2);
-    r->dcs.mBR = INIT_dcmotor(3);
+    r->dcs.mFL = INIT_dcmotorPredef(0);
+    r->dcs.mFR = INIT_dcmotorPredef(1);
+    r->dcs.mBL = INIT_dcmotorPredef(2);
+    r->dcs.mBR = INIT_dcmotorPredef(3);
 }
 
 void ROBOT_initLinCam(S_robot* r)
 {
     if(r->life == IAM_SHEEP_FOLLOWING_THE_LINE)
-        r->cam = INIT_lincam(0);
+        r->cam = INIT_lincamPredef(0);
 }
 
 void ROBOT_initInfras(S_robot* r)
 {
-    if(r->life == IAM_SUMO_WARRIOR)
+    //uint8_t a=0;
+    switch(r->life)
     {
-        // init 4 corner infra sensors
-        r->infs.iFL = INIT_infra(0);
-        r->infs.iFR = INIT_infra(1);
-        r->infs.iBL = INIT_infra(2);
-        r->infs.iBR = INIT_infra(3);
-    }
-    else if(r->life == IAM_SHEEP_FOLLOWING_THE_LINE)
-    {
-        #if __NOT_IMPLEMENTED_YET
-        // init "100" infra sensors strip
-        uint8_t a=0;
-        for(;a<20;a++)
-            r->infs.i[a] = INIT_infra(a);
-        #endif // __NOT_IMPLEMENTED_YET
+        case(IAM_BUGGED_ROBOT):
+            // init 4 corner infra sensors
+            r->infs.iFL = INIT_infraPredef(0);/*
+            r->infs.iFR = INIT_infraPredef(1);
+            r->infs.iBL = INIT_infraPredef(2);
+            r->infs.iBR = INIT_infraPredef(3);
+            */
+            break;
+        case(IAM_SUMO_WARRIOR):
+            // init 4 corner infra sensors
+            r->infs.iFL = INIT_infraPredef(0);/*
+            r->infs.iFR = INIT_infraPredef(1);
+            r->infs.iBL = INIT_infraPredef(2);
+            r->infs.iBR = INIT_infraPredef(3);
+            */
+            break;
+        case(IAM_SHEEP_FOLLOWING_THE_LINE):
+            // init "100" infra sensors strip
+            //for(;a<20;a++)
+              //  r->infs.i[a] = INIT_infraPredef(a);
+            break;
+        default:
+            break;
     }
 }
 
@@ -142,9 +152,9 @@ void ROBOT_initAll(S_robot* r)
     ROBOT_initButtons(r);
     ROBOT_initUltras(r);
     ROBOT_initInfras(r);
-    ROBOT_initLinCam(r);
+    //ROBOT_initLinCam(r);
 
-    ROBOT_initDcmotors(r);
+    //ROBOT_initDcmotors(r);
 }
 
     //____________________________________________________

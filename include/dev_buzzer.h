@@ -77,7 +77,7 @@ extern S_dev_buzzer buzzer_predef[3];
  \param[in]
  \retval    initialized buzzer
  ****************/
-S_dev_buzzer* INIT_buzzer(uint8_t index);
+S_dev_buzzer* INIT_buzzerPredef(uint8_t index);
 
 /****************
  \brief   Plays R2D2 song with busy - active waiting

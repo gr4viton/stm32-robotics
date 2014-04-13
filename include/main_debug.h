@@ -82,7 +82,7 @@
 // STATIC FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DECLARATIONS
-
+typedef struct _S_robot S_robot; // forward declaration
 int main_debug(S_robot* r);
 /****************
  @brief

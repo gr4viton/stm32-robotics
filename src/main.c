@@ -19,19 +19,19 @@
 /*
 TODO:
 [x] udelat jmennou konvenci a coding style
+[x] vytvorit mu projekt na gitu
+[x] ultras serials_predef
+[x] pridat output do repraku
 [] rozchodit interrupt
-- od tlacitka
+x] od tlacitka
 - od timeru
 - od adc
-[] rename main_line na robot_line a to same sumo
-[] ultras serials_predef
 [] rozchodit pwm
-[] vytvorit mu projekt na gitu
-[] dat ho jako subprojekt
-[] pridat output do repraku
 [] lcd
 - dodelat seek
 - vynechat mswait a dat to na pocet asmwait podle clocku procesoru!
+
+[] sensor_battery - ADC-VBAT channel
 */
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,7 +79,6 @@ int main(void)
     S_robot* r = &R; // global= extern S_robot R;
     INIT_clk();
     ROBOT_initButtons(r);
-
     // Chose a program to run
     E_lifeStyleSelector life = ROBOT_getLifeStyle(&R);
     switch(life)

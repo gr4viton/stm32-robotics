@@ -23,9 +23,14 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/adc.h>
+#include  <libopencm3/stm32/exti.h>
+
+
 //_________> project includes
 #include "defines.h"
 #include "waitin.h"
+//#include "robot_config.h"
+#include "main_debug.h"
 //_________> local includes
 //_________> forward includes
 
@@ -51,6 +56,8 @@ typedef struct _S_sensor_infra
     uint32_t clk;
     uint32_t port;
     uint16_t pin;
+
+    volatile uint16_t val;
 #if __NOT_IMPLEMENTED_YET
     uint8_t adc_setting;
 #endif // __NOT_IMPLEMENTED_YET
@@ -77,7 +84,7 @@ extern uint32_t current[4];
  \param[in]
  \retval
  ****************/
- S_sensor_infra* INIT_infra(uint8_t index);
+ S_sensor_infra* INIT_infraPredef(uint8_t index);
 
 /****************
  \brief
@@ -99,6 +106,13 @@ void current_update(void);
  \retval
  ****************/
 void adc_finish(uint16_t values[]);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+uint16_t INFRA_readNaiive(uint8_t channel);
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

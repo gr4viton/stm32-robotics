@@ -51,7 +51,7 @@ S_sensor_lincam lincams_predef[1] = {
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
     //____________________________________________________
 
-S_sensor_lincam* INIT_lincam(uint8_t index)
+S_sensor_lincam* INIT_lincamPredef(uint8_t index)
 {
     S_sensor_lincam* lcam = &lincams_predef[index];
 

@@ -70,7 +70,7 @@ extern S_actuator_dcmotor dcmotor_predef[4];
 // OTHER FUNCTION DECLARATIONS
     //____________________________________________________
     // ..
-S_actuator_dcmotor* INIT_dcmotor(uint8_t index);
+S_actuator_dcmotor* INIT_dcmotorPredef(uint8_t index);
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES

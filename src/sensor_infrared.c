@@ -11,6 +11,22 @@
 \license    LGPL License Terms \ref lgpl_license
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
+/*
+ As in "arm - Refernce manual - DM00031020.pdf" STM32F4 has 12-bit ADC,
+ capable of measuring signals from up to:
+   - 16 external sources
+   - 2 internal sources
+   - VBAT channel
+ A/D conversion can be performed in:
+   - single / continuous / scan / discontinuous modes
+ Stored in 16-bit data register.
+ The analog watchdog feature allows the application to detect if the input
+ voltage goes beyond the user-defined, higher or lower thresholds.
+
+ inspiration:
+ * https://github.com/libopencm3/libopencm3-examples/blob/master/examples/stm32/f4/stm32f4-discovery/adc-dac-printf/adc-dac-printf.c
+ * https://github.com/uamt-brno/inductor-tool/tree/master/fw/f4discovery
+*/
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,10 +57,10 @@ static uint16_t _adc_counter[3] = { 0,0,0 };
  \brief Predefined infra sensors ports & clocks [tx=out;rx=in]
  ****************/
 S_sensor_infra infras_predef[4] = {
-    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO6 },
-    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO7 },
-    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO8 },
-    {.clk=RCC_GPIOB, .port=GPIOB, .pin=GPIO9 }
+    {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO0 },
+    {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO1 },
+    {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO2 },
+    {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO3 }
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
@@ -59,17 +75,53 @@ S_sensor_infra infras_predef[4] = {
     //____________________________________________________
     // ..
 
-S_sensor_infra* INIT_infra(uint8_t index)
+S_sensor_infra* INIT_infraPredef(uint8_t index)
 {
     S_sensor_infra* inf = &infras_predef[index];
+	#if __NOT_IMPLEMENTED_YET
 
 	rcc_periph_clock_enable(inf->clk);
-	#if __NOT_IMPLEMENTED_YET
 	// ADC SETTINGS
 	gpio_mode_setup(inf->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, inf->rxpin);
 	gpio_clear(inf->txport, inf->txpin);
 	#endif // __NOT_IMPLEMENTED_YET
+
+
+	rcc_periph_clock_enable(RCC_ADC1);
+
+	rcc_periph_clock_enable(RCC_GPIOC);
+
+	gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO0);
+	//gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1);
+
+	adc_off(ADC1);
+	adc_disable_scan_mode(ADC1);
+	//adc_enable_all_awd_interrupt(ADC1);//watchdog
+
+	adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_3CYC);
+
+	adc_power_on(ADC1);
+
+	nvic_enable_irq(NVIC_ADC_IRQ);
+
+	/* Wait for ADC starting up. */
+    for (int i = 0; i < 800000; i++)    /* Wait a bit. */
+        __asm__("nop");
+
+
 	return inf;
+}
+
+
+uint16_t INFRA_readNaiive(uint8_t channel)
+{
+	uint8_t channel_array[16];
+	channel_array[0] = channel;
+	adc_set_regular_sequence(ADC1, 1, channel_array);
+	adc_start_conversion_regular(ADC1);
+	while (!adc_eoc(ADC1));
+	uint16_t reg16 = adc_read_regular(ADC1);
+	return reg16;
 }
 
 void current_init(void)
@@ -136,14 +188,32 @@ void current_init(void)
 
 }
 
+void adc_isr(void)
+{
+    if (adc_eoc_injected(ADC1))
+    {
+        _adc_value[0] += adc_read_injected(ADC1, 1);
+        _adc_counter[0]++;
+
+        ADC_SR(ADC1) = ~ADC_SR_JEOC;
+    }
+    if (_adc_counter[0] >= 16)
+    {
+        // measurement cycle end
+        adc_finish(_adc_value);
+        _adc_counter[0] = _adc_counter[1] = _adc_counter[2] = 0;
+        _adc_value[0] = _adc_value[1] = _adc_value[2] = 0;
+    }
+}
 
 void adc_finish(uint16_t values[])
 {
-    UNUSED(values)
+    //UNUSED(values);
     // from main_debug
-    //DBG_adc_finish(values);
+    DBG_adc_finish(values);
 }
 
+#if __NOT_USED_ANYMORE
 void adc_isr(void)
 {
     if (adc_eoc_injected(ADC1))
@@ -178,6 +248,7 @@ void adc_isr(void)
         _adc_value[0] = _adc_value[1] = _adc_value[2] = 0;
     }
 }
+#endif // __NOT_USED_ANYMORE
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
