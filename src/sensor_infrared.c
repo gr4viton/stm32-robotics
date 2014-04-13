@@ -26,6 +26,27 @@
  inspiration:
  * https://github.com/libopencm3/libopencm3-examples/blob/master/examples/stm32/f4/stm32f4-discovery/adc-dac-printf/adc-dac-printf.c
  * https://github.com/uamt-brno/inductor-tool/tree/master/fw/f4discovery
+
+ As in "user manual_hw_UM1472-STM32F4DISCOVERY_DM00039084.pdf"
+ Extension connectors:
+  PA0 - ADC123_IN0
+  PA1 - ADC123_IN1
+  PA2 - ADC123_IN2
+  PA3 - ADC123_IN3
+  PA4 - ADC12_IN4
+  PA5 - ADC12_IN5
+  PA6 - ADC12_IN6
+  PA7 - ADC12_IN7
+
+  PB0 - ADC12_IN8
+  PA1 - ADC12_IN9
+
+  PC0 - ADC123_IN10
+  PC1 - ADC123_IN11
+  PC2 - ADC123_IN12
+  PC3 - ADC123_IN13
+  PC4 - ADC12_IN14
+  PC5 - ADC12_IN15
 */
 
 
@@ -88,11 +109,9 @@ S_sensor_infra* INIT_infraPredef(uint8_t index)
 
 
 	rcc_periph_clock_enable(RCC_ADC1);
-
 	rcc_periph_clock_enable(RCC_GPIOC);
-
 	gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO0);
-	//gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1);
+	gpio_mode_setup(GPIOC, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1);
 
 	adc_off(ADC1);
 	adc_disable_scan_mode(ADC1);
@@ -188,6 +207,7 @@ void current_init(void)
 
 }
 
+// future: interrupt handler can be defined in robot_config / main_sumo ..
 void adc_isr(void)
 {
     if (adc_eoc_injected(ADC1))

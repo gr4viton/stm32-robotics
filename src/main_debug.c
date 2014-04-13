@@ -49,7 +49,7 @@ int main_debug(S_robot* r)
     ROBOT_initAll(r);
     //S_robot_buttons * b = &(r->btns);
 
-	int j = 0;
+	//int j = 0;
 
 	while (1)
     {

@@ -55,6 +55,7 @@ typedef struct _S_sensor_lincam
     uint16_t txpin;
     uint16_t rxpin;
 
+
     uint8_t vals[LINECAM_PIXELS];
 } S_sensor_lincam;
 
