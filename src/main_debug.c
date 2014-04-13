@@ -45,43 +45,44 @@
 int main_debug(S_robot* r)
 {
     INIT_leds();
-    //ROBOT_initLcd(r);
     ROBOT_initAll(r);
-    //S_robot_buttons * b = &(r->btns);
-
-	//int j = 0;
-
 	while (1)
     {
+        /**
+            DO not debug inside this while!
+            Make a separate function like DBG_tryADC(void),
+            and call it from here :)
+        */
 //        DBG_testButtonState(r,100,10);
 //        DBG_testUltraDistance(r,100);
         //TRY_buzzer();
         //LCD_displayWriteCheck(r->lcd);
         //dev_LCD_checkSeek(flcd);
-
-
-
-		uint16_t input_adc0 = INFRA_readNaiive(10);
-
-		uint16_t input_adc1 = INFRA_readNaiive(11);
-
-		LCD_clear(r->lcd);
-		fprintf(r->flcd,"0=%u|1=%d", input_adc0, input_adc1);
-
-
-
-        gpio_toggle(PLED,LED0);
-        mswait(500);
-
-        //fprintf(r->fus,"ADC=%u\n\r", r->infs.iFL->val);
-        //LCD_clear(r->lcd);
-        //fprintf(r->flcd,"ADC=%u", r->infs.iFL->val);
-
+        DBG_tryADC(r);
 	}
 
 	return 0;
 }
 
+
+void DBG_tryADC(S_robot* r)
+{
+    uint16_t input_adc0 = INFRA_readNaiive(10);
+
+    uint16_t input_adc1 = INFRA_readNaiive(11);
+
+    LCD_clear(r->lcd);
+    fprintf(r->flcd,"0=%u|1=%d", input_adc0, input_adc1);
+
+
+
+    gpio_toggle(PLED,LED0);
+    mswait(500);
+
+    //fprintf(r->fus,"ADC=%u\n\r", r->infs.iFL->val);
+    //LCD_clear(r->lcd);
+    //fprintf(r->flcd,"ADC=%u", r->infs.iFL->val);
+}
 void DBG_adc_finish(uint16_t values[])
 {
     R.infs.iFL->val=values[0];
