@@ -42,9 +42,8 @@
 //____________________________________________________
 //constants (user-defined)
 // stored samples from adc
-#define INFRA_SAMPLES       16
-// stored samples from blackwhite sensor
-#define BLACKWHITE_SAMPLES  16
+#define INFRA_SAMPLES           16
+#define ROB_INFRA_BOUNDARY_ADD 666
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -121,6 +120,8 @@ typedef struct _S_sensor_infra
 
     //S_sensor_blackOwhite bnw;
     double triggerVal; // value of the adc watchdog trigger interupt
+    double triggerAdd; // = 666; value offset from measured free space voltage
+    // = used in case that standard deviation is too small (<100)
     volatile bool free; // true if the sensor is over a free space (SUMO-black,LINE-white)
 
 #if __NOT_IMPLEMENTED_YET

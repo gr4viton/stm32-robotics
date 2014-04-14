@@ -52,10 +52,27 @@ S_robot R;
 
 void ROBOT_initUltras(S_robot* r)
 {
-    r->ults.uFL = INIT_ultraPredef(0,1.1);
-    r->ults.uFR = INIT_ultraPredef(1,1.1);
-    r->ults.uL = INIT_ultraPredef(2,1.1);
-    r->ults.uR = INIT_ultraPredef(3,1.1);
+    double coef[ROB_ULTRA_COEF_COUNT] =
+    {3, 11, 0.00};
+
+    uint8_t a = 0;
+    S_robot_ultras* u = &(r->ults);
+
+    for(a=0; a<ROB_ULTRA_MAX_COUNT; a++)
+    {
+        u->u[a] = INIT_ultraPredef(a);
+        ROBOT_initIsr(u->u[a]->rxport, u->u[a]->exti, u->u[a]->irq,
+                      u->u[a]->priority, EXTI_TRIGGER_BOTH);
+        ULTRA_setCoefs(u->u[a], coef);
+    }
+
+    // connection of the PE pins may be alike the position of the sensors on the robot
+                                // trig|echo
+    u->uL  = u->u[0]; // PE0|PE1
+    u->uR  = u->u[1]; // PE1
+    u->uFL = u->u[2]; // PE2
+    u->uFR = u->u[3]; // PE3
+
 }
 
 void ROBOT_initButtons(S_robot* r)
@@ -69,7 +86,8 @@ void ROBOT_initButtons(S_robot* r)
     b->bLine = INIT_buttonPredef(2);
 
     // Initialize IRQ for button bStart
-    INIT_buttonInterrupt(b->bStart);
+    S_sensor_button* bb = b->bStart;
+    ROBOT_initIsr(bb->port, bb->exti, bb->irq, ROB_PRIORITY_BUTTON_START, EXTI_TRIGGER_BOTH);
 }
 
 void ROBOT_initLcd(S_robot* r)
@@ -105,7 +123,7 @@ void ROBOT_initDcmotors(S_robot* r)
 
 void ROBOT_initLinCam(S_robot* r)
 {
-    if(r->life == IAM_SHEEP_FOLLOWING_THE_LINE)
+    if(r->life == IAM_LINE_SNIFFER)
         r->cam = INIT_lincamPredef(0);
 }
 
@@ -129,7 +147,7 @@ void ROBOT_initInfraArrayAndChannels(S_robot* r, const uint8_t nInfras)
             ib = interruptOn_white;
             break;
         case(IAM_BUGGED_ROBOT):
-        case(IAM_SHEEP_FOLLOWING_THE_LINE):
+        case(IAM_LINE_SNIFFER):
         default:
             bv = white_highVoltage;
             ib = interruptOn_black;
@@ -166,7 +184,7 @@ void ROBOT_initInfras(S_robot* r)
             in->iFL = in->i[1];in->iFR = in->i[0]; // FL-> |PC1 PC0| <-FR
             in->iBL = in->i[3];in->iBR = in->i[2]; // BL-> |PC3 PC2| <-BR
             break;
-        case(IAM_SHEEP_FOLLOWING_THE_LINE):
+        case(IAM_LINE_SNIFFER):
             // init "100" infra sensors strip
             //for(;a<20;a++)
               //  i->i[a] = INIT_infraPredef(a);
@@ -179,10 +197,10 @@ void ROBOT_initInfras(S_robot* r)
     INFRA_setupInjectedADC1wTIM2(in->channelArray, in->nInfs);
 }
 
-void ROBOT_initAll(S_robot* r)
+void ROBOT_initLifeDebug(S_robot* r)
 {
     INIT_leds();
-    r->STARTED = 0;
+    r->oneSec = 970;
     ROBOT_initBuzzers(r);
     ROBOT_initUsart(r);
     ROBOT_initLcd(r);
@@ -196,6 +214,41 @@ void ROBOT_initAll(S_robot* r)
     //ROBOT_initDcmotors(r);
 }
 
+void ROBOT_initLifeSumo(S_robot* r)
+{
+    INIT_leds();
+    r->oneSec = 970;
+    ROBOT_initBuzzers(r);
+    ROBOT_initUsart(r);
+    ROBOT_initLcd(r);
+
+    // sensors
+    //ROBOT_initButtons(r);
+    ROBOT_initUltras(r);
+    ROBOT_initInfras(r);
+    //ROBOT_initLinCam(r);
+
+    ROBOT_initDcmotors(r);
+}
+
+void ROBOT_initLifeLine(S_robot* r)
+{
+    INIT_leds();
+    r->oneSec = 970;
+    ROBOT_initBuzzers(r);
+    ROBOT_initUsart(r);
+    ROBOT_initLcd(r);
+
+    // sensors
+    //ROBOT_initButtons(r);
+    ROBOT_initUltras(r);
+    ROBOT_initInfras(r);
+    ROBOT_initLinCam(r);
+
+    ROBOT_initDcmotors(r);
+}
+
+
     //____________________________________________________
     // others
 E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r)
@@ -207,7 +260,7 @@ E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r)
 
     if(r->btns.bLine->state!= 0 && r->btns.bSumo->state== 0)
     {
-        newLife = IAM_SHEEP_FOLLOWING_THE_LINE;
+        newLife = IAM_LINE_SNIFFER;
     }
     else if(r->btns.bLine->state== 0 && r->btns.bSumo->state!= 0)
     {
@@ -232,15 +285,6 @@ void _tocPrintFrom(FILE* f,uint32_t start)
 {
     uint32_t t = _tocFrom(start);
     fprintf(f, "%lums|", t);
-}
-
-    //____________________________________________________
-    // interrupts request handlers = interrupt handler functions
-void btnStart_isr(void)
-{
-    // btnStart was pressed
-	exti_reset_request(R.btns.bStart->exti); // reset flag
-	R.STARTED = 1;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

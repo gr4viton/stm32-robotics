@@ -22,6 +22,11 @@
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/exti.h>
+
+#include <libopencm3/cm3/systick.h>
+
+#include <math.h> // pow
 //_________> project includes
 #include "defines.h"
 #include "waitin.h"
@@ -35,6 +40,9 @@
 // MACRO DEFINITIONS
 //____________________________________________________
 //constants (user-defined)
+// degree of the polynomial
+
+#define ROB_ULTRA_COEF_COUNT 3
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -57,13 +65,22 @@ typedef struct _S_sensor_ultra
     uint16_t txpin;
     uint16_t rxpin;
 
-    uint8_t irq;
-    double dist;
-    double proportion;
-    uint32_t nOverflows;
+    // interrupts
+    uint32_t exti; // exti line
+    uint8_t irq; // NVIC irq
+
+
+    // uint32_t nOverflows; // not needed as sysTick overflows in 49 days in current config
     uint32_t ticksStart;
     uint32_t ticksEnd;
     uint32_t nTicks;
+
+    uint8_t priority; // interrupt priority
+
+    double dist;
+    double coef[ROB_ULTRA_COEF_COUNT];
+    // dist = coef[0] + coef[1]*nTicks + coef[2]*nTicks^2 + .. + coef[N]*nTicks^N
+    // .. where N = ROB_ULTRA_COEF_COUNT
 
 } S_sensor_ultra;
 
@@ -81,43 +98,61 @@ typedef struct _S_sensor_ultra
 // OTHER FUNCTION DECLARATIONS
 /****************
  \brief Initializes MCU ports for ultrasensor
- \param[in]
- \retval
  ****************/
-S_sensor_ultra* INIT_ultraPredef(uint8_t index, double prop);
+S_sensor_ultra* INIT_ultraPredef(uint8_t index);
 
 /****************
- \brief
- \param
- \retval
+ \brief Calculates the distance from measured period (nTicks)
  ****************/
-double ULTRA_getDist(S_sensor_ultra* ult);
+double ULTRA_calcDist(S_sensor_ultra* ult);
 
 /****************
- \brief
- \param
- \retval
+ \brief Generate a pulse on trigger signal line
  ****************/
 void ULTRA_signalSend(S_sensor_ultra *dev);
 
 /****************
- \brief
- \param
- \retval
+ \brief On echo signal started
  ****************/
-void ULTRA_signalAcquired(S_sensor_ultra *dev);
+void ULTRA_echoStarted(S_sensor_ultra *ult);
+
+/****************
+ \brief On echo signal end
+ ****************/
+void ULTRA_echoEnded(S_sensor_ultra *ult);
+
+/****************
+ \brief The echo signal changed - handle it
+ ****************/
+void ULTRA_handleEcho(S_sensor_ultra* ult);
+
+/****************
+ \brief Sets coeficients of polynomial function modeling sensor distance
+ \param coef array of coeficients
+ ****************/
+void ULTRA_setCoefs(S_sensor_ultra* ult, double coef[]);
+
 
 /****************
  \brief   Try ultrasonic sensor function without interrupts
- \param
- \retval
  ****************/
  void ULTRA_debug_try(void);
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
+/*
+void exti0_1_isr(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line0) != RESET)
+  {
+    // Toggle LED2
+    STM_EVAL_LEDToggle(LED2);
 
-
+    // Clear the EXTI line 0 pending bit
+    EXTI_ClearITPendingBit(EXTI_Line0);
+  }
+}
+*/
 
 #endif // DEV_ULTRASONIC_H_INCLUDED

@@ -60,14 +60,14 @@ static void _txsignal(struct ringbuf *rb);
 
 static uart_device_t uarts[] =
     {
-        { .device=USART1, .irq=NVIC_USART1_IRQ, .txport=GPIOA, .txpin=GPIO9,  .rxport=GPIOA, .rxpin=GPIO10, .af=GPIO_AF7, .clk=RCC_USART1, .txpclk=RCC_GPIOA, .rxpclk=RCC_GPIOA },
+        /*0*/{ .device=USART1, .irq=NVIC_USART1_IRQ, .txport=GPIOA, .txpin=GPIO9,  .rxport=GPIOA, .rxpin=GPIO10, .af=GPIO_AF7, .clk=RCC_USART1, .txpclk=RCC_GPIOA, .rxpclk=RCC_GPIOA },
         /* used begin */
-        { .device=USART2, .irq=NVIC_USART2_IRQ, .txport=GPIOD, .txpin=GPIO5,  .rxport=GPIOD, .rxpin=GPIO6,  .af=GPIO_AF7, .clk=RCC_USART2, .txpclk=RCC_GPIOD, .rxpclk=RCC_GPIOD  },
-        { .device=USART3, .irq=NVIC_USART3_IRQ, .txport=GPIOD, .txpin=GPIO8,  .rxport=GPIOD, .rxpin=GPIO9,  .af=GPIO_AF7, .clk=RCC_USART3, .txpclk=RCC_GPIOD, .rxpclk=RCC_GPIOD  },
+        /*1*/{ .device=USART2, .irq=NVIC_USART2_IRQ, .txport=GPIOD, .txpin=GPIO5,  .rxport=GPIOD, .rxpin=GPIO6,  .af=GPIO_AF7, .clk=RCC_USART2, .txpclk=RCC_GPIOD, .rxpclk=RCC_GPIOD  },
+        /*2*/{ .device=USART3, .irq=NVIC_USART3_IRQ, .txport=GPIOD, .txpin=GPIO8,  .rxport=GPIOD, .rxpin=GPIO9,  .af=GPIO_AF7, .clk=RCC_USART3, .txpclk=RCC_GPIOD, .rxpclk=RCC_GPIOD  },
         /* used end */
-        { .device=UART4,  .irq=NVIC_UART4_IRQ,  .txport=GPIOC, .txpin=GPIO10, .rxport=GPIOC, .rxpin=GPIO11, .af=GPIO_AF8, .clk=RCC_UART4 , .txpclk=RCC_GPIOC, .rxpclk=RCC_GPIOC  },
-        { .device=UART5,  .irq=NVIC_UART5_IRQ,  .txport=GPIOC, .txpin=GPIO12, .rxport=GPIOD, .rxpin=GPIO2,  .af=GPIO_AF8, .clk=RCC_UART5 , .txpclk=RCC_GPIOC, .rxpclk=RCC_GPIOD  },
-        { .device=USART6, .irq=NVIC_USART6_IRQ, .txport=GPIOC, .txpin=GPIO6,  .rxport=GPIOC, .rxpin=GPIO7,  .af=GPIO_AF8, .clk=RCC_USART6, .txpclk=RCC_GPIOC, .rxpclk=RCC_GPIOC  },
+        /*3*/{ .device=UART4,  .irq=NVIC_UART4_IRQ,  .txport=GPIOC, .txpin=GPIO10, .rxport=GPIOC, .rxpin=GPIO11, .af=GPIO_AF8, .clk=RCC_UART4 , .txpclk=RCC_GPIOC, .rxpclk=RCC_GPIOC  },
+        /*4*/{ .device=UART5,  .irq=NVIC_UART5_IRQ,  .txport=GPIOC, .txpin=GPIO12, .rxport=GPIOD, .rxpin=GPIO2,  .af=GPIO_AF8, .clk=RCC_UART5 , .txpclk=RCC_GPIOC, .rxpclk=RCC_GPIOD  },
+        /*5*/{ .device=USART6, .irq=NVIC_USART6_IRQ, .txport=GPIOC, .txpin=GPIO6,  .rxport=GPIOC, .rxpin=GPIO7,  .af=GPIO_AF8, .clk=RCC_USART6, .txpclk=RCC_GPIOC, .rxpclk=RCC_GPIOC  },
     };
 //____________________________________________________
 // other variables

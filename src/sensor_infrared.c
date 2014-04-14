@@ -145,6 +145,7 @@ S_sensor_infra* INIT_infraPredef(uint8_t index)
         inf->samplesADC[inf->indADC] = 0;
     }
     inf->indADC = 0;
+    inf->triggerAdd = ROB_INFRA_BOUNDARY_ADD;
 
 	// RCC digital interface clock enable
 	rcc_periph_clock_enable(inf->clk);
@@ -236,9 +237,7 @@ void INFRA_setTresholdLastValue(S_sensor_infra* inf, double trigger_add)
         sign = -1;
     }
 
-    if(inf->nStds * inf->stdev < 100) trigger_add = 666;
-    else trigger_add = inf->nStds * inf->stdev;
-
+    if(inf->nStds * inf->stdev > 100) trigger_add = inf->nStds * inf->stdev;
     inf->triggerVal = inf->val + sign * trigger_add;
 }
 

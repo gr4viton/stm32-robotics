@@ -55,29 +55,10 @@ extern S_sensor_ultra ultras_predef[];
 // STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
-int main_line(void)
+int main_line(S_robot* r)
 {
-    uint8_t i_ultra = 0;
-    uint8_t ilcd = 0;
-
     INIT_clk();
-
-    fus = fopenserial(3, 9600, tbuf, ROB_US_TBUFSZ, rbuf, ROB_US_RBUFSZ); // uarts[3] = UART4 = tC10,rC11
-    //lcd = fopenlcd(1, 9600, tbuf,1024,rbuf,1024);
-
-    flcd = fopenLCD(ilcd, 16,
-                   LCD_C_8BIT_2L_5x7_LIGHT, //0x38,//0x30, //LCD_C_8BIT_2L_5x7_LIGHT, //LCD_C_8BIT_1L_5x7_LIGHT,//
-                   LCD_C_ENTRY_RIGHT_CMOVE,
-                   LCD_C_CUR_VIS_STATIC,
-                   lcd_dbuf, ROB_LCD_DBUFSZ);
-
-    //ultra_sensor_t* ultra1 = 0;
-    INIT_leds();
-    INIT_ultraPredef(i_ultra ,0);
-
-
-    S_dev_lcd* lcd_dev = &(lcds_predef[ilcd]);
-    S_sensor_ultra* ultra = &(ultras_predef[i_ultra]);
+    ROBOT_initLifeLine(r);
 	while (1) {
         gpio_toggle(PLED,LED0);
 

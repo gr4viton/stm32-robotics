@@ -28,8 +28,10 @@ x] od timeru
 x] od adc -> pomoci injected a Timeru
 ] od adc watchdog - kdy z merenych hodnot budu menit hodnotu watchdogu?
 
+[] priority nvic!!!
 [] rozchodit pwm
 [] lcd
+x] 4bit
 - dodelat seek
 - vynechat mswait a dat to na pocet asmwait podle clocku procesoru!
 
@@ -65,6 +67,8 @@ x] od adc -> pomoci injected a Timeru
 // STATIC FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
+
+
 int main(void)
 {
     /** If you look here and hope to find out how this program works,
@@ -74,7 +78,10 @@ int main(void)
     */
 
     S_robot* r = &R; // global= extern S_robot R;
-      INIT_clk();
+    INIT_clk();
+    INIT_leds();
+
+    r->STARTED = 0;
     ROBOT_initButtons(r);
     // Chose a program to run
     E_lifeStyleSelector life = ROBOT_getLifeStyle(&R);
@@ -84,7 +91,7 @@ int main(void)
             main_debug(r); break;
         case(IAM_SUMO_WARRIOR):
             main_sumo(r); break;
-        case(IAM_SHEEP_FOLLOWING_THE_LINE):
+        case(IAM_LINE_SNIFFER):
             //main_line(r); break;
         default:
             main_debug(r);

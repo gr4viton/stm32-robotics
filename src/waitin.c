@@ -115,6 +115,10 @@ void INIT_clk()
 {
     // Set STM32 to 168 MHz.
 	rcc_clock_setup_hse_3v3(&hse_8mhz_3v3[CLOCK_3V3_168MHZ]);
+
+    // for enabling changing SYSCFG - exti line port selection
+    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SYSCFGEN);
+    // 6hours for one line - IRC ftw!
 	systick_setup();
 
 #if __NOT_IMPORTANT

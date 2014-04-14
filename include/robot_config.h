@@ -38,12 +38,14 @@
 #include "defines.h"
 #include "waitin.h"
 
+// interrupts
+//#include "robot_interrupts.h"
+
 // devices = I/O
 #include "dev_serial.h"
 #include "dev_LCD_HD44780.h"
 #include "LCD_HD44780.h"
 #include "dev_buzzer.h"
-
 #include "led_f4.h"
 
 // sensors
@@ -54,6 +56,9 @@
 
 // actuators
 #include "actuator_dcmotor.h"
+
+// robot
+#include "robot_interrupts.h"
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,11 +71,15 @@
 #define ROB_US_TBUFSZ 1024
 // LCD data buffer size
 #define ROB_LCD_DBUFSZ 1024
-// infras
+// sensor count
 #define ROB_INFRA_MAX_COUNT 16
+#define ROB_ULTRA_MAX_COUNT 4
+// actuators
+#define ROB_MOTOR_COUNT 4
 //____________________________________________________
 //constants (do not change)
-#define btnStart_isr exti0_isr
+#define ROB_PRIORITY_BUTTON_START 10
+//#define btnStart_isr exti0_isr
 //____________________________________________________
 // macro functions (do not use often!)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,6 +111,7 @@ typedef struct _S_robot_ultras
     S_sensor_ultra* uFR;
     S_sensor_ultra* uL;
     S_sensor_ultra* uR;
+    S_sensor_ultra* u[ROB_ULTRA_MAX_COUNT]; // array of poiners to ultra_predef
 } S_robot_ultras;
 
 /****************
@@ -123,6 +133,7 @@ typedef struct _S_robot_dcmotors
     S_actuator_dcmotor* mFR; // motor front right
     S_actuator_dcmotor* mBL; // motor back left
     S_actuator_dcmotor* mBR; // motor back right
+    S_actuator_dcmotor* m[ROB_MOTOR_COUNT]; //  array of poiners to motor_predef
 } S_robot_dcmotors;
 
 typedef struct _S_sensor_infra S_sensor_infra;
@@ -160,6 +171,7 @@ typedef struct _S_robot
 
     // state machine
     E_lifeStyleSelector life;
+    uint16_t oneSec;
     //-> future: maybe in separate state structure
     uint8_t STARTED; // 1= when the STARTbutton was pushed - program has started
 
@@ -235,9 +247,19 @@ void ROBOT_initInfras(S_robot* r);
 void ROBOT_initInfraArrayAndChannels(S_robot* r, const uint8_t nInfras);
 
 /****************
- @brief Initializes whole robot
+ @brief Initializes whole robot for debugging
  ****************/
-void ROBOT_initAll(S_robot* r);
+void ROBOT_initLifeDebug(S_robot* r);
+
+/****************
+ @brief Initializes whole robot as Sumo Warior
+ ****************/
+void ROBOT_initLifeSumo(S_robot* r);
+
+/****************
+ @brief Initializes whole robot as Line Follower
+ ****************/
+void ROBOT_initLifeLine(S_robot* r);
     //____________________________________________________
     // tictoc
 /****************

@@ -11,7 +11,11 @@
 \license    LGPL License Terms \ref lgpl_license
 ***********/
 /* DOCSTYLE: gr4viton_2014_A <goo.gl/1deDBa> */
-
+/*
+ inspiration:
+ * https://github.com/libopencm3/libopencm3-examples/blob/master/examples/stm32/f1/stm32-h103/exti_both/exti_both.c
+ =EXTI NVIC interrupts
+*/
 #ifndef SENSOR_BUTTON_H_INCLUDED
 #define SENSOR_BUTTON_H_INCLUDED
 
@@ -50,9 +54,9 @@
  ****************/
 typedef enum _E_lifeStyleSelector
 {
-    IAM_BUGGED_ROBOT =0,            // for debugging and development
-    IAM_SUMO_WARRIOR ,              // for mini-sumo competition
-    IAM_SHEEP_FOLLOWING_THE_LINE    // for line-follower
+    IAM_BUGGED_ROBOT =0,  // for debugging and development
+    IAM_SUMO_WARRIOR =42, // for mini-sumo competition
+    IAM_LINE_SNIFFER =69  // for line-follower
 } E_lifeStyleSelector;
 //____________________________________________________
 // structs
@@ -66,9 +70,10 @@ typedef struct _S_sensor_button
     uint8_t pull; // button pull resistor
     uint16_t pin; // button pin
 
-    uint8_t nvic; // button NVIC
-    uint8_t exti; // button EXTI
-    enum exti_trigger_type exti_trigger; // button interrupt triger - rising / falling / both
+    uint8_t priority; // priority of isr
+    uint8_t irq; // button NVIC irq
+    uint32_t exti; // button EXTI
+    enum exti_trigger_type exti_triggerDir; // button interrupt triger - rising / falling / both
 
 
     uint16_t state; // state of the button 0 or 1
@@ -78,7 +83,7 @@ typedef struct _S_sensor_button
 // unions
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-extern S_sensor_button buttons_predef[3];
+extern S_sensor_button buttons_predef[];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS
@@ -87,12 +92,6 @@ extern S_sensor_button buttons_predef[3];
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DECLARATIONS
 
-/****************
- \brief   Initializes interrupt (exti & nvic) of a button
- \param
- \retval
- ****************/
-void INIT_buttonInterrupt(S_sensor_button* b);
 
 /****************
  \brief   Activates clock and pin in port defined in buttons_predef

@@ -32,11 +32,12 @@
 
 #define UNUSED(x) (void)(x);
 
-#define __NOT_IMPLEMENTED_YET 0
-#define __NOT_IMPORTANT 0
-#define __NOT_USED_ANYMORE 0
-#define __LEGACY 0
-#define __IS_BUGGY 0
+#define __NOT_IMPLEMENTED_YET       0
+#define __NOT_IMPORTANT             0
+#define __NOT_USED_ANYMORE          0
+#define __LEGACY                    0
+#define __IS_BUGGY                  0
+#define __PREMATURE_OPTIMALIZATION  0
 
 // later for interrupt timer wait contra current not active noping
 #define __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE 0

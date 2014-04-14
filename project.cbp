@@ -60,6 +60,7 @@
 		<Unit filename="include/primitives/llist.h" />
 		<Unit filename="include/primitives/ringbuf.h" />
 		<Unit filename="include/robot_config.h" />
+		<Unit filename="include/robot_interrupts.h" />
 		<Unit filename="include/sablona_headerfile.h" />
 		<Unit filename="include/sensor_button.h" />
 		<Unit filename="include/sensor_infrared.h" />
@@ -921,6 +922,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/robot_config.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/robot_interrupts.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/sablona_sourcefile.c">

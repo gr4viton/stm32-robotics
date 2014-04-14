@@ -45,9 +45,13 @@
 int main_debug(S_robot* r)
 {
     _tic();
-    INIT_leds();
-    ROBOT_initAll(r);
+    R.STARTED = 1;
+    ROBOT_initLifeDebug(r);
+    fprintf(r->flcd, "Initialization=");
     _tocPrint(r->flcd);
+    mswait(400);
+    LCD_clear(r->lcd);
+
 	while (1)
     {
         /**
@@ -55,24 +59,33 @@ int main_debug(S_robot* r)
             Make a separate function like DBG_tryADC(void),
             and call it from here :)
         */
+
 //        DBG_testButtonState(r,100,10);
-//        DBG_testUltraDistance(r,100);
+//        DBG_testUltraDistanceOld(r,100);
         //TRY_buzzer();
         //LCD_displayWriteCheck(r->lcd);
         //dev_LCD_checkSeek(flcd);
         //DBG_tryADC(r);
-        DBG_tryCNY70(r);
+        //DBG_tryCNY70(r);
+        DBG_testUltraDistance(r,100);
 
 	}
 
 	return 0;
 }
 
+void DBG_touchD7blink(void)
+{
+    // D7 - touch blink
+	rcc_periph_clock_enable(RCC_GPIOD);
+    gpio_mode_setup(GPIOD, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO7);
+    ROBOT_initIsr(GPIOD,EXTI7,NVIC_EXTI9_5_IRQ,10,EXTI_TRIGGER_BOTH);
+}
 
 void DBG_tryCNY70(S_robot* r)
 {
     LCD_clear(r->lcd);
-    fprintf(r->flcd,"PC0=%7.2f \n", r->infs.i[0]->val);
+    fprintf(r->flcd,"PC0=%7.2f \r\n", r->infs.i[0]->val);
 
 
     gpio_toggle(PLED,LED0);
@@ -93,7 +106,6 @@ void DBG_tryADC(S_robot* r)
             r->infs.iBR->val
             );
 
-
     gpio_toggle(PLED,LED0);
     mswait(500);
 
@@ -102,13 +114,15 @@ void DBG_tryADC(S_robot* r)
     //fprintf(r->flcd,"ADC=%u", r->infs.iFL->val);
 }
 
+void SUMO_wait5secAndSample(S_robot* r);
+
 void DBG_ticTocSumoWait(S_robot* r)
 {
     while(1)
     {
         _tic();
         uint8_t a=0;
-        for(a=0; a<5; a++) SUMO_waitSec(970, a);
+        for(a=0; a<5; a++) SUMO_wait5secAndSample(r);
         _tocPrint(r->flcd);
         mswait(300);
     }
@@ -148,6 +162,34 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
 }
 
 void DBG_testUltraDistance(S_robot* r,uint32_t repeats)
+{
+    S_sensor_ultra* u ;
+    uint8_t a =0;
+    FILE* f = r->fus;
+    //FILE* f = r->flcd;
+    while(repeats>1)
+    {
+        repeats--;
+        fprintf(f,"ULTRAS[0-3]:");
+
+        for(a=0;a<ROB_ULTRA_MAX_COUNT;a++)
+        {
+            u = r->ults.u[a];
+            if(u->ticksStart == 0)
+                ULTRA_signalSend(u);
+            fprintf(f, "[%u]=%3lu|%5.2f[cm]", a, u->nTicks, u->dist);
+        }
+        fprintf(f, "\n");
+
+
+        //LCD_clear(r->lcd);
+        //fprintf(f, "%lu|%.2f[cm]", u->nTicks, u->dist);
+        //fprintf(f, "%lu|%.2f[cm]\n", u->nTicks, u->dist);
+        mswait(200);
+    }
+}
+
+void DBG_testUltraDistanceOld(S_robot* r,uint32_t repeats)
 {
 /*
     uint8_t i_ultra = 0;

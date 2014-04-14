@@ -163,8 +163,8 @@ FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t nCharsPerLine,
     rcc_periph_clock_enable(dev->datap_clk);
 
     // init pins
-    gpio_mode_setup(dev->data_port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, dev->data_pins_all);
-    gpio_mode_setup(dev->cmd_port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, dev->cmd_pins_all);
+    gpio_mode_setup(dev->data_port, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, dev->data_pins_all);
+    gpio_mode_setup(dev->cmd_port, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, dev->cmd_pins_all);
 
     // reset lcd pins
 	gpio_clear(dev->data_port, dev->data_pins_all); // Data bus low
