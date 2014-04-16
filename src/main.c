@@ -22,10 +22,12 @@ TODO:
 [x] vytvorit mu projekt na gitu
 [x] ultras serials_predef
 [x] pridat output do repraku
-[] rozchodit interrupt
+[x] rozchodit interrupt
 x] od tlacitka
-- od timeru
-- od adc
+x] od timeru
+x] od adc -> pomoci injected a Timeru
+] od adc watchdog - kdy z merenych hodnot budu menit hodnotu watchdogu?
+
 [] rozchodit pwm
 [] lcd
 - dodelat seek
@@ -39,11 +41,6 @@ x] od tlacitka
 //_________> project includes
 #include "main.h"
 // move to headerfile
-
-
-#define LCD_DBUFSZ 1024
-#define RBUFSZ 1024
-#define TBUFSZ 1024
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // TYPE DEFINITIONS
 //____________________________________________________

@@ -68,6 +68,14 @@ int main_sumo(S_robot* r);
  \retval
  ****************/
 void SUMO_wait5sec(void);
+
+/****************
+ \brief  During 5 seconds, counts mean from measure of free-space color
+ For robosumo the free-space color is black
+ \param
+ \retval
+ ****************/
+void SUMO_wait5secAndSample(S_robot* r);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

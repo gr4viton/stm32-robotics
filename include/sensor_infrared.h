@@ -18,8 +18,10 @@
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INCLUDES
-#include <libopencm3/stm32/timer.h>
 #include <libopencm3/cm3/nvic.h>
+#include <libopencm3/cm3/vector.h>
+
+#include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/adc.h>
@@ -38,6 +40,7 @@
 // MACRO DEFINITIONS
 //____________________________________________________
 //constants (user-defined)
+#define INFRA_SAMPLES 16
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -46,6 +49,42 @@
 // TYPE DEFINITIONS
 //____________________________________________________
 // enumerations
+
+/****************
+ @brief It depends on the infrasensor connection
+ If the CNY70 transistor connection is inversed it generates
+  - lower voltages for white
+  - higher voltages for black
+ and vice versa.
+ (Maybe it is exactly the oposite inversed vs. non-inversed, you should check circuit)
+ ****************/
+typedef enum _E_infraBrightVoltage
+{
+    white_highVoltage = 0,
+    black_lowVoltage = 0,
+    black_highVoltage = 1,
+    white_lowVoltage = 1
+}E_infraBrightVoltage;
+
+/****************
+ @brief On which brightness should the interrupt be triggered
+ ****************/
+typedef enum _E_infraInterruptBrightness
+{
+    interruptOn_white = 0,
+    interruptOn_black = 1
+}E_infraInterruptBrightness;
+
+/****************
+ @brief On which voltage should the interrupt be triggered
+ ****************/
+typedef enum _E_infraVoltageTresholdType
+{
+    treshVoltage_high = 1,
+    treshVoltage_low = 0
+}E_infraVoltageTresholdType;
+
+
 //____________________________________________________
 // structs
 /****************
@@ -57,19 +96,40 @@ typedef struct _S_sensor_infra
     uint32_t port;
     uint16_t pin;
 
-    volatile uint16_t val;
+    E_infraBrightVoltage brightVolt;          // depends on connection of infra sensor
+    E_infraInterruptBrightness treshInterruptOn; // depends on lifeStyle (SUMO->interrupt on white)
+    E_infraVoltageTresholdType treshVoltage;     // this is conjuction of the 2 above -> watchdog settings
+
+    uint16_t triggerVal; // value of the adc watchdog trigger interupt
+
+
 #if __NOT_IMPLEMENTED_YET
     uint8_t adc_setting;
 #endif // __NOT_IMPLEMENTED_YET
+
+
+    uint16_t channel; // chanels to scan (injected)
+    volatile double val; // counted last value of the ADC
+
+    volatile uint8_t indADC; // index of active element in samples, values arrays
+    volatile uint16_t samplesADC[INFRA_SAMPLES]; // input from AD conversion
+    volatile uint16_t valuesADC[INFRA_SAMPLES]; // previous counted value (mean)
 } S_sensor_infra;
+
+#if __NOT_IMPLEMENTED_YET
+// another possibility how to solve it->
+typedef struct _S_sensor_blackWhite
+{
+    volatile bool free; // true if the sensor is over a free space (SUMO-black,LINE-white)
+
+    S_sensor_infra* i
+}S_sensor_blackWhite;
+#endif // __NOT_IMPLEMENTED_YET
 //____________________________________________________
 // unions
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-extern uint32_t vbus;
-extern uint32_t current[4];
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,14 +151,45 @@ extern uint32_t current[4];
  \param
  \retval
  ****************/
-void current_init(void);
+void INFRA_setupInjectedTIM2(void);
 
 /****************
  \brief
  \param
  \retval
  ****************/
-void current_update(void);
+void INFRA_setupInjectedADC1wTIM2(uint8_t* channel_array, uint8_t nChannels);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+void INFRA_addSample(S_sensor_infra* inf, uint16_t sample);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+void INFRA_countMean(S_sensor_infra* inf);
+
+/****************
+ \brief
+ \param
+ \retval
+ ****************/
+void INFRA_addSampleCountMean(S_sensor_infra* inf, uint16_t sample);
+
+/****************
+ \brief Sets interrupt trigger treshold value and orientation
+ find out if the interrupt is generated on higher voltage from treshold or vice versa
+ and set the treshold value to the last value masured
+ this is done, because of the setting of adc watchdog (not sure yet..)
+ \param
+ \retval
+ ****************/
+void INFRA_setTresholdLastValue(S_sensor_infra* inf, E_infraInterruptBrightness interruptOn);
 
 /****************
  \brief
@@ -107,13 +198,11 @@ void current_update(void);
  ****************/
 void adc_finish(uint16_t values[]);
 
-/****************
- \brief
- \param
- \retval
- ****************/
+#if __NOT_USED_ANYMORE
+void current_init(void);
+void current_update(void);
 uint16_t INFRA_readNaiive(uint8_t channel);
-
+#endif // __NOT_USED_ANYMORE
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES

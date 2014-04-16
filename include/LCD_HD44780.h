@@ -174,6 +174,13 @@ void INIT_LCD(void);
 void LCD_clear(S_dev_lcd *dev);
 
 /****************
+ \brief
+ \param
+ \retval
+ ****************/
+void LCD_nextLine(S_dev_lcd *dev);
+
+/****************
  \brief  Writes blank spaces on [lineNum]-th line of LCD
  \param
  \retval

@@ -47,13 +47,27 @@ int main_sumo(S_robot* r)
     // waitin for button
     while(r->STARTED==0) __asm__("nop");
     // 5sec waitin
-    SUMO_wait5sec();
+    SUMO_wait5secAndSample(r);
 	while (1) {
         gpio_toggle(PLED,LED1);
         mswait(1000);
 	}
 
 	return 0;
+}
+
+void SUMO_wait5secAndSample(S_robot* r)
+{
+    uint8_t a=0;
+    SUMO_wait5sec();
+    /*
+    - sampling is done in the background --> interrupts of adc
+    it is not mean from whole 5 seconds but last [INFRA_SAMPLES] samples
+    so we only need to grab the final value
+    - in SUMO, the interrupt should be triggered on white line around the arena
+    */
+    for(a=0; a<r->infs.nInfs; a++)
+        INFRA_setTresholdLastValue(r->infs.i[a], interruptOn_white);
 }
 
 void SUMO_wait5sec(void)

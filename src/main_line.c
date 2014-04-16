@@ -20,9 +20,9 @@
 
 #if __NOT_IMPLEMENTED_YET
 
-#define LCD_DBUFSZ 1024
-#define RBUFSZ 1024
-#define TBUFSZ 1024
+#define ROB_LCD_DBUFSZ 1024
+#define ROB_US_RBUFSZ 1024
+#define ROB_US_TBUFSZ 1024
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // TYPE DEFINITIONS
 //____________________________________________________
@@ -36,9 +36,9 @@
 // VARIABLE DEFINITIONS
 //____________________________________________________
 // static variables
-static uint8_t rbuf[RBUFSZ];
-static uint8_t tbuf[TBUFSZ];
-static uint8_t lcd_dbuf[LCD_DBUFSZ];
+static uint8_t rbuf[ROB_US_RBUFSZ];
+static uint8_t tbuf[ROB_US_TBUFSZ];
+static uint8_t lcd_dbuf[ROB_LCD_DBUFSZ];
 //____________________________________________________
 // other variables
 FILE *fus;
@@ -62,14 +62,14 @@ int main_line(void)
 
     INIT_clk();
 
-    fus = fopenserial(3, 9600, tbuf, TBUFSZ, rbuf, RBUFSZ); // uarts[3] = UART4 = tC10,rC11
+    fus = fopenserial(3, 9600, tbuf, ROB_US_TBUFSZ, rbuf, ROB_US_RBUFSZ); // uarts[3] = UART4 = tC10,rC11
     //lcd = fopenlcd(1, 9600, tbuf,1024,rbuf,1024);
 
     flcd = fopenLCD(ilcd, 16,
                    LCD_C_8BIT_2L_5x7_LIGHT, //0x38,//0x30, //LCD_C_8BIT_2L_5x7_LIGHT, //LCD_C_8BIT_1L_5x7_LIGHT,//
                    LCD_C_ENTRY_RIGHT_CMOVE,
                    LCD_C_CUR_VIS_STATIC,
-                   lcd_dbuf, LCD_DBUFSZ);
+                   lcd_dbuf, ROB_LCD_DBUFSZ);
 
     //ultra_sensor_t* ultra1 = 0;
     INIT_leds();

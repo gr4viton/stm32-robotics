@@ -128,7 +128,8 @@ FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
     ringbuf_init(&(dev->data_ring),dbuf,dbufsz);
     //ringbuf_init(&(dev->rx_ring),rbuf,rbufsz);
     dev->data_ring.signal = _txsignal;
-
+    dev->actY = 0;
+    dev->actX = 0;
 
     // predef ports and clks
     dev->datap_clk = lcds_predef[index].datap_clk;
@@ -269,7 +270,16 @@ static ssize_t _iowr(void *_cookie, const char *_buf, size_t _n)
     uint8_t i = 0;
  //       LCD_writeChar(dev,_buf[i]);
     do {
-        LCD_writeChar(dev,(uint8_t)_buf[i]);
+        uint8_t ch = (uint8_t)_buf[i];
+        if( (ch == '\n') || (ch == '\r') )
+        {
+            LCD_nextLine(dev);
+        }
+        else
+        {
+            LCD_writeChar(dev,(uint8_t)_buf[i]);
+        }
+
         _n--;
         written++;
     } while(_n>0);//_buf[i]!='\0');

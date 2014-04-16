@@ -92,6 +92,9 @@ typedef struct _S_lcdDevice{
     uint8_t nCharsPerLine;
     uint8_t nLines;
 
+    uint8_t actX;
+    uint8_t actY;
+
     struct ringbuf data_ring;
     //struct ringbuf rx_ring;
 

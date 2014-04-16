@@ -27,12 +27,15 @@
 //_________> local includes
 //_________> forward includes
 
+//struct S_robot;
+
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/exti.h>
 
+#include <stdlib.h>
+
 #include "defines.h"
-struct S_robot;
 #include "waitin.h"
 
 // devices = I/O
@@ -58,11 +61,13 @@ struct S_robot;
 //____________________________________________________
 //constants (user-defined)
 // USART recieve buffer size
-#define RBUFSZ 1024
+#define ROB_US_RBUFSZ 1024
 // USART transmission buffer size
-#define TBUFSZ 1024
+#define ROB_US_TBUFSZ 1024
 // LCD data buffer size
-#define LCD_DBUFSZ 1024
+#define ROB_LCD_DBUFSZ 1024
+// infras
+#define ROB_INFRA_MAX_COUNT 16
 //____________________________________________________
 //constants (do not change)
 #define btnStart_isr exti0_isr
@@ -123,10 +128,15 @@ typedef struct _S_robot_dcmotors
 typedef struct _S_sensor_infra S_sensor_infra;
 typedef struct _S_robot_infras
 {
-    S_sensor_infra* iFL; // infra front left
-    S_sensor_infra* iFR; // infra front right
-    S_sensor_infra* iBL; // infra back left
-    S_sensor_infra* iBR; // infra back right
+    uint8_t nInfs;       // number of all infra sensors
+
+    S_sensor_infra* iFL; // infra front left -> pointer to i[x]
+    S_sensor_infra* iFR; // infra front right -> pointer to i[x]
+    S_sensor_infra* iBL; // infra back left -> pointer to i[x]
+    S_sensor_infra* iBR; // infra back right -> pointer to i[x]
+
+    uint8_t channelArray[ROB_INFRA_MAX_COUNT]; // array of ADC channels to measure
+    S_sensor_infra* i[ROB_INFRA_MAX_COUNT]; // array of poiners to infra_predef
 } S_robot_infras;
 
 
@@ -156,11 +166,11 @@ typedef struct _S_robot
 
     // usart
     FILE *fus; // FILE USART - pointer to usart device to write strings to
-    uint8_t rbuf[RBUFSZ]; // recieve buffer (using ring buffer logic)
-    uint8_t tbuf[TBUFSZ]; // transmission buffer (using ring buffer logic)
+    uint8_t rbuf[ROB_US_RBUFSZ]; // recieve buffer (using ring buffer logic)
+    uint8_t tbuf[ROB_US_TBUFSZ]; // transmission buffer (using ring buffer logic)
     // lcd
     FILE *flcd; // FILE LCD - pointer to lcd device display to write strings to
-    uint8_t lcd_dbuf[LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
+    uint8_t lcd_dbuf[ROB_LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
 }S_robot;
 
 //____________________________________________________
@@ -218,6 +228,11 @@ void ROBOT_initDcmotors(S_robot* r);
  \brief
  ****************/
 void ROBOT_initInfras(S_robot* r);
+
+/****************
+ @brief
+ ****************/
+void ROBOT_initInfraArrayAndChannels(S_robot* r, const uint8_t nInfras);
 
 /****************
  @brief Initializes whole robot

@@ -55,15 +55,24 @@ void LCD_waitBusy(E_waitType wType){
     }
 
 }
-
+void LCD_nextLine(S_dev_lcd *dev)
+{
+    if(dev->actY>=dev->nLines-1) dev->actY=0;
+    else dev->actY++;
+    LCD_gotoxy(dev,0,dev->actY);
+}
 void LCD_clear(S_dev_lcd *dev)
 {
+    dev->actX = 0;
+    dev->actY = 0;
     LCD_writeCmd(dev,LCD_C_CLR0);
 }
 
 // indexed from zero
 uint8_t LCD_gotoxy(S_dev_lcd *dev, uint8_t x, uint8_t y){
     if(x>HD44780_P_XMAX-1) return('x');
+    dev->actX = x;
+    dev->actY = y;
     switch(y){
         case(0):
             LCD_writeCmd(dev, LCD_C_CUR_ADDRESS_L1+x); break;
@@ -78,6 +87,7 @@ uint8_t LCD_gotoxy(S_dev_lcd *dev, uint8_t x, uint8_t y){
 void LCD_writeChar(S_dev_lcd *dev,uint8_t ch){
     LCD_write(dev,ch,sendData);
 }
+
 void LCD_writeCmd(S_dev_lcd *dev,uint8_t cmd_data){
     LCD_write(dev,cmd_data,sendCmd);
     if( (cmd_data & 0xE0) == 0x20 )
@@ -100,7 +110,8 @@ void LCD_write(S_dev_lcd *dev, uint8_t data, E_waitType wType){
     else {
         gpio_set(dev->cmd_port, dev->cmdRS); // cmd: sending data
         LCD_waitBusy(setEnable);
-        LCD_writeByte(dev,data, sendData);
+        LCD_writeByte(dev, data, sendData);
+        dev->actX++;
     }
 }
 

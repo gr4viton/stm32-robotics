@@ -88,8 +88,9 @@ int main_debug(S_robot* r);
  @brief
  ****************/
 void DBG_ultraTest(void);
-void DBG_adc_finish(uint16_t values[]);
+void DBG_adc_finish(void);
 void DBG_tryADC(S_robot* r);
+void DBG_tryCNY70(S_robot* r);
 
 void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms);
 void DBG_testUltraDistance(S_robot* r,uint32_t repeats);

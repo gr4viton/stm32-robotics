@@ -58,22 +58,38 @@ int main_debug(S_robot* r)
         //TRY_buzzer();
         //LCD_displayWriteCheck(r->lcd);
         //dev_LCD_checkSeek(flcd);
-        DBG_tryADC(r);
+        //DBG_tryADC(r);
+        DBG_tryCNY70(r);
+
 	}
 
 	return 0;
 }
 
 
+void DBG_tryCNY70(S_robot* r)
+{
+    LCD_clear(r->lcd);
+    fprintf(r->flcd,"PC0=%7.2f \n", r->infs.i[0]->val);
+
+
+    gpio_toggle(PLED,LED0);
+    mswait(500);
+}
 void DBG_tryADC(S_robot* r)
 {
-    uint16_t input_adc0 = INFRA_readNaiive(10);
+    //uint16_t input_adc0 = INFRA_readNaiive(10);
 
-    uint16_t input_adc1 = INFRA_readNaiive(11);
+    //uint16_t input_adc1 = INFRA_readNaiive(11);
+//    uint16_t input_adc1 = r->infs.iFL->val;
 
     LCD_clear(r->lcd);
-    fprintf(r->flcd,"0=%u|1=%d", input_adc0, input_adc1);
-
+    fprintf(r->flcd,"%7.2f  %7.2f\n%7.2f  %7.2f\n",
+            r->infs.iFL->val,
+            r->infs.iFR->val,
+            r->infs.iBL->val,
+            r->infs.iBR->val
+            );
 
 
     gpio_toggle(PLED,LED0);
@@ -83,9 +99,10 @@ void DBG_tryADC(S_robot* r)
     //LCD_clear(r->lcd);
     //fprintf(r->flcd,"ADC=%u", r->infs.iFL->val);
 }
-void DBG_adc_finish(uint16_t values[])
+
+void DBG_adc_finish(void)
 {
-    R.infs.iFL->val=values[0];
+    //R.infs.iFL->val=values[0];
 }
 
 void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)

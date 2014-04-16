@@ -79,7 +79,7 @@ void ROBOT_initLcd(S_robot* r)
                    LCD_C_8BIT_2L_5x7_LIGHT,
                    LCD_C_ENTRY_RIGHT_CMOVE,
                    LCD_C_CUR_VIS_STATIC,
-                   r->lcd_dbuf, LCD_DBUFSZ);
+                   r->lcd_dbuf, ROB_LCD_DBUFSZ);
 
     r->lcd = &(lcds_predef[ilcd]);
 }
@@ -87,7 +87,7 @@ void ROBOT_initLcd(S_robot* r)
 void ROBOT_initUsart(S_robot* r)
 {
     // uarts[3] = UART4 = tC10,rC11
-    r->fus = fopenserial(3, 9600, r->tbuf, TBUFSZ, r->rbuf, RBUFSZ);
+    r->fus = fopenserial(3, 9600, r->tbuf, ROB_US_TBUFSZ, r->rbuf, ROB_US_RBUFSZ);
 }
 
 void ROBOT_initBuzzers(S_robot* r)
@@ -109,35 +109,58 @@ void ROBOT_initLinCam(S_robot* r)
         r->cam = INIT_lincamPredef(0);
 }
 
+void ROBOT_initInfraArrayAndChannels(S_robot* r, const uint8_t nInfras)
+{
+    uint8_t a=0;
+    S_robot_infras* in = &(r->infs);
+    in->nInfs = nInfras;
+
+    // allocate space - dendent on number of infras
+    //*(in->i) = (S_sensor_infra*) malloc(in->nInfs);
+    for(a=0; a < in->nInfs; a++)
+        in->i[a] = INIT_infraPredef(a);
+
+    // Select the channels we want to convert.
+    // for injected sampling, 4 channels max, for regular, 16 max
+    for(a=0;a<nInfras;a++)
+    {
+        in->channelArray[a] = in->i[a]->channel;
+    }
+}
+
 void ROBOT_initInfras(S_robot* r)
 {
     //uint8_t a=0;
+    S_robot_infras* in= &(r->infs);
     switch(r->life)
     {
         case(IAM_BUGGED_ROBOT):
-            // init 4 corner infra sensors
-            r->infs.iFL = INIT_infraPredef(0);/*
-            r->infs.iFR = INIT_infraPredef(1);
-            r->infs.iBL = INIT_infraPredef(2);
-            r->infs.iBR = INIT_infraPredef(3);
-            */
+            // init 4 corner infra sensors:
+            // scanning on channels IN10-IN13 = PC0-PC3 (Extension connectors table)
+            ROBOT_initInfraArrayAndChannels(r,4);
+            // connection of the PC pins is alike as position of the sensors
+            in->iFL = in->i[1];in->iFR = in->i[0]; // FL-> |PC1 PC0| <-FR
+            in->iBL = in->i[3];in->iBR = in->i[2]; // BL-> |PC3 PC2| <-BR
             break;
         case(IAM_SUMO_WARRIOR):
-            // init 4 corner infra sensors
-            r->infs.iFL = INIT_infraPredef(0);/*
-            r->infs.iFR = INIT_infraPredef(1);
-            r->infs.iBL = INIT_infraPredef(2);
-            r->infs.iBR = INIT_infraPredef(3);
-            */
+            // init 4 corner infra sensors:
+            // scanning on channels IN10-IN13 = PC0-PC3 (Extension connectors table)
+            ROBOT_initInfraArrayAndChannels(r,4);
+            // connection of the PC pins is alike as position of the sensors
+            in->iFL = in->i[1];in->iFR = in->i[0]; // FL-> |PC1 PC0| <-FR
+            in->iBL = in->i[3];in->iBR = in->i[2]; // BL-> |PC3 PC2| <-BR
             break;
         case(IAM_SHEEP_FOLLOWING_THE_LINE):
             // init "100" infra sensors strip
             //for(;a<20;a++)
-              //  r->infs.i[a] = INIT_infraPredef(a);
+              //  i->i[a] = INIT_infraPredef(a);
             break;
         default:
             break;
     }
+
+    INFRA_setupInjectedTIM2();
+    INFRA_setupInjectedADC1wTIM2(in->channelArray, in->nInfs);
 }
 
 void ROBOT_initAll(S_robot* r)
