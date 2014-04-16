@@ -44,8 +44,10 @@
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 int main_debug(S_robot* r)
 {
+    _tic();
     INIT_leds();
     ROBOT_initAll(r);
+    _tocPrint(r->flcd);
 	while (1)
     {
         /**

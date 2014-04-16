@@ -85,6 +85,7 @@ Read/Write ASCII to the Display
 
 // HD44780 physical parameters
 #define LCD_8DATA_BIT
+//#define LCD_4DATA_BIT
 #define HD44780_P_XMAX      16
 #define HD44780_P_YMAX      2
 //____________________________________________________

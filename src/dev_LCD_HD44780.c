@@ -101,13 +101,16 @@ static inline size_t min(const size_t a,const size_t b)
 void LCD_setDataPins(uint8_t index, S_dev_lcd *dev){
     uint16_t _data_pins_all  = 0x0000;
     uint8_t i = 0;
-    for(;i<8;i++) {
+    for(i=0;i<8;i++)
+    {
         dev->data_pins[i] = lcd_device_data_predef[index][i];
         _data_pins_all |= dev->data_pins[i];
     }
+    dev->data_pins_all = _data_pins_all;
 }
 
-uint16_t LCD_getMaskDataPins(S_dev_lcd *dev){
+uint16_t LCD_getMaskDataPins(S_dev_lcd *dev)
+{
     uint16_t _data_pins_all = 0x0000;
     uint8_t i = 0;
     for(;i<8;i++)
@@ -116,53 +119,42 @@ uint16_t LCD_getMaskDataPins(S_dev_lcd *dev){
 }
     //____________________________________________________
     // cookie - file access to lcd
-FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
+FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t a_nCharsPerLine,\
                uint8_t functionSet, uint8_t entryMode, uint8_t cursorMode,\
                uint8_t *dbuf, size_t dbufsz)
 {
-    // rewrite for shortness!
     S_dev_lcd *dev = &lcds_predef[index];
 
-    uint8_t i=0;
-    // initialize ring buffers
+    // initialize ring buffers - not using for lcd yet
     ringbuf_init(&(dev->data_ring),dbuf,dbufsz);
     //ringbuf_init(&(dev->rx_ring),rbuf,rbufsz);
     dev->data_ring.signal = _txsignal;
+
+    //____________________________________________________
+    // cursor position
     dev->actY = 0;
     dev->actX = 0;
+    dev->nCharsPerLine = a_nCharsPerLine;
 
+    //____________________________________________________
+    // PORTS
     // predef ports and clks
     dev->datap_clk = lcds_predef[index].datap_clk;
     dev->data_port = lcds_predef[index].data_port;
     dev->cmdp_clk = lcds_predef[index].cmdp_clk;
     dev->cmd_port = lcds_predef[index].cmd_port;
-
-    dev->nCharsPerLine = a_nCharsPerLine;
-
-
+    //____________________________________________________
+    // PINS
     // data pins
-    LCD_setDataPins(index,dev);
-    //dev->data_pins_all = LCD_getMaskDataPins(dev);
+    LCD_setDataPins(indexPins,dev);
     // cmd pins
     dev->cmdRS = GPIO11;
     dev->cmdRW = GPIO13;
     dev->cmdEN = GPIO15;
     dev->cmd_pins_all = 0x0000 | (dev->cmdRS | dev->cmdRW | dev->cmdEN);
 
-    dev->datap_clk = RCC_GPIOE;
-    dev->data_port = GPIOE;
-    dev->data_pins[0] = GPIO8;
-    dev->data_pins[1] = GPIO10;
-    dev->data_pins[2] = GPIO12;
-    dev->data_pins[3] = GPIO14;
-    dev->data_pins[4] = GPIO7;
-    dev->data_pins[5] = GPIO9;
-    dev->data_pins[6] = GPIO11;
-    dev->data_pins[7] = GPIO13;
-
-    for(;i<8;i++)
-        dev->data_pins_all |= dev->data_pins[i];
-
+    //____________________________________________________
+    // ENABLE HW
     // enable the clocks
     rcc_periph_clock_enable(dev->cmdp_clk);
     rcc_periph_clock_enable(dev->datap_clk);
@@ -175,7 +167,9 @@ FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
 	gpio_clear(dev->data_port, dev->data_pins_all); // Data bus low
     gpio_clear(dev->cmd_port, dev->cmd_pins_all); // Control bus low, Enable display
 
-    // init lcd
+    //____________________________________________________
+    // INIT LCD
+    // initial sequence for buggy response
     LCD_writeCmd(dev,LCD_C_INIT);
     LCD_waitBusy(sendCmd);
     LCD_writeCmd(dev,LCD_C_INIT);
@@ -187,28 +181,12 @@ FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
     LCD_writeCmd(dev,entryMode);
     LCD_writeCmd(dev,cursorMode);
 
-    LCD_writeCmd(dev,LCD_C_CLR0);
-/*
-    // this is not initialization - these are settings
-
-        LCD_writeCmd(0x30); asmwait(10);
-        LCD_writeCmd(0x30); asmwait(10);
-        LCD_writeCmd(0x30); asmwait(10);
-
-        //LCD_writeCmd(0x38); // Function set (8-bit interface, 2 lines, 5*7 Pixels)
-        LCD_writeCmd(0x30); // Function set (8a-bit interface, 2 lines, 5*7 Pixels) + back
-        LCD_writeCmd(0x06); // entry mode - normal
-
-        LCD_writeCmd(0x0F); // Turn on visible blinking-block cursor
-        LCD_writeCmd(LCD_C_CLR0); // Home (move cursor to top/left character position)
-*/
+    LCD_clear(dev);
 
     // init irqs
 	//usart_enable_rx_interrupt(dev->device);
 	//nvic_enable_irq(dev->irq);
-
-    // run the serail line
-    //usart_enable(dev->device);
+    // take advantage of TIMer of RTC?
 
     // stdio stub
     cookie_io_functions_t stub = { _iord, _iowr, _ioseek, _ioclose };
@@ -220,7 +198,6 @@ FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,\
     // testin'
 void LCD_displayWriteCheck(S_dev_lcd *dev)
 {
-
     uint8_t xmax = dev->nCharsPerLine - 1;
     uint8_t ymax = dev->nLines;
     uint8_t x = 0;
@@ -231,22 +208,26 @@ void LCD_displayWriteCheck(S_dev_lcd *dev)
     while(1){
         LCD_gotoxy(dev,x,y);
         LCD_writeChar(dev,'0'+x);
-        //gpio_toggle(PLED,LED0);
-        if(x == xmax)
-        {
-            y++; x=0;
-        }
-        else
-        {
-            x++;
-        }
+        if(x == xmax){ y++; x=0; }
+        else         { x++; }
         if(y == ymax) break;
     }
     LCD_waitBusy(dispCheck);
 }
+
+void dev_LCD_checkSeek(FILE* flcd)
+{
+    uint8_t b = 0;
+    while(b!=32) // b reset value should be nCharsPerLine * nLines
+    {
+        fseek(flcd,b,SEEK_SET);
+        fputc('x',flcd);
+        twait(10);
+        b++;
+    }
+}
     //____________________________________________________
     // low level
-
 
 static ssize_t _iord(void *_cookie, char *_buf,size_t _n)
 {
@@ -261,14 +242,11 @@ static ssize_t _iowr(void *_cookie, const char *_buf, size_t _n)
 {
     // tohle bude volat druhou funkci LCD_write s parametrem DATA (vždy)
     // pomoci fopencookie nebude možné nastavovat LCD -> pouze psát data
-    // možná pøi initu se dá aj init všeho -> dvì možnosti, init bez zmìny
-    // -> a druhá init s nastavením
     S_dev_lcd *dev = (S_dev_lcd *)_cookie;
     // prozatím vynechám buffer
     int written = 0;
     //int c = 0;
     uint8_t i = 0;
- //       LCD_writeChar(dev,_buf[i]);
     do {
         uint8_t ch = (uint8_t)_buf[i];
         if( (ch == '\n') || (ch == '\r') )
@@ -279,13 +257,17 @@ static ssize_t _iowr(void *_cookie, const char *_buf, size_t _n)
         {
             LCD_writeChar(dev,(uint8_t)_buf[i]);
         }
-
+        //if lcd->writeInsideOnly
+            if(dev->actX > dev->nCharsPerLine)
+            {
+                LCD_nextLine(dev);
+            }
         _n--;
         written++;
     } while(_n>0);//_buf[i]!='\0');
 
     return written;
-/*
+#if __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
     do {
         //nvic_disable_irq(dev->irq);
 
@@ -303,7 +285,7 @@ static ssize_t _iowr(void *_cookie, const char *_buf, size_t _n)
                 {}; // generic idle
     } while (_n > 0);
     return written;
-    */
+#endif // __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
 }
 
 static int _ioseek(void *_cookie, off_t *_off,int _whence)
@@ -333,11 +315,6 @@ static int _ioseek(void *_cookie, off_t *_off,int _whence)
     LCD_writeCmd(dev,pos);
 
     return(0);
-    /*
-    UNUSED(_whence);
-    UNUSED(_off);
-    UNUSED(_cookie);
-    return EINVAL;*/
 }
 
 static int _ioclose(void *_cookie)
@@ -353,19 +330,6 @@ struct ringbuf *ser_txbuf(uint8_t index)
     return &uarts[index].tx_ring;
 }
 #endif // __NOT_IMPLEMENTED_YET
-
-
-void dev_LCD_checkSeek(FILE* flcd)
-{
-    uint8_t b = 0;
-    while(b!=32) // b reset value should be nCharsPerLine * nLines
-    {
-        fseek(flcd,b,SEEK_SET);
-        fputc('x',flcd);
-        twait(10);
-        b++;
-    }
-}
 
 #if __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
 static void _isru(uart_device_t *dev)

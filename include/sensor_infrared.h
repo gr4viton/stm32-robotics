@@ -27,6 +27,7 @@
 #include <libopencm3/stm32/adc.h>
 #include  <libopencm3/stm32/exti.h>
 
+#include <math.h>
 
 //_________> project includes
 #include "defines.h"
@@ -40,7 +41,10 @@
 // MACRO DEFINITIONS
 //____________________________________________________
 //constants (user-defined)
-#define INFRA_SAMPLES 16
+// stored samples from adc
+#define INFRA_SAMPLES       16
+// stored samples from blackwhite sensor
+#define BLACKWHITE_SAMPLES  16
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -88,6 +92,19 @@ typedef enum _E_infraVoltageTresholdType
 //____________________________________________________
 // structs
 /****************
+ @brief
+ ****************/
+// another possibility how to solve it->
+typedef struct _S_sensor_blackNwhite
+{
+    volatile bool free; // true if the sensor is over a free space (SUMO-black,LINE-white)
+
+    // rewrite to use the values bit-wise (with mapping)
+    volatile bool values[BLACKWHITE_SAMPLES];
+}S_sensor_blackNwhite;
+
+
+/****************
  @brief Structure encapsulating ultrasonic sensor
  ****************/
 typedef struct _S_sensor_infra
@@ -102,7 +119,7 @@ typedef struct _S_sensor_infra
 
     uint16_t triggerVal; // value of the adc watchdog trigger interupt
 
-
+    S_sensor_blackNwhite bnw;
 #if __NOT_IMPLEMENTED_YET
     uint8_t adc_setting;
 #endif // __NOT_IMPLEMENTED_YET
@@ -110,21 +127,15 @@ typedef struct _S_sensor_infra
 
     uint16_t channel; // chanels to scan (injected)
     volatile double val; // counted last value of the ADC
+    double stdev; // standard deviation
+    double nStds; // number of standard deviations
 
     volatile uint8_t indADC; // index of active element in samples, values arrays
     volatile uint16_t samplesADC[INFRA_SAMPLES]; // input from AD conversion
     volatile uint16_t valuesADC[INFRA_SAMPLES]; // previous counted value (mean)
 } S_sensor_infra;
 
-#if __NOT_IMPLEMENTED_YET
-// another possibility how to solve it->
-typedef struct _S_sensor_blackWhite
-{
-    volatile bool free; // true if the sensor is over a free space (SUMO-black,LINE-white)
 
-    S_sensor_infra* i
-}S_sensor_blackWhite;
-#endif // __NOT_IMPLEMENTED_YET
 //____________________________________________________
 // unions
 

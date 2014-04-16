@@ -74,8 +74,9 @@ void ROBOT_initButtons(S_robot* r)
 
 void ROBOT_initLcd(S_robot* r)
 {
-    int ilcd = 0;
-    r->flcd = fopenLCD(ilcd, 16,
+    uint8_t ilcd = 1;
+    uint8_t iPins = 0;
+    r->flcd = fopenLCD(ilcd, iPins, 16,
                    LCD_C_8BIT_2L_5x7_LIGHT,
                    LCD_C_ENTRY_RIGHT_CMOVE,
                    LCD_C_CUR_VIS_STATIC,
@@ -203,6 +204,19 @@ E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r)
     }
     return newLife;
 
+}
+    //____________________________________________________
+    // tictoc
+void _tocPrint(FILE* f)
+{
+    uint32_t t = _toc();
+    fprintf(f, "%lums|", t);
+}
+
+void _tocPrintFrom(FILE* f,uint32_t start)
+{
+    uint32_t t = _tocFrom(start);
+    fprintf(f, "%lums|", t);
 }
 
     //____________________________________________________

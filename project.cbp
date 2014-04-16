@@ -22,12 +22,12 @@
 				<Option type="5" />
 				<Option compiler="armelfgcc" />
 				<MakeCommands>
-					<Build command="$make  -f $makefile images" />
+					<Build command="$make -f $makefile images" />
 					<CompileFile command="$make -f $makefile $file" />
 					<Clean command="$make -f $makefile clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
 					<AskRebuildNeeded command="$make -q -f $makefile $target" />
-					<SilentBuild command="$make  -f $makefile images &gt; $(CMD_NULL)" />
+					<SilentBuild command="$make -f $makefile images &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 			<Target title="Release">

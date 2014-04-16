@@ -214,7 +214,19 @@ void INFRA_setTresholdLastValue(S_sensor_infra* inf, E_infraInterruptBrightness 
     // set treshold value from the last value
     // future-> maybe to have it as a mean value of samples
     // (instead of the last value which is counted a little differently)
-    inf->triggerVal = inf->val;
+
+    // add or subtract nStds standard deviations of samples
+    // -> to be sure the trigger is different enaugh
+    inf->stdev = 0; // standard deviation
+    inf->nStds = 5; // number of standard deviations added
+    uint8_t a=0;
+    for(a=0; a<INFRA_SAMPLES; a++)
+    {
+        inf->stdev += (inf->valuesADC[a] - inf->val) * (inf->valuesADC[a] - inf->val);
+    }
+    inf->stdev = sqrt(inf->stdev / (INFRA_SAMPLES-1) );
+    if(inf->treshVoltage == treshVoltage_high) inf->triggerVal = inf->val + inf->nStds * inf->stdev;
+    if(inf->treshVoltage == treshVoltage_low) inf->triggerVal = inf->val - inf->nStds * inf->stdev;
 }
 
     //____________________________________________________
@@ -287,7 +299,7 @@ void adc_isr(void)
         // the order of channels in adc channelArray is the same as in array inf->i[]
         for(a=0; a<R.infs.nInfs; a++)
         {
-            gpio_toggle(PLED,LEDRED2);
+            //gpio_toggle(PLED,LEDRED2);
             sample = adc_read_injected(ADC1, a+1); // indexed from 1
             INFRA_addSampleCountMean(R.infs.i[a], sample);
         }

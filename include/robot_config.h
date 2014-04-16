@@ -239,6 +239,18 @@ void ROBOT_initInfraArrayAndChannels(S_robot* r, const uint8_t nInfras);
  ****************/
 void ROBOT_initAll(S_robot* r);
     //____________________________________________________
+    // tictoc
+/****************
+ \brief   Calls _toc function and prints the interval
+ \param FILE* fopencookie where to print to
+ ****************/
+void _tocPrint(FILE* f);
+/****************
+ \brief   Calls _tocFrom function and prints the interval
+ \param FILE* fopencookie where to print to
+ ****************/
+void _tocPrintFrom(FILE* f, uint32_t start);
+    //____________________________________________________
     // others
 /****************
  \brief   Finds out which life should be lived by pushed "buttons"

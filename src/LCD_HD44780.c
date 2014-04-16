@@ -49,7 +49,9 @@ void LCD_waitBusy(E_waitType wType){
     switch(wType){
         case(sendCmd): mswait(5); break;  // Wait 5ms for command writes
         case(sendData): mswait(1); break;     // and 200us for data writes.
-        case(setEnable): mswait(1); break;  // Wait At Least 450 ns!!!
+        case(setEnable): //mswait(1); break;  // Wait At Least 450 ns!!!
+            __asm__("nop");__asm__("nop");__asm__("nop");
+            break;
         case(dispCheck): mswait(500); break;  // long for refreshment - LCD_displayWriteCheck
         default: mswait(5);
     }
@@ -116,7 +118,7 @@ void LCD_write(S_dev_lcd *dev, uint8_t data, E_waitType wType){
 }
 
 #ifdef LCD_4DATA_BIT
-
+#if __NOT_USED_ANYMORE
 void LCD_writePort(uint8_t data){
     uint16_t LCD_port = 0x0000;
     if( data & GPIO4) LCD_port |= LCD_D4;
@@ -126,25 +128,36 @@ void LCD_writePort(uint8_t data){
 
     gpio_port_write(PLCD_DATA,LCD_port);
 }
+#endif // __NOT_USED_ANYMORE
 
-void LCD_writeByte(uint8_t data, E_waitType wType){
-    gpio_clear(PLCD_CMD,LCD_EN);
+void LCD_writePort(S_dev_lcd *dev, uint8_t data){
+    uint16_t LCD_port = 0x0000;
+    uint8_t i=0;
+    for(;i<8;i++)
+        if( data & ((1LU)<<i))
+            LCD_port |= dev->data_pins[i];
+    gpio_port_write(dev->data_port, LCD_port); // expose data/cmd on data bus
+}
+
+void LCD_writeByte(S_dev_lcd *dev, uint8_t data, E_waitType wType){
+    gpio_clear(dev->cmd_port,dev->cmdEN);
     // write HIGH NIBBLE of the data/command on D7-4
     uint8_t nibble = data & 0xF0;
-    LCD_writePort( nibble );
-        gpio_set(PLCD_CMD, LCD_EN);
+    LCD_writePort( dev, nibble );
+        gpio_set(dev->cmd_port, dev->cmdEN);
             LCD_waitBusy(setEnable);
-        gpio_clear(PLCD_CMD,LCD_EN);
+        gpio_clear(dev->cmd_port, dev->cmdEN);
     LCD_waitBusy(wType);
 
     // write the LOW NIBBLE of the data/command on D7-4
     nibble = (data<<4) & 0xF0;
-    LCD_writePort(nibble);
-        gpio_set(PLCD_CMD, LCD_EN);
+    LCD_writePort( dev, nibble );
+        gpio_set(dev->cmd_port, dev->cmdEN);
             LCD_waitBusy(setEnable);
-        gpio_clear(PLCD_CMD,LCD_EN);
+        gpio_clear(dev->cmd_port, dev->cmdEN);
     LCD_waitBusy(wType);
 }
+
 #endif // LCD_4DATA_BIT
 #ifdef LCD_8DATA_BIT
 
@@ -161,7 +174,7 @@ void LCD_writeByte(S_dev_lcd *dev, uint8_t data, E_waitType wType){
     gpio_clear(dev->cmd_port,dev->cmdEN);
     LCD_writePort( dev, data );
         gpio_set(dev->cmd_port, dev->cmdEN);
-        __asm__("nop");__asm__("nop");__asm__("nop");
+            LCD_waitBusy(setEnable);
         gpio_clear(dev->cmd_port, dev->cmdEN);
     LCD_waitBusy(wType);
 }

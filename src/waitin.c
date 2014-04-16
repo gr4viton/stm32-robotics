@@ -53,6 +53,7 @@
  overflows every 49 days(for WAITIN_SYSCLK_1MS) if you're wondering
  ****************/
 volatile uint32_t system_tick;
+volatile uint32_t tic_toc_start;
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
@@ -69,6 +70,22 @@ static void systick_setup(void);
 void sys_tick_handler(void)
 {   /* Called when systick fires */
 	system_tick++;
+}
+
+uint32_t _tic(void)
+{
+    tic_toc_start = system_tick;
+    return tic_toc_start;
+}
+
+uint32_t _toc(void)
+{
+    return system_tick - tic_toc_start;
+}
+
+uint32_t _tocFrom(uint32_t start)
+{
+    return system_tick - start;
 }
 
 #ifdef WAITIN_SYSCLK_1MS

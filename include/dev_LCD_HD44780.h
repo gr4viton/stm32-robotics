@@ -89,6 +89,9 @@ typedef struct _S_lcdDevice{
     //uint16_t txpin;
     //uint16_t rxpin;
 
+    // write only inside the visible frame
+    //uint8_t writeInsideOnly;
+
     uint8_t nCharsPerLine;
     uint8_t nLines;
 
@@ -143,7 +146,9 @@ extern S_dev_lcd lcds_predef[];
 void LCD_setDataPins(uint8_t index, S_dev_lcd *dev);
 
 /****************
- \brief
+ \brief Returns all pins in one port all_pins port
+ Not used much as all_pins are counted in LCD_setDataPins
+ although -> you can call this function after you change i.e one pin
  \param
  \retval
  ****************/
@@ -161,7 +166,7 @@ void LCD_displayWriteCheck(S_dev_lcd *dev);
  \param
  \retval
  ****************/
-FILE *fopenLCD(uint8_t index, uint8_t a_nCharsPerLine,
+FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t a_nCharsPerLine,
                uint8_t functionSet, uint8_t entryMode, uint8_t cursorMode,
                uint8_t *dbuf, size_t dbufsz);
 

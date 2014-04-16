@@ -63,11 +63,18 @@
 int main_sumo(S_robot* r);
 
 /****************
- \brief
- \param
+ \brief Wait for 5*one_sec with led effects
+ \param one_sec lenght of one sec in ms
+ ****************/
+void SUMO_wait5sec(uint16_t one_sec);
+
+/****************
+ \brief   Wait for one sec with led effect of index-th second
+ \param uint16_t lenght of one sec in ms
+ \param uint8_t which second led effect to do
  \retval
  ****************/
-void SUMO_wait5sec(void);
+void SUMO_waitSec(uint16_t one_sec, uint8_t index);
 
 /****************
  \brief  During 5 seconds, counts mean from measure of free-space color

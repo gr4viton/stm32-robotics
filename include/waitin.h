@@ -52,6 +52,7 @@
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
+extern volatile uint32_t tic_toc_start;
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS
@@ -76,6 +77,26 @@ void INIT_clk(void);
  \retval
  ****************/
 void mswait(uint32_t delay);
+
+/****************
+ \brief Stores systick stamp to global variable (MATLAB alike)
+ \retval also returns the stamp
+ ****************/
+uint32_t _tic(void);
+
+/****************
+ \brief Count ticks of systick from the last call of _tic
+ \retval interval between _tic and _toc in systick units
+ ****************/
+uint32_t _toc(void);
+
+/****************
+ \brief Count ticks of systick from the start time stamp
+ \param start time stamp
+ \retval interval between start time stamp and _tocFrom in systick units
+ ****************/
+uint32_t _tocFrom(uint32_t start);
+
 
 #ifdef LEGACY_WAITIN
 /****************
