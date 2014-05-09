@@ -51,7 +51,8 @@ S_actuator_dcmotor* INIT_dcmotorPredef(uint8_t index)
     S_actuator_dcmotor* dc = &(dcmotor_predef[index]);
 
     rcc_periph_clock_enable(dc->pclk);
-	gpio_mode_setup(dc->port, GPIO_MODE_INPUT, dc->pull, dc->pin);
+	gpio_mode_setup(dc->port, GPIO_MODE_INPUT, dc->pull, dc->pEN);
+	gpio_mode_setup(dc->port, GPIO_MODE_INPUT, dc->pull, dc->pPWM);
 	return dc;
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

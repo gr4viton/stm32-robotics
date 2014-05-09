@@ -28,13 +28,19 @@ x] od timeru
 x] od adc -> pomoci injected a Timeru
 ] od adc watchdog - kdy z merenych hodnot budu menit hodnotu watchdogu?
 
-[] priority nvic!!!
+[] priority nvic - nastavit aby to nedelalo problemy!!!
+[] ultracidla - timer counter period
 [] rozchodit pwm
-[] lcd
-x] 4bit
-- dodelat seek
-- vynechat mswait a dat to na pocet asmwait podle clocku procesoru!
 
+
+[x] lcd
+x] 4bit
+] dodelat seek
+] vynechat mswait a dat to na pocet asmwait podle clocku procesoru!
+
+[] buzzer skrze interrupt
+[] rozchodit akclerometr i2c
+[] RTC clock i2c communication
 [] sensor_battery - ADC-VBAT channel
 */
 

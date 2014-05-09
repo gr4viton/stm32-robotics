@@ -67,8 +67,13 @@ int main_debug(S_robot* r)
         //dev_LCD_checkSeek(flcd);
         //DBG_tryADC(r);
         //DBG_tryCNY70(r);
-        DBG_testUltraDistance(r,100);
+        //DBG_testUltraDistance(r,100);
 
+        timtick_setup();
+        while(1)
+        {
+
+        }
 	}
 
 	return 0;
@@ -220,6 +225,11 @@ void DBG_testUltraDistanceOld(S_robot* r,uint32_t repeats)
         fprintf(r->flcd, "dist[cm]=%.2f", ultra->dist/100);//ULTRA_getDist(i_ultra));
         mswait(500);
     }
+}
+
+void DBG_flash(void)
+{
+    gpio_toggle(PLED,LEDRED2);
 }
 
 #if __NOT_IMPLEMENTED_YET

@@ -89,6 +89,12 @@ void ROBOT_handleUltraEchoOnExti(uint8_t exti);
  \param
  ****************/
 void ROBOT_initIsr(uint32_t port, uint32_t exti, uint8_t irqn, uint8_t priority, enum exti_trigger_type trig);
+
+/****************
+ \brief Start clock of SYSCFG setup register - exti line port selection
+ must be called before ROBOT_initIsr for it to work!
+ ****************/
+void ROBOT_initClkIsr(void);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

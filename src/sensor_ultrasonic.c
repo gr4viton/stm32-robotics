@@ -35,11 +35,11 @@
  \brief Predefined ultrasonic sensors ports & clocks [tx=out;rx=in]
  ****************/
 S_sensor_ultra ultras_predef[] = {
- {.clk=RCC_GPIOD, .txport=GPIOD, .rxport=GPIOD, .txpin=GPIO2, .rxpin=GPIO0, .irq=NVIC_EXTI0_IRQ, .exti=EXTI0}
-,{.clk=RCC_GPIOD, .txport=GPIOD, .rxport=GPIOD, .txpin=GPIO3, .rxpin=GPIO1, .irq=NVIC_EXTI1_IRQ, .exti=EXTI1}
-,{.clk=RCC_GPIOD, .txport=GPIOD, .rxport=GPIOD, .txpin=GPIO6, .rxpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI4}
-,{.clk=RCC_GPIOD, .txport=GPIOD, .rxport=GPIOD, .txpin=GPIO7, .rxpin=GPIO5, .irq=NVIC_EXTI9_5_IRQ, .exti=EXTI5}
-//,{.clk=RCC_GPIOE, .txport=GPIOE, .rxport=GPIOE, .txpin=GPIO5, .rxpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI5}
+ {.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO2, .txpin=GPIO0, .irq=NVIC_EXTI0_IRQ, .exti=EXTI0}
+,{.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO3, .txpin=GPIO1, .irq=NVIC_EXTI1_IRQ, .exti=EXTI1}
+,{.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO6, .txpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI4}
+,{.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO7, .txpin=GPIO5, .irq=NVIC_EXTI9_5_IRQ, .exti=EXTI5}
+//,{.clk=RCC_GPIOE, .rxport=GPIOE, .txport=GPIOE, .rxpin=GPIO5, .txpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI5}
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
@@ -64,6 +64,13 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index)
 	gpio_mode_setup(ult->txport, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, ult->txpin);
 	gpio_mode_setup(ult->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, ult->rxpin);
 	gpio_clear(ult->txport, ult->txpin);
+
+/* setup timer:
+    - external trigger start rising edge
+    - upcounting
+    - external trigger stop falling edge
+    - good prescalers for measurining signal between <0.2; 12> [ms]
+*/
 
     return ult;
 }

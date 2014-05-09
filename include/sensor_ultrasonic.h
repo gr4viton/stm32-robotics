@@ -58,7 +58,6 @@
  ****************/
 typedef struct _S_sensor_ultra
 {
-    // VOLATILE !!!!!!!!!!! ??????
     uint32_t clk;
     uint32_t txport;
     uint32_t rxport;
@@ -67,21 +66,19 @@ typedef struct _S_sensor_ultra
 
     // interrupts
     uint32_t exti; // exti line
-    uint8_t irq; // NVIC irq
+    uint8_t irq;   // NVIC irq
+    uint8_t priority;
 
-
-    // uint32_t nOverflows; // not needed as sysTick overflows in 49 days in current config
+    // tick counting
     uint32_t ticksStart;
     uint32_t ticksEnd;
     uint32_t nTicks;
 
-    uint8_t priority; // interrupt priority
-
+    // distance 
     double dist;
     double coef[ROB_ULTRA_COEF_COUNT];
     // dist = coef[0] + coef[1]*nTicks + coef[2]*nTicks^2 + .. + coef[N]*nTicks^N
     // .. where N = ROB_ULTRA_COEF_COUNT
-
 } S_sensor_ultra;
 
 //____________________________________________________

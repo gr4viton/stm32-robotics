@@ -177,7 +177,7 @@ void INFRA_setupInjectedADC1wTIM2(uint8_t* channel_array, uint8_t nChannels)
 	adc_set_resolution(ADC1, ADC_CR1_RES_12BIT);    // resolution
 
 	/* We want to read the temperature sensor, so we have to enable it. */
-	adc_enable_temperature_sensor();                // temperature - (big offset -> measure difference only!)
+	//adc_enable_temperature_sensor();                // temperature - (big offset -> measure difference only!)
 
 	adc_set_injected_sequence(ADC1, nChannels, channel_array);
 
@@ -369,8 +369,6 @@ uint16_t INFRA_readNaiive(uint8_t channel)
 
 void current_init(void)
 {
-
-
 	rcc_periph_clock_enable(RCC_ADC1);
 	rcc_periph_clock_enable(RCC_ADC2);
 	rcc_periph_clock_enable(RCC_ADC3);

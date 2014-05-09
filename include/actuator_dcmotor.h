@@ -46,10 +46,11 @@
 // structs
 typedef struct _S_actuator_dcmotor
 {
-    uint32_t pclk; // button port RCC
-    uint32_t port; // button port address
-    uint8_t pull; // button pull resistor
-    uint16_t pin; // button pin
+    uint32_t pclk; // actuator port RCC
+    uint32_t port; // actuator port address
+    uint16_t pEN;  // actuator pin ENable
+    uint8_t pull;  // actuator pullU/D/None settings
+    uint16_t pPWM; // actuator pin PWM
 
     uint16_t dutyCycle; // will be used?
     uint32_t pwm; // not sure yet

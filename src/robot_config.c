@@ -201,6 +201,7 @@ void ROBOT_initLifeDebug(S_robot* r)
 {
     INIT_leds();
     r->oneSec = 970;
+    ROBOT_initClkIsr();
     ROBOT_initBuzzers(r);
     ROBOT_initUsart(r);
     ROBOT_initLcd(r);
@@ -218,6 +219,7 @@ void ROBOT_initLifeSumo(S_robot* r)
 {
     INIT_leds();
     r->oneSec = 970;
+    ROBOT_initClkIsr();
     ROBOT_initBuzzers(r);
     ROBOT_initUsart(r);
     ROBOT_initLcd(r);
@@ -235,6 +237,7 @@ void ROBOT_initLifeLine(S_robot* r)
 {
     INIT_leds();
     r->oneSec = 970;
+    ROBOT_initClkIsr();
     ROBOT_initBuzzers(r);
     ROBOT_initUsart(r);
     ROBOT_initLcd(r);

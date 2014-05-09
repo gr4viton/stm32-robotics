@@ -100,17 +100,17 @@ typedef struct _S_robot_buttons
 
     //-> future: maybe in separate state structure
     uint8_t btnStartEnabled; // 1=for accepting interrupts
-}S_robot_buttons;
+} S_robot_buttons;
 
 /****************
  @brief Structure defining all ultrasonic sensors of the robot
  ****************/
 typedef struct _S_robot_ultras
 {
-    S_sensor_ultra* uFL;
-    S_sensor_ultra* uFR;
-    S_sensor_ultra* uL;
-    S_sensor_ultra* uR;
+    S_sensor_ultra* uFL; // pointer to front left  ultrasonic sensor
+    S_sensor_ultra* uFR; // pointer to front right ultrasonic sensor
+    S_sensor_ultra* uL;  // pointer to side  left  ultrasonic sensor
+    S_sensor_ultra* uR;  // pointer to side  right ultrasonic sensor
     S_sensor_ultra* u[ROB_ULTRA_MAX_COUNT]; // array of poiners to ultra_predef
 } S_robot_ultras;
 
@@ -183,7 +183,7 @@ typedef struct _S_robot
     // lcd
     FILE *flcd; // FILE LCD - pointer to lcd device display to write strings to
     uint8_t lcd_dbuf[ROB_LCD_DBUFSZ]; // lcd data buffer (will use ring buffer logic)
-}S_robot;
+} S_robot;
 
 //____________________________________________________
 // unions

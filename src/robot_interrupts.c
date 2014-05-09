@@ -130,6 +130,28 @@ void ROBOT_handleUltraEchoOnExti(uint8_t exti)
             ULTRA_handleEcho(R.ults.u[a]);
     }
 }
+
+void ROBOT_initClkIsr(void)
+{
+    // for enabling changing SYSCFG - exti line port selection
+    // rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SYSCFGEN);// deprecated
+    rcc_periph_clock_enable(RCC_SYSCFG);
+}
+
+
+void tim3_isr()
+{
+    static int a =0;
+    if( nvic_get_pending_irq(NVIC_TIM3_IRQ) != 0)
+    {
+        a>10? a++: 0;
+        if(a==0) gpio_toggle(PLED,LEDORANGE1);
+
+        nvic_clear_pending_irq(NVIC_TIM3_IRQ); // reset flag
+    }
+
+}
+
 #if __NOT_IMPLEMENTED_YET
 void exti9_5_isr(void)
 {

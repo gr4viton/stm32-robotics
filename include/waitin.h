@@ -27,6 +27,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/systick.h>
+#include <libopencm3/stm32/timer.h>
 #include "defines.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,6 +123,11 @@ void twait(uint32_t times);
  ****************/
 void tnop(uint32_t times);
 #endif // LEGACY_WAITIN
+
+/****************
+ \brief   Sets the timer3 for 100ms intervals
+ ****************/
+void timtick_setup(void);
 
 #ifdef WAITIN_SYSCLK_100NS
 /****************

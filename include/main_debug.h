@@ -99,6 +99,7 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms);
 void DBG_testUltraDistanceOld(S_robot* r,uint32_t repeats);
 void DBG_testUltraDistance(S_robot* r,uint32_t repeats);
 
+void DBG_flash(void);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

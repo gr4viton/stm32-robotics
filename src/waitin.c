@@ -116,9 +116,6 @@ void INIT_clk()
     // Set STM32 to 168 MHz.
 	rcc_clock_setup_hse_3v3(&hse_8mhz_3v3[CLOCK_3V3_168MHZ]);
 
-    // for enabling changing SYSCFG - exti line port selection
-    rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SYSCFGEN);
-    // 6hours for one line - IRC ftw!
 	systick_setup();
 
 #if __NOT_IMPORTANT
@@ -134,7 +131,7 @@ void INIT_clk()
 		.msi_range = RCC_ICSCR_MSIRANGE_4MHZ,
 	};
 	rcc_clock_setup_msi(&myclock_config);
-#endif // __NOT_IMPORTANT
+#endif // __NOT_IMPORTANTb
 }
 
 void systick_setup(void)
@@ -151,6 +148,59 @@ void systick_setup(void)
 	systick_counter_enable();
 	/* this done last */
 	systick_interrupt_enable();
+}
+
+void timtick_setup(void)
+{
+    // initialize timer X for 1ns ticking
+    uint32_t timer;
+	timer   = TIM3;
+
+    //____________________________________________________
+    // clock initialization
+	rcc_periph_clock_enable(RCC_APB1ENR_TIM3EN);
+	rcc_periph_clock_enable(RCC_TIM3);
+    timer_reset(timer); /* Time Base configuration */
+
+    // CK_INT = f_periph(TIM3=APB1) = 30[MHz]??          //RM0090.pdf
+    //____________________________________________________
+    // MODE SETTING
+    // - use internal clock as a trigger
+    timer_set_mode(timer, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+    // TIM_CR1_CKD_CK_INT = Clock Division Ratio
+    //  - set CK_PSC = CK_INT = f_periph = 30[MHz]
+    // TIM_CR1_CMS_EDGE = Center-aligned Mode Selection
+    //  - edge..??
+    // TIM_CR1_DIR_UP = counting direction up
+
+    /*
+
+    */
+    // PSC = 0 --> CK_CNT = CK_PSC = 30[MHz]
+    timer_set_prescaler(timer, 0x0);
+
+    // Input Filter clock prescaler -
+    timer_set_clock_division(timer, 0x0); // 30[MHz] down to 30[Mhz] .= 33.3 [ns]
+
+    // TIMx_ARR - Period in counter clock ticks.
+    timer_set_period(timer, 3000-1); // ctj?? 30MHz/3000Hz -1 ??? = theoreticly generates 100[ms] intervals
+
+    /* Generate TRGO on every update. */
+    timer_set_master_mode(timer, TIM_CR2_MMS_UPDATE);
+
+    // start
+    timer_enable_counter(timer);
+
+    //____________________________________________________
+    // NVIC isr setting
+
+	//exti_select_source(exti, port);
+	//exti_set_trigger(exti, trig);
+	//exti_enable_request(exti);
+
+    // enable interrupt in NestedVectorInterruptCoo?
+	nvic_enable_irq(NVIC_TIM3_IRQ);
+	//nvic_set_priority(NVIC_TIM3_IRQ,15);
 }
 
 #ifdef LEGACY_WAITIN
