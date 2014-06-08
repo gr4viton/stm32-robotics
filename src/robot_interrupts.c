@@ -138,7 +138,7 @@ void ROBOT_initClkIsr(void)
     rcc_periph_clock_enable(RCC_SYSCFG);
 }
 
-uint32_t world_time = 0;
+uint32_t world_time_10ms = 0;
 void tim3_isr()
 {
     uint32_t t;
@@ -151,7 +151,7 @@ void tim3_isr()
     uint32_t per = 100;
     if( timer_get_flag(t,TIM_SR_UIF) != 0 )
     {
-        world_time++;
+        world_time_10ms++;
         gpio_toggle(PLED,LEDRED2);
         if(a%per == 0)
         {

@@ -170,7 +170,7 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
 }
 
 
-extern uint32_t world_time;
+extern uint32_t world_time_10ms;
 void timtick_setup(S_robot* r)
 {
     // initialize timer X for 1ns ticking
@@ -189,29 +189,24 @@ void timtick_setup(S_robot* r)
     // - use internal clock as a trigger
     timer_set_mode(t, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
     // TIM_CR1_CKD_CK_INT = Clock Division Ratio
-    //  - set CK_PSC = CK_INT = f_periph = 30[MHz]
+    //  - set CK_PSC = CK_INT = f_periph = 84[MHz]
     // TIM_CR1_CMS_EDGE = Center-aligned Mode Selection
     //  - edge..??
     // TIM_CR1_DIR_UP = counting direction up
 
-    /*
+    // presc=30, period=65536-1
+    // == <0.37; 24,186.27> [ms] == <0.006; 417> [cm]
 
-    */
-    //0xfff 20000
-
-    // PSC = 0 --> CK_CNT = CK_PSC = 30[MHz]
-    // 168Mhz / 168k = 10kHz
-    //timer_set_prescaler(t, 0x0);
+    // 84Mhz / 8400 = 10kHz
     timer_set_prescaler(t, 8400);
 
     // Input Filter clock prescaler -
-    //timer_set_clock_division(t, 0x0); // 30[MHz] down to 30[Mhz] .= 33.3 [ns]
-    timer_set_clock_division(t, 0x0); // 30[MHz] down to 30[Mhz] .= 33.3 [ns] -> no effect ??
-
+    timer_set_clock_division(t, 0);
+    // tick_interval = 1/f = (1[s]) / (84[MHz]) = 11.90[ns]
 
     // TIMx_ARR - Period in counter clock ticks.
-    timer_set_period(t, 10000-1); // ctj?? 30MHz/3000Hz -1 ??? = theoreticly generates 100[ms] intervals
-    //timer_set_period(t, 20000-1); // ctj?? 30MHz/3000Hz -1 ??? = theoreticly generates 100[ms] intervals
+    //timer_set_period(t, 65536-1);
+    timer_set_period(t, 100-1); // = <0.37; 24,186.27> [ms] = <0.006; 417> [cm]
 
     /* Generate TRGO on every update. */
     timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
@@ -238,12 +233,14 @@ void timtick_setup(S_robot* r)
     // -> if some of the timer interrupts is enabled -> it will call the tim isr function
 	nvic_enable_irq(NVIC_TIM3_IRQ);
     uint32_t last_wtime = 0;
+    uint32_t world_time = 0;
 	while(1)
     {
-        if(world_time != last_wtime)
+        if(world_time_10ms != last_wtime)
         {
-            fprintf(r->flcd, "%02lu:%02lu:%02lu\n\n", (world_time/3600), (world_time/60)%60, world_time%60);
-            last_wtime = world_time;
+            world_time = world_time_10ms/100;
+            fprintf(r->flcd, "%02lu:%02lu:%02lu.%02lu\n\n", (world_time/3600), (world_time/60)%60, world_time%60, world_time_10ms%100);
+            last_wtime = world_time_10ms;
         }
     }
 }
