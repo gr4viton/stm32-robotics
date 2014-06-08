@@ -57,6 +57,8 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index)
     ult->ticksStart = 0;
     ult->ticksEnd = 0;
     ult->nTicks = 0;
+    ult->cnt_period = 0;
+    ult->state = s0_idle_before_trigger;
 
     // get RCC from port and enable
     //rcc_periph_clock_enable(GET_rcc_from_port(ult->txport))); //????
@@ -94,6 +96,16 @@ double ULTRA_calcDist(S_sensor_ultra* ult)
     return ult->dist;
 }
 
+void ULTRA_tiggerStart(S_sensor_ultra *ult)
+{
+    gpio_set(ult->txport, ult->txpin);
+}
+
+void ULTRA_tiggerEnd(S_sensor_ultra *ult)
+{
+    gpio_clear(ult->txport, ult->txpin);
+}
+
 void ULTRA_signalSend(S_sensor_ultra *ult)
 {
     gpio_set(ult->txport, ult->txpin);
@@ -105,7 +117,10 @@ void ULTRA_signalSend(S_sensor_ultra *ult)
 
 void ULTRA_echoStarted(S_sensor_ultra *ult)
 {
-    ult->ticksStart = _tic();
+    static uint32_t t = TIM3;
+    //ult->ticksStart = _tic();
+    ult->ticksStart = timer_get_counter(t);
+    ult->state = s3_waiting_for_echo_end;
 }
 
 void ULTRA_echoEnded(S_sensor_ultra *ult)
@@ -113,9 +128,17 @@ void ULTRA_echoEnded(S_sensor_ultra *ult)
     #if __PREMATURE_OPTIMALIZATION
     ult->nTicks = (ult->ticksEnd - ult->ticksStart); //+ ult->nOverflow * ult->..; OF in 49 days ;)
     #endif // __PREMATURE_OPTIMALIZATION
-    ult->nTicks = _tocFrom(ult->ticksStart);
-    ult->ticksStart = 0; // for interrupt handler distinction between echoStart and echoEnd
+    //ult->nTicks = _tocFrom(ult->ticksStart);
+    static uint32_t t = TIM3;
+    ult->ticksEnd = timer_get_counter(t);
+    uint32_t period_interval = 10000;
+
+    ult->nTicks = (ult->cnt_period * period_interval) + ult->ticksEnd - ult->ticksStart;
     ULTRA_calcDist(ult);
+
+    ult->ticksStart = 0; // for interrupt handler distinction between echoStart and echoEnd
+    ult->cnt_period = 0;
+    ult->state = s0_idle_before_trigger;
 }
 
 void ULTRA_handleEcho(S_sensor_ultra* ult)

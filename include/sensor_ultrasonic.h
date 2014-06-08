@@ -51,6 +51,16 @@
 // TYPE DEFINITIONS
 //____________________________________________________
 // enumerations
+/****************
+ @brief Enumerator of ultra sensor states
+  ****************/
+ typedef enum _E_sensor_ultra_state
+ {
+     s0_idle_before_trigger = 0,
+     s1_sending_trigger,
+     s2_waiting_for_echo,
+     s3_waiting_for_echo_end
+ } E_sensor_ultra_state;
 //____________________________________________________
 // structs
 /****************
@@ -69,12 +79,15 @@ typedef struct _S_sensor_ultra
     uint8_t irq;   // NVIC irq
     uint8_t priority;
 
+    E_sensor_ultra_state state;
+
     // tick counting
+    uint16_t cnt_period;
     uint32_t ticksStart;
     uint32_t ticksEnd;
     uint32_t nTicks;
 
-    // distance 
+    // distance
     double dist;
     double coef[ROB_ULTRA_COEF_COUNT];
     // dist = coef[0] + coef[1]*nTicks + coef[2]*nTicks^2 + .. + coef[N]*nTicks^N
@@ -103,10 +116,13 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index);
  ****************/
 double ULTRA_calcDist(S_sensor_ultra* ult);
 
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// deprecated
 /****************
  \brief Generate a pulse on trigger signal line
  ****************/
 void ULTRA_signalSend(S_sensor_ultra *dev);
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /****************
  \brief On echo signal started

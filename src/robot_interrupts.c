@@ -138,29 +138,68 @@ void ROBOT_initClkIsr(void)
     rcc_periph_clock_enable(RCC_SYSCFG);
 }
 
-uint32_t world_time_10ms = 0;
+uint32_t world_time = 0;
+uint32_t cmp = 1000;
+
 void tim3_isr()
 {
-    uint32_t t;
-	t   = TIM3;
+    static uint32_t t = TIM3;
+    S_robot_ultras* us = R.ults;
+    S_sensor_ultra* u = R.ults.u[0];
 
-    //gpio_toggle(PLED,LEDORANGE1);
+    gpio_toggle(PLED,LEDGREEN0);
 
+        u = us->u[0];
 
-    static uint32_t a =0;
-    uint32_t per = 100;
+    if (timer_get_flag(t, TIM_SR_CC1IF))
+    {
+        timer_clear_flag(t, TIM_SR_CC1IF);
+
+        switch(u->state)
+        {
+        case(s1_sending_trigger):
+            gpio_clear(PLED,LEDORANGE1);
+            u->state = s2_waiting_for_echo;
+
+            break;
+
+        }
+
+        cmp = timer_get_counter(t) + 1000;
+
+        timer_set_oc_value(t, TIM_OC1, cmp);
+
+        gpio_toggle(PLED,LEDBLUE3);
+    }
+
     if( timer_get_flag(t,TIM_SR_UIF) != 0 )
     {
-        world_time_10ms++;
-        gpio_toggle(PLED,LEDRED2);
-        if(a%per == 0)
+        timer_clear_flag(t, TIM_SR_UIF);
+
+        switch(u->state)
         {
-            gpio_toggle(PLED,LEDORANGE1);
+        case(s0_idle_before_trigger):
+            // send 10us trigger signal
+            cmp = 2000;
+            u->cnt_period = 0;
+            gpio_set(PLED,LEDORANGE1);
+            u->state = s1_sending_trigger;
+
+            break;
+
         }
-        a++;
+        u->cnt_period++;
+        //if(u->cnt_period)
+        //cnt_period
+
+        cmp = 1;
+        world_time++;
+        gpio_toggle(PLED,LEDRED2);
+        /*
         nvic_clear_pending_irq(NVIC_TIM3_IRQ); // reset flag
+        */
     }
-/*
+    /*
 
     if( nvic_get_pending_irq(NVIC_TIM3_IRQ) != 0)
     {
@@ -170,7 +209,7 @@ void tim3_isr()
         nvic_clear_pending_irq(NVIC_TIM3_IRQ); // reset flag
     }
     */
-    timer_clear_flag(t,0xFFFF);
+    //timer_clear_flag(t,0xFFFF);
 }
 
 #if __NOT_IMPLEMENTED_YET

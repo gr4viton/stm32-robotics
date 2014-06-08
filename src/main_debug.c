@@ -170,7 +170,7 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
 }
 
 
-extern uint32_t world_time_10ms;
+extern uint32_t world_time;
 void timtick_setup(S_robot* r)
 {
     // initialize timer X for 1ns ticking
@@ -194,6 +194,9 @@ void timtick_setup(S_robot* r)
     //  - edge..??
     // TIM_CR1_DIR_UP = counting direction up
 
+    // continuous
+    timer_continuous_mode(TIM2);
+
     // presc=30, period=65536-1
     // == <0.37; 24,186.27> [ms] == <0.006; 417> [cm]
 
@@ -206,21 +209,46 @@ void timtick_setup(S_robot* r)
 
     // TIMx_ARR - Period in counter clock ticks.
     //timer_set_period(t, 65536-1);
-    timer_set_period(t, 100-1); // = <0.37; 24,186.27> [ms] = <0.006; 417> [cm]
+    timer_set_period(t, 10000-1); // = <0.37; 24,186.27> [ms] = <0.006; 417> [cm]
 
     /* Generate TRGO on every update. */
     timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
+
+    /* Disable outputs. */
+    timer_disable_oc_output(t, TIM_OC1);
+    timer_disable_oc_output(t, TIM_OC2);
+    timer_disable_oc_output(t, TIM_OC3);
+    timer_disable_oc_output(t, TIM_OC4);
+
+
+    /* -- OC1 configuration -- */
+
+    /* Configure global mode of line 1. */
+    timer_disable_oc_clear(t, TIM_OC1);
+    timer_disable_oc_preload(t, TIM_OC1);
+    timer_set_oc_slow_mode(t, TIM_OC1);
+    timer_set_oc_mode(t, TIM_OC1, TIM_OCM_FROZEN);
+
+    /* Set the capture compare value for OC1. */
+    timer_set_oc_value(t, TIM_OC1, 1000);
+
+    /* Enable commutation interrupt. */
+    timer_enable_irq(t, TIM_DIER_CC1IE);
+    /* ---- */
+    #if 0
+#endif // 0
 
     // start
     timer_enable_counter(t);
     uint16_t irqs = 0 ;
 
-    irqs = TIM_DIER_CC1IE | TIM_DIER_BIE ;
+    timer_enable_irq(t, TIM_DIER_UIE);
+    //irqs = TIM_DIER_CC1IE | TIM_DIER_BIE ;
     //irqs = TIM_DIER_BIE;
     //irqs = TIM_DIER_TIE;
     //irqs = TIM_DIER_UIE; // update is the best :)
-    irqs = 0xFFFF;
-    timer_enable_irq(t,irqs);
+    //irqs = 0xFFFF;
+    //timer_enable_irq(t,irqs);
 
     //____________________________________________________
     // NVIC isr setting
@@ -233,14 +261,23 @@ void timtick_setup(S_robot* r)
     // -> if some of the timer interrupts is enabled -> it will call the tim isr function
 	nvic_enable_irq(NVIC_TIM3_IRQ);
     uint32_t last_wtime = 0;
-    uint32_t world_time = 0;
+    uint16_t cnt = 0;
+
+    uint32_t period = 100;
+    uint32_t prStart = _tic();
 	while(1)
     {
-        if(world_time_10ms != last_wtime)
+        if(world_time != last_wtime)
         {
-            world_time = world_time_10ms/100;
-            fprintf(r->flcd, "%02lu:%02lu:%02lu.%02lu\n\n", (world_time/3600), (world_time/60)%60, world_time%60, world_time_10ms%100);
-            last_wtime = world_time_10ms;
+            fprintf(r->flcd, "%02lu:%02lu:%02lu\n", (world_time/3600), (world_time/60)%60, world_time%60);
+            last_wtime = world_time;
+        }
+        if( _tocFrom(prStart) > period )
+        {
+            LCD_gotoxy(r->lcd,0,1);
+            fprintf(r->flcd, "[%4u/%s]\n", cnt, "10k");
+            cnt = timer_get_counter(t);
+            prStart = _tic();
         }
     }
 }
