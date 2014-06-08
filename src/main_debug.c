@@ -43,102 +43,6 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
 
-extern uint32_t world_time;
-void timtick_setup(S_robot* r)
-{
-    // initialize timer X for 1ns ticking
-    uint32_t t;
-	t   = TIM3;
-
-    //____________________________________________________
-    // clock initialization
-	rcc_periph_clock_enable(RCC_APB1ENR_TIM3EN);
-	rcc_periph_clock_enable(RCC_TIM3);
-    timer_reset(t); /* Time Base configuration */
-
-    // CK_INT = f_periph(TIM3=APB1) = 30[MHz]??          //RM0090.pdf
-    //____________________________________________________
-    // MODE SETTING
-    // - use internal clock as a trigger
-    timer_set_mode(t, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    // TIM_CR1_CKD_CK_INT = Clock Division Ratio
-    //  - set CK_PSC = CK_INT = f_periph = 30[MHz]
-    // TIM_CR1_CMS_EDGE = Center-aligned Mode Selection
-    //  - edge..??
-    // TIM_CR1_DIR_UP = counting direction up
-
-    /*
-
-    */
-    //0xfff 20000
-
-    // PSC = 0 --> CK_CNT = CK_PSC = 30[MHz]
-    // 168Mhz / 168k = 10kHz
-    //timer_set_prescaler(t, 0x0);
-    timer_set_prescaler(t, 8400);
-
-    // Input Filter clock prescaler -
-    //timer_set_clock_division(t, 0x0); // 30[MHz] down to 30[Mhz] .= 33.3 [ns]
-    timer_set_clock_division(t, 0x0); // 30[MHz] down to 30[Mhz] .= 33.3 [ns] -> no effect ??
-
-
-    // TIMx_ARR - Period in counter clock ticks.
-    timer_set_period(t, 10000-1); // ctj?? 30MHz/3000Hz -1 ??? = theoreticly generates 100[ms] intervals
-    //timer_set_period(t, 20000-1); // ctj?? 30MHz/3000Hz -1 ??? = theoreticly generates 100[ms] intervals
-
-    /* Generate TRGO on every update. */
-    timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
-
-    // start
-    timer_enable_counter(t);
-    uint16_t irqs = 0 ;
-
-    irqs = TIM_DIER_CC1IE | TIM_DIER_BIE ;
-    //irqs = TIM_DIER_BIE;
-    //irqs = TIM_DIER_TIE;
-    //irqs = TIM_DIER_UIE; // update is the best :)
-    irqs = 0xFFFF;
-    timer_enable_irq(t,irqs);
-
-    //____________________________________________________
-    // NVIC isr setting
-
-	//exti_select_source(exti, port);
-	//exti_set_trigger(exti, trig);
-	//exti_enable_request(exti);
-
-    // enable interrupt in NestedVectorInterrupt
-    // -> if some of the timer interrupts is enabled -> it will call the tim isr function
-	nvic_enable_irq(NVIC_TIM3_IRQ);
-    uint32_t last_wtime = 0;
-	while(1)
-    {
-        if(world_time != last_wtime)
-        {
-            fprintf(r->flcd, "cnt=%lu  \n", world_time);
-            last_wtime = world_time;
-        }
-    }
-/*
-	uint32_t count = 0xFF;
-	uint32_t last_count = 0xFF;
-	uint32_t a = 0;
-	uint32_t per = 0x2FFFF;
-    while(1)
-    {
-
-        if(a%per==0)
-        {
-            count = timer_get_counter(t);
-            fprintf(r->flcd, "cnt=%lu  \n",count);
-            fprintf(r->flcd, "dif=%lu  \n",count>last_count ? count-last_count: last_count-count);
-            last_count = count;
-        }
-        a++;
-    }
-*/
-	//nvic_set_priority(NVIC_TIM3_IRQ,15);
-}
 
 int main_debug(S_robot* r)
 {
@@ -165,10 +69,10 @@ int main_debug(S_robot* r)
         //dev_LCD_checkSeek(flcd);
         //DBG_tryADC(r);
         //DBG_tryCNY70(r);
-        //DBG_testUltraDistance(r,100);
+        DBG_testUltraDistance(r,100);
 
         //INIT_tim(r);
-        timtick_setup(r);
+
         while(1)
         {
 
@@ -265,12 +169,94 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
     gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
 }
 
+
+extern uint32_t world_time;
+void timtick_setup(S_robot* r)
+{
+    // initialize timer X for 1ns ticking
+    uint32_t t;
+	t   = TIM3;
+
+    //____________________________________________________
+    // clock initialization
+	rcc_periph_clock_enable(RCC_APB1ENR_TIM3EN);
+	rcc_periph_clock_enable(RCC_TIM3);
+    timer_reset(t); /* Time Base configuration */
+
+    // CK_INT = f_periph(TIM3=APB1) = 30[MHz]??          //RM0090.pdf
+    //____________________________________________________
+    // MODE SETTING
+    // - use internal clock as a trigger
+    timer_set_mode(t, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+    // TIM_CR1_CKD_CK_INT = Clock Division Ratio
+    //  - set CK_PSC = CK_INT = f_periph = 30[MHz]
+    // TIM_CR1_CMS_EDGE = Center-aligned Mode Selection
+    //  - edge..??
+    // TIM_CR1_DIR_UP = counting direction up
+
+    /*
+
+    */
+    //0xfff 20000
+
+    // PSC = 0 --> CK_CNT = CK_PSC = 30[MHz]
+    // 168Mhz / 168k = 10kHz
+    //timer_set_prescaler(t, 0x0);
+    timer_set_prescaler(t, 8400);
+
+    // Input Filter clock prescaler -
+    //timer_set_clock_division(t, 0x0); // 30[MHz] down to 30[Mhz] .= 33.3 [ns]
+    timer_set_clock_division(t, 0x0); // 30[MHz] down to 30[Mhz] .= 33.3 [ns] -> no effect ??
+
+
+    // TIMx_ARR - Period in counter clock ticks.
+    timer_set_period(t, 10000-1); // ctj?? 30MHz/3000Hz -1 ??? = theoreticly generates 100[ms] intervals
+    //timer_set_period(t, 20000-1); // ctj?? 30MHz/3000Hz -1 ??? = theoreticly generates 100[ms] intervals
+
+    /* Generate TRGO on every update. */
+    timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
+
+    // start
+    timer_enable_counter(t);
+    uint16_t irqs = 0 ;
+
+    irqs = TIM_DIER_CC1IE | TIM_DIER_BIE ;
+    //irqs = TIM_DIER_BIE;
+    //irqs = TIM_DIER_TIE;
+    //irqs = TIM_DIER_UIE; // update is the best :)
+    irqs = 0xFFFF;
+    timer_enable_irq(t,irqs);
+
+    //____________________________________________________
+    // NVIC isr setting
+
+	//exti_select_source(exti, port);
+	//exti_set_trigger(exti, trig);
+	//exti_enable_request(exti);
+
+    // enable interrupt in NestedVectorInterrupt
+    // -> if some of the timer interrupts is enabled -> it will call the tim isr function
+	nvic_enable_irq(NVIC_TIM3_IRQ);
+    uint32_t last_wtime = 0;
+	while(1)
+    {
+        if(world_time != last_wtime)
+        {
+            fprintf(r->flcd, "%02lu:%02lu:%02lu\n\n", (world_time/3600), (world_time/60)%60, world_time%60);
+            last_wtime = world_time;
+        }
+    }
+}
+
 void DBG_testUltraDistance(S_robot* r,uint32_t repeats)
 {
     S_sensor_ultra* u ;
     uint8_t a =0;
     FILE* f = r->fus;
     //FILE* f = r->flcd;
+
+    timtick_setup(r);
+
     while(repeats>1)
     {
         repeats--;
