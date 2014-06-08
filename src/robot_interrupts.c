@@ -138,10 +138,30 @@ void ROBOT_initClkIsr(void)
     rcc_periph_clock_enable(RCC_SYSCFG);
 }
 
-
+uint32_t world_time = 0;
 void tim3_isr()
 {
-    static int a =0;
+    uint32_t t;
+	t   = TIM3;
+
+    //gpio_toggle(PLED,LEDORANGE1);
+
+
+    static uint32_t a =0;
+    uint32_t per = 100;
+    if( timer_get_flag(t,TIM_SR_UIF) != 0 )
+    {
+        world_time++;
+        gpio_toggle(PLED,LEDRED2);
+        if(a%per == 0)
+        {
+            gpio_toggle(PLED,LEDORANGE1);
+        }
+        a++;
+        nvic_clear_pending_irq(NVIC_TIM3_IRQ); // reset flag
+    }
+/*
+
     if( nvic_get_pending_irq(NVIC_TIM3_IRQ) != 0)
     {
         a>10? a++: 0;
@@ -149,7 +169,8 @@ void tim3_isr()
 
         nvic_clear_pending_irq(NVIC_TIM3_IRQ); // reset flag
     }
-
+    */
+    timer_clear_flag(t,0xFFFF);
 }
 
 #if __NOT_IMPLEMENTED_YET

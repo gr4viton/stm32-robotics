@@ -33,11 +33,13 @@
 // static variables
 /****************
  \brief Predefined mapping of [LCD data pins] to [MCU port pins]
+ D0 D1 D2 D3 D4 D5 D6 D7 ?
  ****************/
 static uint16_t lcd_device_data_predef[][8] =
 {
-    { GPIO8, GPIO10, GPIO12, GPIO14, GPIO7, GPIO9, GPIO11, GPIO13 },
-    { GPIO0, GPIO1, GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, GPIO7 }
+/*0*/{ GPIO8, GPIO10, GPIO12, GPIO14, GPIO7, GPIO9, GPIO11, GPIO13 },
+/*1*/{ GPIO0, GPIO1, GPIO2, GPIO3, GPIO4, GPIO5, GPIO6, GPIO7 },
+/*2*/{ GPIO7, GPIO9, GPIO11, GPIO13, GPIO8, GPIO10, GPIO12, GPIO14  }
 };
 /****************
  \brief Predefined LCD ports & clocks for CMD(control-command) and DATA buses
@@ -45,8 +47,8 @@ static uint16_t lcd_device_data_predef[][8] =
 // later on this could be static as you probably want to use the LCD only through cookie
 S_dev_lcd lcds_predef[] =
 {
-    { .cmd_port=GPIOD, .cmdp_clk=RCC_GPIOD, .data_port=GPIOE,  .datap_clk=RCC_GPIOE },
-    { .cmd_port=GPIOB, .cmdp_clk=RCC_GPIOB, .data_port=GPIOE,  .datap_clk=RCC_GPIOE }
+/*0*/{ .cmd_port=GPIOD, .cmdp_clk=RCC_GPIOD, .data_port=GPIOE,  .datap_clk=RCC_GPIOE },
+/*1*/{ .cmd_port=GPIOB, .cmdp_clk=RCC_GPIOB, .data_port=GPIOE,  .datap_clk=RCC_GPIOE }
 };
 
 #if __NOT_USED_ANYMORE
@@ -169,6 +171,23 @@ FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t nCharsPerLine,
     // reset lcd pins
 	gpio_clear(dev->data_port, dev->data_pins_all); // Data bus low
     gpio_clear(dev->cmd_port, dev->cmd_pins_all); // Control bus low, Enable display
+
+    //____________________________________________________
+    //pwr pin -> transistor switch
+    uint16_t pwrPin = GPIO15;
+    uint32_t pwrClk = RCC_GPIOE;
+    uint32_t pwrPort = GPIOE;
+
+    rcc_periph_clock_enable(pwrClk);
+    mswait(1);
+    //gpio_mode_setup(pwrPort, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, pwrPin);
+    gpio_mode_setup(pwrPort, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, pwrPin);
+
+    // turn the display off
+	gpio_clear(pwrPort, pwrPin);
+
+    // turn the display on
+	gpio_set(pwrPort, pwrPin);
 
     //____________________________________________________
     // INIT LCD

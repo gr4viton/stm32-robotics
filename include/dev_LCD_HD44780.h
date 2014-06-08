@@ -210,6 +210,7 @@ typedef enum _E_lcdBasicFunctionAddresses
 typedef struct _S_lcdDevice{
     uint32_t cmd_port;
     uint32_t data_port;
+
     uint32_t cmdp_clk;
     uint32_t datap_clk;
 

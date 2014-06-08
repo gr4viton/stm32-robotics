@@ -144,7 +144,7 @@ void LCD_writeByte(S_dev_lcd *dev, uint8_t data, E_waitType wType)
         LCD_writePort(dev, data, wType);
     }
     else
-    { // 4bit dataBus mode - Lower then Higher nibble ? OR THE OTHER WAY!!
+    { // 4bit dataBus mode
         LCD_writePort(dev, (data & 0xF0),      wType); // Higher nibble
         LCD_writePort(dev, ((data<<4) & 0xF0), wType); // Lower nibble
     }

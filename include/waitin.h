@@ -127,7 +127,7 @@ void tnop(uint32_t times);
 /****************
  \brief   Sets the timer3 for 100ms intervals
  ****************/
-void timtick_setup(void);
+//void timtick_setup(void);
 
 #ifdef WAITIN_SYSCLK_100NS
 /****************
