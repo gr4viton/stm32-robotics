@@ -95,7 +95,7 @@ correct interrupt continual sequence adc settings:
 /****************
  \brief Predefined infra sensors ports & clocks [tx=out;rx=in]
  ****************/
-S_sensor_infra infras_predef[4] = {
+S_sensor_infra predef_infras[4] = {
     {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO0, .channel=10},
     {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO1, .channel=11},
     {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO2, .channel=12},
@@ -136,7 +136,7 @@ void INFRA_setupInjectedTIM2(void)
 
 S_sensor_infra* INIT_infraPredef(uint8_t index)
 {
-    S_sensor_infra* inf = &infras_predef[index];
+    S_sensor_infra* inf = &predef_infras[index];
 
     // empty the measured values
     inf->val = 0;

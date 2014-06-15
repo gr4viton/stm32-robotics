@@ -34,7 +34,7 @@
 /****************
  \brief Predefined buzzer sensors ports & clocks [tx=out;rx=in]
  ****************/
-S_dev_buzzer buzzer_predef[3] = {
+S_dev_buzzer predef_buzzers[3] = {
     {.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO2 }
     ,{.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO3 }
     ,{.clk=RCC_GPIOC, .port=GPIOC, .pin=GPIO4 }
@@ -68,7 +68,7 @@ uint16_t SONG_r2d2[100][2] =
 
 S_dev_buzzer* INIT_buzzerPredef(uint8_t index)
 {
-    S_dev_buzzer* buz = &buzzer_predef[index];
+    S_dev_buzzer* buz = &predef_buzzers[index];
 
 	rcc_periph_clock_enable(buz->clk);
 	gpio_mode_setup(buz->port, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, buz->pin);

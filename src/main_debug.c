@@ -47,12 +47,13 @@
 int main_debug(S_robot* r)
 {
     _tic();
-    R.STARTED = 1;
     ROBOT_initLifeDebug(r);
     fprintf(r->flcd, "Init=");
     _tocPrint(r->flcd);
     mswait(400);
     LCD_clear(r->lcd);
+
+    ROBOT_START(r);
 
 	while (1)
     {
@@ -69,14 +70,9 @@ int main_debug(S_robot* r)
         //dev_LCD_checkSeek(flcd);
         //DBG_tryADC(r);
         //DBG_tryCNY70(r);
-        DBG_testUltraDistance(r,100);
+        DBG_testUltraDistance(r,0xFFFF);
 
         //INIT_tim(r);
-
-        while(1)
-        {
-
-        }
 	}
 
 	return 0;
@@ -169,121 +165,21 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
     gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
 }
 
-struct _S_periph_timer
+
+
+
+void DBG_testUltraDistance(S_robot*r, uint32_t reps)
 {
-    uint32_t tim; // timer address
-    uint32_t period;
-
-} S_periph_timer;
-
-
-//extern uint32_t world_time;
-void timtick_setup(S_robot* r);
-void timtick_setup(S_robot* r)
-{
-    // initialize timer X for 1ns ticking
-    uint32_t t;
-	t   = TIM3;
-
-    //____________________________________________________
-    // clock initialization
-	rcc_periph_clock_enable(RCC_APB1ENR_TIM3EN);
-	rcc_periph_clock_enable(RCC_TIM3);
-    timer_reset(t); /* Time Base configuration */
-
-    // CK_INT = f_periph(TIM3=APB1) = 30[MHz]??          //RM0090.pdf
-    //____________________________________________________
-    // MODE SETTING
-    // - use internal clock as a trigger
-    timer_set_mode(t, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    // TIM_CR1_CKD_CK_INT = Clock Division Ratio
-    //  - set CK_PSC = CK_INT = f_periph = 84[MHz]
-    // TIM_CR1_CMS_EDGE = Center-aligned Mode Selection
-    //  - edge..??
-    // TIM_CR1_DIR_UP = counting direction up
-
-    // continuous
-    timer_continuous_mode(t);
-    //timer_get
-    // 84Mhz / 8400 = 10kHz
-    // [prsc=30, period=65536-1] == <0.37; 24186.27> [ms] == <0.006; 417> [cm]
-    // [prsc=8400, period=10k  ] == <0.1 ; 840> [ms]
-
-    timer_set_prescaler(t, 30);
-
-    // Input Filter clock prescaler -
-    timer_set_clock_division(t, 0);
-
-    // TIMx_ARR - Period in counter clock ticks.
-    timer_set_period(t, 65536-1);
-
-    /* Generate TRGO on every update. */
-    timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
-
-
-    S_sensor_ultra* u = 0;
-    uint8_t q = 0;
-    uint8_t qmax = ROB_ULTRA_MAX_COUNT;
-    uint8_t timDIERccXie = 0;
-    for(q=0;q<qmax;q++)
-    {
-
-        u = R.ults.u[q];
-
-        /* Disable outputs. */
-        timer_disable_oc_output(t, u->timOCX);
-
-        /* -- OC1 configuration -- */
-
-        /* Configure global mode of line 1. */
-        timer_disable_oc_clear(t, u->timOCX);
-        timer_disable_oc_preload(t, u->timOCX);
-        timer_set_oc_slow_mode(t, u->timOCX);
-        timer_set_oc_mode(t, u->timOCX, TIM_OCM_FROZEN);
-
-        /* Set the capture compare value for OC1. */
-        timer_set_oc_value(t, u->timOCX, u->interval_trigger);
-
-        /* Enable commutation interrupt. */
-        timDIERccXie = TIM_DIER_CC1IE<<q;
-        timer_enable_irq(t, timDIERccXie);
-        /* ---- */
-    }
-
-    // start
-    timer_enable_counter(t);
-    //uint16_t irqs = 0 ;
-
-    timer_enable_irq(t, TIM_DIER_UIE);
-    //irqs = TIM_DIER_CC1IE | TIM_DIER_BIE ;
-    //irqs = TIM_DIER_BIE;
-    //irqs = TIM_DIER_TIE;
-    //irqs = TIM_DIER_UIE; // update is the best :)
-    //irqs = 0xFFFF;
-    //timer_enable_irq(t,irqs);
-
-    //____________________________________________________
-    // NVIC isr setting
-
-	//exti_select_source(exti, port);
-	//exti_set_trigger(exti, trig);
-	//exti_enable_request(exti);
-
-    // enable interrupt in NestedVectorInterrupt
-    // -> if some of the timer interrupts is enabled -> it will call the tim isr function
-	nvic_enable_irq(NVIC_TIM3_IRQ);
     uint32_t last_wtime = 0;
-    uint16_t cnt = 0;
-
     uint32_t world_time = 0;
 
     uint32_t period = 100;
     uint32_t prStart = _tic();
-    //S_sensor_ultra* u
+    S_sensor_ultra* u = 0;
     u = r->ults.u[0];
-	while(1)
+    while(reps>1)
     {
-        world_time = _tocFrom(0)/1000;
+        world_time = _tic()/1000;
         if(world_time != last_wtime)
         {
             char str_hhmmss[] = "%2lu:%02lu:%02lu";
@@ -323,20 +219,22 @@ void timtick_setup(S_robot* r)
             fprintf(r->flcd, "=%6lu |p=%u ",  u->nTicks, u->nOwerflow);
             //fprintf(r->flcd, "[s=%u][%4u]", u->state, cnt);
 
-            cnt = timer_get_counter(t);
+            //cnt = timer_get_counter(u->TIMX);
             prStart = _tic();
         }
+        reps--;
     }
 }
 
-void DBG_testUltraDistance(S_robot* r,uint32_t repeats)
+
+void DBG_testUltraDistanceOld2(S_robot* r,uint32_t repeats)
 {
     S_sensor_ultra* u ;
     uint8_t a =0;
     FILE* f = r->fus; // for output on uart
     //FILE* f = r->flcd; // for output on lcd
 
-    timtick_setup(r);
+//    INIT_ultraTimer(r,0);
 
     while(repeats>1)
     {
@@ -406,9 +304,9 @@ void DBG_debug_try(void)
     INIT_ultraPredef(i_ultra ,0);
     uint8_t ilcd = 0;
 
-    S_dev_lcd* lcd_dev = &(lcds_predef[ilcd]);
+    S_dev_lcd* lcd_dev = &(predef_lcds[ilcd]);
 
-    S_sensor_ultra* ultra = &(ultras_predef[i_ultra]);
+    S_sensor_ultra* ultra = &(predef_ultras[i_ultra]);
     ULTRA_signalSend(ultra);
     while(1)
     {

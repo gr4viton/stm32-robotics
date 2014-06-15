@@ -45,7 +45,7 @@ static uint16_t lcd_device_data_predef[][8] =
  \brief Predefined LCD ports & clocks for CMD(control-command) and DATA buses
  ****************/
 // later on this could be static as you probably want to use the LCD only through cookie
-S_dev_lcd lcds_predef[] =
+S_dev_lcd predef_lcds[] =
 {
 /*0*/{ .cmd_port=GPIOD, .cmdp_clk=RCC_GPIOD, .data_port=GPIOE,  .datap_clk=RCC_GPIOE },
 /*1*/{ .cmd_port=GPIOB, .cmdp_clk=RCC_GPIOB, .data_port=GPIOE,  .datap_clk=RCC_GPIOE }
@@ -126,7 +126,7 @@ FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t nCharsPerLine,
                uint8_t entryMode, uint8_t cursorMode,
                uint8_t *dbuf, size_t dbufsz)
 {
-    S_dev_lcd *dev = &lcds_predef[index];
+    S_dev_lcd *dev = &predef_lcds[index];
 
     // initialize ring buffers - not using for lcd yet
     ringbuf_init(&(dev->data_ring),dbuf,dbufsz);
@@ -144,10 +144,10 @@ FILE *fopenLCD(uint8_t index, uint8_t indexPins, uint8_t nCharsPerLine,
     //____________________________________________________
     // PORTS
     // predef ports and clks
-    dev->datap_clk = lcds_predef[index].datap_clk;
-    dev->data_port = lcds_predef[index].data_port;
-    dev->cmdp_clk = lcds_predef[index].cmdp_clk;
-    dev->cmd_port = lcds_predef[index].cmd_port;
+    dev->datap_clk = predef_lcds[index].datap_clk;
+    dev->data_port = predef_lcds[index].data_port;
+    dev->cmdp_clk = predef_lcds[index].cmdp_clk;
+    dev->cmd_port = predef_lcds[index].cmd_port;
     //____________________________________________________
     // PINS
     // data pins
@@ -342,7 +342,7 @@ struct ringbuf *ser_txbuf(uint8_t index)
 #endif // __NOT_IMPLEMENTED_YET
 
 #if __NOT_IMPLEMENTED_YET__INTERRUPT_WAITING_TOBE
-static void _isru(uart_device_t *dev)
+static void _isru(predef_uart_device_t *dev)
 {
     uint8_t ch;
 

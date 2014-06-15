@@ -46,8 +46,8 @@ FILE *flcd;
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-extern S_dev_lcd lcds_predef[];
-extern S_sensor_ultra ultras_predef[];
+extern S_dev_lcd predef_lcds[];
+extern S_sensor_ultra predef_ultras[];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE

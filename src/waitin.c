@@ -55,6 +55,14 @@
 volatile uint32_t system_tick;
 volatile uint32_t tic_toc_start;
 
+/****************
+ @brief Predefines for timer setup
+ ****************/
+S_timer_setup predef_timers[] =
+{ // full_freq it depends on the mode and to which apb1/2 is the timer connected
+/*0*/{.TIMX=TIM3,.prsc=30,.period=0xFFFF-1,.clk=RCC_TIM3,.apbclk=RCC_APB1ENR_TIM3EN,.nvic=NVIC_TIM3_IRQ,.full_freq=84000000},
+/*1*/{.TIMX=TIM3,.prsc=30,.period=0xFFFF-1,.clk=RCC_TIM3,.apbclk=RCC_APB1ENR_TIM3EN,.nvic=NVIC_TIM3_IRQ,.full_freq=84000000}
+};
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

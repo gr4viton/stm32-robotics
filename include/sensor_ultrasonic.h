@@ -68,14 +68,14 @@
  ****************/
 typedef struct _S_sensor_ultra
 {
-    uint8_t indx;
+    // pin settings
     uint32_t clk;
     uint32_t txport;
     uint32_t rxport;
     uint16_t txpin;
     uint16_t rxpin;
 
-    // interrupts
+    // pin interrupts
     uint32_t exti; // exti line
     uint8_t irq;   // NVIC irq
     uint8_t priority;
@@ -84,15 +84,20 @@ typedef struct _S_sensor_ultra
     E_sensor_ultra_state state; // state in which the sensor is
 
 
+    // tick settings
+    S_timer_setup* tim_s;  // pointer to the timer structure for tick counting
+    uint32_t TIMX;         // address of timer for tick counting
+    uint8_t indx;          // index of compare register in timer
+    enum tim_oc_id timOCX; // compare register of the ultra sensor in the timer
+    uint16_t nTriggerTicks; // trigger interval
+
     // tick counting
     uint16_t nOwerflow; // number of periods from echoStart to echoEnd
     uint32_t ticksStart; // ticks in timer on EchoStart
     uint32_t ticksEnd;   // ticks in timer on EchoEnd
     uint32_t nTicks;     // number of ticks from echoStart to echoEnd
-    enum tim_oc_id timOCX; // compare register of the ultra sensor in the timer
-    uint16_t interval_trigger; // trigger interval
 
-    // distance
+    // distance measurement
     double dist;
     double coef[ROB_ULTRA_COEF_COUNT];
     // dist = coef[0] + coef[1]*nTicks + coef[2]*nTicks^2 + .. + coef[N]*nTicks^N
@@ -114,7 +119,12 @@ typedef struct _S_sensor_ultra
 /****************
  \brief Initializes MCU ports for ultrasensor
  ****************/
-S_sensor_ultra* INIT_ultraPredef(uint8_t index);
+S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* tim_s);
+
+/****************
+ @brief Initializes timer for 4 ultrasensors
+ ****************/
+S_timer_setup* INIT_ultraTimer(uint8_t indx);
 
 /****************
  \brief Calculates the distance from measured period (nTicks)

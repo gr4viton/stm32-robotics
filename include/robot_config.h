@@ -274,14 +274,17 @@ void _tocPrint(FILE* f);
  ****************/
 void _tocPrintFrom(FILE* f, uint32_t start);
     //____________________________________________________
-    // others
+    // life
 /****************
  \brief   Finds out which life should be lived by pushed "buttons"
  \retval life Selected lifestyle
  ****************/
 E_lifeStyleSelector ROBOT_getLifeStyle(S_robot* r);
 
-
+/****************
+ @brief starts the timers and gives a life to the robot (R.STARTED=1)
+ ****************/
+void ROBOT_START(S_robot* r);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

@@ -82,8 +82,8 @@ int main(void)
     mainly look inside the robot_config.c and inside the struct S_robot.
     S_robot is is the core of everything
     */
-
-    S_robot* r = &R; // global= extern S_robot R;
+    // todo -> R is global pointer (for isrs) -> more pre-initialized robots -> only chose which one is active
+    S_robot* r = &R; // R is global = extern S_robot R;
     INIT_clk();
     INIT_leds();
 

@@ -8,6 +8,7 @@ CFLAGS	+= -ffunction-sections -fdata-sections -ffast-math -fno-common
 #additional warnings
 CFLAGS	+= -Wmissing-declarations -Wmissing-include-dirs -Wunreachable-code
 
+
 ###############################################################################
 # C++ flags
 
@@ -26,8 +27,15 @@ CPPFLAGS+= -Wall -Wundef
 CPPFLAGS+= $(DEFS)
 #additional warnings
 CPPFLAGS+= -Winline -Winit-self -Wuninitialized -Wfloat-equal -Wcast-qual
-CPPFLAGS+= -Wcast-align -Wswitch-enum -Wswitch-default -Wformat=2
+CPPFLAGS+= -Wcast-align -Wswitch-enum -Wswitch-default
 
+CFLAGS  += -Wformat=2
+#==
+#CFLAGS += -Wformat -Wformat-nonliteral -Wformat-security -Wformat-y2k
+CFLAGS += -Wformat -Wformat-security -Wformat-y2k
+
+# for ignoring compiler cannot control input parameter types in printf when formating string is given by a variable
+#CFLAGS  += -Wformat-nonliteral
 ###############################################################################
 # Linker flags
 
@@ -46,5 +54,7 @@ LDFLAGS	+= -Wl,--gc-sections
 # Linker libraries to be built with
 
 LDLIBS	+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
+
+
 
 

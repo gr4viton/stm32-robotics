@@ -49,21 +49,35 @@ S_robot R;
 // OTHER FUNCTION DEFINITIONS - doxygen description should be in HEADERFILE
     //____________________________________________________
 
+void ROBOT_START(S_robot* r)
+{
+    r->STARTED = 1;
+    // start the timer
+    timer_enable_counter(r->ults.u[0]->tim_s->TIMX);
+}
 
 void ROBOT_initUltras(S_robot* r)
 {
-    uint32_t sum_tick_in_period = 65536;
-    uint32_t p = sum_tick_in_period;
+    uint8_t iTim = 0;
+    S_timer_setup* tim_s = INIT_ultraTimer(iTim);
 
+/*
+    uint32_t p = tim_s->period;
     double coef[ROB_ULTRA_COEF_COUNT] =
     {0, 1.0/(double)p, 0.00};
+*/
+    //data from calibration measurement for HCR04 <4;100>cm 2014_06_15
+    double coef[ROB_ULTRA_COEF_COUNT] =
+    {0.00, 6.3143133e-3, 8.0595701e-9};
+    //{0.00, 158.40826, -0.0316105}; // = inverse
 
     uint8_t a = 0;
     S_robot_ultras* u = &(r->ults);
 
     for(a=0; a<ROB_ULTRA_MAX_COUNT; a++)
     {
-        u->u[a] = INIT_ultraPredef(a);
+        u->u[a] = INIT_ultraPredef(a, tim_s);
+
         ROBOT_initIsr(u->u[a]->rxport, u->u[a]->exti, u->u[a]->irq,
                       u->u[a]->priority, EXTI_TRIGGER_BOTH);
         ULTRA_setCoefs(u->u[a], coef);
@@ -102,7 +116,7 @@ void ROBOT_initLcd(S_robot* r)
         (display_on | cursor_on | cursor_notBlinking),
          r->lcd_dbuf, ROB_LCD_DBUFSZ);
 
-    r->lcd = &(lcds_predef[ilcd]);
+    r->lcd = &(predef_lcds[ilcd]);
 }
 
 void ROBOT_initUsart(S_robot* r)

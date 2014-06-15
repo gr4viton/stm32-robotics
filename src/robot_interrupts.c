@@ -151,7 +151,7 @@ void ROBOT_initClkIsr(void)
     rcc_periph_clock_enable(RCC_SYSCFG);
 }
 
-uint32_t cmp = 1000;
+//uint32_t cmp = 1000;
 
 void tim3_isr()
 {
@@ -162,41 +162,46 @@ void tim3_isr()
     uint8_t qmax = ROB_ULTRA_MAX_COUNT;
     uint8_t timSRccX = 0;
 
-    for(q=0; q<qmax; q++)
+    if( R.STARTED == 1 )
     {
-        u = us->u[q];
-        timSRccX = TIM_SR_CC1IF<<q;
-        if (timer_get_flag(t, timSRccX))
-        {
-            timer_clear_flag(t, timSRccX);
-
-            if( u->state == s1_sending_trigger)
-            {
-                ULTRA_tiggerEnd(u);
-                gpio_clear(PLED, LEDORANGE1);
-            }
-        }
-        //gpio_toggle(PLED, LEDBLUE3);
-    }
-
-    if( timer_get_flag(t, TIM_SR_UIF) != 0 )
-    {
-        timer_clear_flag(t, TIM_SR_UIF);
-
         for(q=0; q<qmax; q++)
         {
             u = us->u[q];
-            u->nOwerflow++;
-            if( u->state == s0_idle_before_trigger)
+            timSRccX = TIM_SR_CC1IF<<q;
+            if (timer_get_flag(t, timSRccX))
             {
-                ULTRA_tiggerStart(u);
-                gpio_set(PLED,LEDORANGE1);
+                timer_clear_flag(t, timSRccX);
+
+                if( u->state == s1_sending_trigger)
+                {
+                    ULTRA_tiggerEnd(u);
+                    gpio_clear(PLED, LEDORANGE1);
+                }
             }
-            //world_time++; // delete later
-            //gpio_toggle(PLED,LEDRED2);
+            //gpio_toggle(PLED, LEDBLUE3);
+        }
+
+        if( timer_get_flag(t, TIM_SR_UIF) != 0 )
+        {
+            timer_clear_flag(t, TIM_SR_UIF);
+
+            for(q=0; q<qmax; q++)
+            {
+                u = us->u[q];
+                if( u->state == s0_idle_before_trigger)
+                {
+                    //if(u->nOwerflow >= 1) // ?? not sure //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    //{ // must wait at least one period to ensure there is enaught time between triggers
+                    ULTRA_tiggerStart(u);
+                    gpio_set(PLED,LEDORANGE1);
+                    //}
+                }
+                u->nOwerflow++;
+                //world_time++; // delete later
+                //gpio_toggle(PLED,LEDRED2);
+            }
         }
     }
-
     timer_clear_flag(t, 0xffff);
 }
 

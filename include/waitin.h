@@ -50,12 +50,32 @@
 // enumerations
 //____________________________________________________
 // structs
+/****************
+ @brief Timer setup for setting a timer (of ultrasound sensor mainly)
+ ****************/
+typedef struct _S_timer_setup
+{
+    uint32_t TIMX; // timer address
+    uint32_t period;
+    uint32_t full_freq; // it depends on the mode and to which apb1/2 is the timer connected
+    uint32_t prsc;
+    uint32_t clk;
+    uint32_t apbclk;
+    uint32_t nvic;
+    /*
+    // mode
+    uint32_t clock_div;
+    uint32_t alignment;
+    uint32_t direction;
+    */
+} S_timer_setup;
 //____________________________________________________
 // unions
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
 extern volatile uint32_t tic_toc_start;
+extern S_timer_setup predef_timers[];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS

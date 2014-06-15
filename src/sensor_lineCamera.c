@@ -36,7 +36,7 @@
 /****************
  \brief Predefined line camera sensors ports & clocks []
  ****************/
-S_sensor_lincam lincams_predef[1] = {
+S_sensor_lincam predef_lincams[1] = {
     {.clk=RCC_GPIOD, .txport=GPIOD, .rxport=GPIOD, .txpin=GPIO4, .rxpin=GPIO5 }
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,7 +53,7 @@ S_sensor_lincam lincams_predef[1] = {
 
 S_sensor_lincam* INIT_lincamPredef(uint8_t index)
 {
-    S_sensor_lincam* lcam = &lincams_predef[index];
+    S_sensor_lincam* lcam = &predef_lincams[index];
 
     for(index=0; index<LINECAM_PIXELS; index++)
         lcam->vals[index] = 0;

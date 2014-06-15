@@ -44,7 +44,7 @@ typedef struct {
     uint32_t stats_rxoverruns;
     uint32_t stats_rxerrors;
 
-} uart_device_t;
+} predef_uart_device_t;
 //____________________________________________________
 // unions
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,10 +55,10 @@ static ssize_t _iord(void *_cookie, char *_buf,size_t _n);
 static ssize_t _iowr(void *_cookie,const char *_buf, size_t _n);
 static int _ioseek(void *_cookie, off_t *_off,int _whence);
 static int _ioclose(void *_cookie);
-static void _isru(uart_device_t *dev);
+static void _isru(predef_uart_device_t *dev);
 static void _txsignal(struct ringbuf *rb);
 
-static uart_device_t uarts[] =
+static predef_uart_device_t uarts[] =
 {
     /*0*/{ .device=USART1, .irq=NVIC_USART1_IRQ, .txport=GPIOA, .txpin=GPIO9,  .rxport=GPIOA, .rxpin=GPIO10, .af=GPIO_AF7, .clk=RCC_USART1, .txpclk=RCC_GPIOA, .rxpclk=RCC_GPIOA },
     /* used begin */
@@ -97,7 +97,7 @@ void usart6_isr(void) { _isru(&uarts[5]); }
 
 FILE *fopenserial(uint8_t index,uint32_t baudrate, uint8_t *tbuf, size_t tbufsz, uint8_t *rbuf, size_t rbufsz)
 {
-    uart_device_t *dev = &uarts[index];
+    predef_uart_device_t *dev = &uarts[index];
 
     // initialize ring buffers
     ringbuf_init(&(dev->tx_ring),tbuf,tbufsz);
@@ -160,7 +160,7 @@ static ssize_t _iord(void *_cookie, char *_buf,size_t _n)
 
 static ssize_t _iowr(void *_cookie,const char *_buf, size_t _n)
 {
-    uart_device_t *dev = (uart_device_t*)_cookie;
+    predef_uart_device_t *dev = (predef_uart_device_t*)_cookie;
 
     int written = 0;
     int c = 0;
@@ -198,7 +198,7 @@ static int _ioclose(void *_cookie)
 }
 
 
-static void _isru(uart_device_t *dev)
+static void _isru(predef_uart_device_t *dev)
 {
     uint8_t ch;
 

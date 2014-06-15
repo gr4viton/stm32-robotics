@@ -31,7 +31,7 @@
 // static variables
 //____________________________________________________
 // other variables
-S_sensor_button buttons_predef[] =
+S_sensor_button predef_buttons[] =
 {
 /*0*/{.pin=GPIO0, .port=GPIOA, .pclk=RCC_GPIOA, .pull=GPIO_PUPD_NONE, .state=0,
  .irq=NVIC_EXTI0_IRQ, .exti=EXTI0,  .exti_triggerDir=EXTI_TRIGGER_RISING},
@@ -52,7 +52,7 @@ S_sensor_button buttons_predef[] =
 
 S_sensor_button* INIT_buttonPredef(uint8_t index)
 {
-    S_sensor_button* btn = &(buttons_predef[index]);
+    S_sensor_button* btn = &(predef_buttons[index]);
 
     rcc_periph_clock_enable(btn->pclk);
 	gpio_mode_setup(btn->port, GPIO_MODE_INPUT, btn->pull, btn->pin);
