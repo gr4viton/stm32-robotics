@@ -68,24 +68,27 @@ void exti0_isr(void)
     }
 }
 
-void exti1_isr(void)
+// ultra exti on lines: 2,3,6,7
+void exti2_isr(void)
 {
-    uint8_t actExti = EXTI1;
-    if( exti_get_flag_status(actExti) != 0)
-    {
-        if( R.STARTED == 1 )
-        { // the robot is already alive - button does not work!
-            ROBOT_handleUltraEchoOnExti(actExti);
-            // flag reseting is done in ULTRA_handleEcho(..)
-        }
+    extiX_isr(EXTI2);
+}
+void exti3_isr(void)
+{
+    extiX_isr(EXTI3);
+}
 
-        exti_reset_request(actExti); // reset flag
+void exti9_5_isr(void)
+{
+    uint8_t q=0;
+    for(q=0;q<9-5+1;q++)
+    {// call common exti_isr function for lines 5 to 9
+        extiX_isr(EXTI5<<q);
     }
 }
 
-void exti2_isr(void)
+inline void extiX_isr(uint8_t actExti)
 {
-    uint8_t actExti = EXTI2;
     gpio_toggle(PLED,LEDGREEN0);
     if( exti_get_flag_status(actExti) != 0)
     {
@@ -97,29 +100,6 @@ void exti2_isr(void)
         exti_reset_request(actExti); // reset flag
     }
 }
-
-void exti9_5_isr(void)
-{
-    gpio_toggle(PLED, LEDGREEN0);
-	exti_reset_request(EXTI5);
-	exti_reset_request(EXTI6);
-	exti_reset_request(EXTI7);
-	exti_reset_request(EXTI8);
-	exti_reset_request(EXTI9);
-}
-
-
-/*
-void exti4_isr(void)
-{
-    if( R.STARTED == 1 )
-    { // the robot is already alive - button does not work!
-        ROBOT_handleUltraEchoOnExti(EXTI4);
-        // flag reseting is done in ULTRA_handleEcho(..)
-    }
-    exti_reset_request(EXTI4); // reset flag
-}
-*/
 
 
 void ROBOT_initIsr(uint32_t port, uint32_t exti, uint8_t irqn, uint8_t priority, enum exti_trigger_type trig)
@@ -141,6 +121,9 @@ void ROBOT_handleUltraEchoOnExti(uint8_t exti)
     {
         if(exti == R.ults.u[a]->exti)
             ULTRA_handleEcho(R.ults.u[a]);
+        if(exti == 1<<6)
+            gpio_toggle(PLED,LEDRED2);
+
     }
 }
 
@@ -195,6 +178,11 @@ void tim3_isr()
                     ULTRA_tiggerStart(u);
                     gpio_set(PLED,LEDORANGE1);
                     //}
+                }
+                if(u->nOwerflow > 5)
+                { // this can happen when echo signal is not acquired for whatever reason
+                    // without this the u->state stucked in s3_waiting_for_echo_end
+                    u->state = s0_idle_before_trigger;
                 }
                 u->nOwerflow++;
                 //world_time++; // delete later

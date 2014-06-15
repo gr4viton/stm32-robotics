@@ -95,6 +95,12 @@ void ROBOT_initIsr(uint32_t port, uint32_t exti, uint8_t irqn, uint8_t priority,
  must be called before ROBOT_initIsr for it to work!
  ****************/
 void ROBOT_initClkIsr(void);
+
+/****************
+ @brief Common function for exti isr for echo line of ultrasonic sensors
+ ultra exti on lines: 2,3,6,7
+ ****************/
+void extiX_isr(uint8_t actExti);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

@@ -69,8 +69,10 @@ int main_debug(S_robot* r)
         //LCD_displayWriteCheck(r->lcd);
         //dev_LCD_checkSeek(flcd);
         //DBG_tryADC(r);
-        //DBG_tryCNY70(r);
-        DBG_testUltraDistance(r,0xFFFF);
+        //DBG_tryCNY70(r
+        //DBG_testUltraDistance(r,0xFFFF);
+        DBG_testAllUltraDistance(r,0xFFFF);
+
 
         //INIT_tim(r);
 	}
@@ -167,11 +169,53 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
 
 
 
+void DBG_testAllUltraDistance(S_robot*r, uint32_t reps)
+{
+
+    uint32_t period = 100;
+    uint32_t prStart = _tic();
+    uint8_t q=0;
+    S_robot_ultras* us = 0;
+    us = &(r->ults);
+    while(reps>1)
+    {
+        CLOCK_digiPrint(r);
+
+        if( _tocFrom(prStart) > period )
+        {
+            gpio_toggle(PLED,LEDBLUE3);
+            LCD_gotoxy(r->lcd,0,0);
+            fprintf(r->flcd, "s");
+                for(q=0;q<ROB_ULTRA_MAX_COUNT;q++)
+                    fprintf(r->flcd, "%u", us->u[q]->state );
+            fprintf(r->flcd, "p");
+                for(q=0;q<ROB_ULTRA_MAX_COUNT;q++)
+                    fprintf(r->flcd, "%u", us->u[q]->nOwerflow);
+            fprintf(r->flcd, "  ");
+            //fprintf(r->flcd, "p=");
+            //u->nOwerflow
+
+            LCD_gotoxy(r->lcd,0,1);
+            fprintf(r->flcd, "");
+                for(q=0;q<ROB_ULTRA_MAX_COUNT;q++)
+                {
+                    fprintf(r->flcd, "%3.0f|", us->u[q]->dist );
+                    //fprintf(r->flcd, "%3.0f", us->u[q]->dist );
+                    //if(q<3) fprintf(r->flcd, "|");
+                }
+
+            //fprintf(r->flcd, "[s=%u][%4u]", u->state, cnt);
+
+            //cnt = timer_get_counter(u->TIMX);
+            prStart = _tic();
+        }
+        reps--;
+    }
+}
+
 
 void DBG_testUltraDistance(S_robot*r, uint32_t reps)
 {
-    uint32_t last_wtime = 0;
-    uint32_t world_time = 0;
 
     uint32_t period = 100;
     uint32_t prStart = _tic();
@@ -179,36 +223,7 @@ void DBG_testUltraDistance(S_robot*r, uint32_t reps)
     u = r->ults.u[0];
     while(reps>1)
     {
-        world_time = _tic()/1000;
-        if(world_time != last_wtime)
-        {
-            char str_hhmmss[] = "%2lu:%02lu:%02lu";
-            char str_mss[] = "%2lu:%02lu";
-            char str_s[] = "%2lu";
-            uint32_t hh = (world_time/3600);
-            uint32_t mm = (world_time/60)%60;
-            uint32_t ss = world_time%60;
-            if(mm > 0)
-            {
-                if(hh>0)
-                {
-                    LCD_gotoxy(r->lcd,8,0);
-                    fprintf(r->flcd, str_hhmmss, hh, mm, ss);
-                }
-                else
-                {
-                    LCD_gotoxy(r->lcd,11,0);
-                    fprintf(r->flcd, str_mss, mm, ss);
-                }
-            }
-            else
-            {
-                LCD_gotoxy(r->lcd,14,0);
-                fprintf(r->flcd, str_s, ss);
-
-            }
-            last_wtime = world_time;
-        }
+        CLOCK_digiPrint(r);
 
         if( _tocFrom(prStart) > period )
         {
@@ -294,6 +309,43 @@ void DBG_testUltraDistanceOld(S_robot* r,uint32_t repeats)
 void DBG_flash(void)
 {
     gpio_toggle(PLED,LEDRED2);
+}
+
+
+void CLOCK_digiPrint(S_robot* r)
+{
+    static uint32_t world_time = 0;
+    static uint32_t last_wtime = 0;
+    world_time = _tic()/1000;
+    if(world_time != last_wtime)
+    {
+        char str_hhmmss[] = "%2lu:%02lu:%02lu";
+        char str_mss[] = "%2lu:%02lu";
+        char str_s[] = "%2lu";
+        uint32_t hh = (world_time/3600);
+        uint32_t mm = (world_time/60)%60;
+        uint32_t ss = world_time%60;
+        if(mm > 0)
+        {
+            if(hh>0)
+            {
+                LCD_gotoxy(r->lcd,8,0);
+                fprintf(r->flcd, str_hhmmss, hh, mm, ss);
+            }
+            else
+            {
+                LCD_gotoxy(r->lcd,11,0);
+                fprintf(r->flcd, str_mss, mm, ss);
+            }
+        }
+        else
+        {
+            LCD_gotoxy(r->lcd,14,0);
+            fprintf(r->flcd, str_s, ss);
+
+        }
+        last_wtime = world_time;
+    }
 }
 
 #if __NOT_IMPLEMENTED_YET

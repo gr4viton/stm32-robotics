@@ -269,15 +269,18 @@ void ULTRA_handleEcho(S_sensor_ultra* u)
     { // some of the ultras responded with up or down edge
         u->echoState = BIT_TOGGLE(u->echoState, 0);
 
-        if(u->state == s2_waiting_for_echo)
+        if((u->state == s2_waiting_for_echo)||(u->state == s3_waiting_for_echo_end))
+        //if(u->state == s2_waiting_for_echo)
+        if(u->echoState != 0)
         { // start of measuring period
-            if(u->echoState != 0) ULTRA_echoStarted(u);
+             ULTRA_echoStarted(u);
 
 
         }
-        else if(u->state == s3_waiting_for_echo_end)
+        //else if(u->state == s3_waiting_for_echo_end)
+        if(u->echoState == 0)
         { // end of measuring period
-            if(u->echoState == 0) ULTRA_echoEnded(u);
+             ULTRA_echoEnded(u);
         }
     }
 }

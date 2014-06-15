@@ -96,11 +96,21 @@ void DBG_ticTocSumoWait(S_robot* r);
 
 void DBG_touchD7blink(void);
 void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms);
+//____________________________________________________
+//ultras
+
+void DBG_testAllUltraDistance(S_robot*r, uint32_t reps);
 void DBG_testUltraDistanceOld2(S_robot* r,uint32_t repeats);
 void DBG_testUltraDistanceOld(S_robot* r,uint32_t repeats);
 void DBG_testUltraDistance(S_robot* r,uint32_t repeats);
 
 void DBG_flash(void);
+
+/****************
+ @brief Shows digital clock on external character lcd in top-right corner
+ -> actualizes them only every second
+ ****************/
+void CLOCK_digiPrint(S_robot* r);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
