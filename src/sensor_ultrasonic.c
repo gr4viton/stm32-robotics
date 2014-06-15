@@ -35,11 +35,11 @@
  \brief Predefined ultrasonic sensors ports & clocks [tx=out;rx=in]
  ****************/
 S_sensor_ultra ultras_predef[] = {
- {.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO2, .txpin=GPIO0, .irq=NVIC_EXTI0_IRQ, .exti=EXTI0}
-,{.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO3, .txpin=GPIO1, .irq=NVIC_EXTI1_IRQ, .exti=EXTI1}
-,{.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO6, .txpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI4}
-,{.clk=RCC_GPIOD, .rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO7, .txpin=GPIO5, .irq=NVIC_EXTI9_5_IRQ, .exti=EXTI5}
-//,{.clk=RCC_GPIOE, .rxport=GPIOE, .txport=GPIOE, .rxpin=GPIO5, .txpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI5}
+/*0*/ {.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO2, .txpin=GPIO0, .irq=NVIC_EXTI2_IRQ, .exti=EXTI2, .timOCX=TIM_OC1}
+/*1*/,{.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO3, .txpin=GPIO1, .irq=NVIC_EXTI3_IRQ, .exti=EXTI3, .timOCX=TIM_OC2}
+/*2*/,{.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO6, .txpin=GPIO4, .irq=NVIC_EXTI9_5_IRQ, .exti=EXTI6, .timOCX=TIM_OC3}
+/*3*/,{.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO7, .txpin=GPIO5, .irq=NVIC_EXTI9_5_IRQ, .exti=EXTI7, .timOCX=TIM_OC4}
+//,{.clk=RCC_GPIOE, .::rxport=GPIOE, .txport=GPIOE, .rxpin=GPIO5, .txpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI5}
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
@@ -54,11 +54,19 @@ S_sensor_ultra ultras_predef[] = {
 S_sensor_ultra* INIT_ultraPredef(uint8_t index)
 {
     S_sensor_ultra* ult = &ultras_predef[index];
+    ult->indx = index;
+    ult->echoState = 0;
     ult->ticksStart = 0;
     ult->ticksEnd = 0;
     ult->nTicks = 0;
-    ult->cnt_period = 0;
+    ult->nOwerflow = 0;
     ult->state = s0_idle_before_trigger;
+    ult->timOCX = TIM_OC1;
+
+
+    uint32_t sum_tick_in_period = 65536;
+    uint32_t us1 = 1000; // count from frequency of timer and its period
+    ult->interval_trigger = us1; // should be at least 10us
 
     // get RCC from port and enable
     //rcc_periph_clock_enable(GET_rcc_from_port(ult->txport))); //????
@@ -70,7 +78,7 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index)
 /* setup timer:
     - external trigger start rising edge
     - upcounting
-    - external trigger stop falling edge
+    - external trigger stop falling edge::
     - good prescalers for measurining signal between <0.2; 12> [ms]
 */
 
@@ -91,67 +99,104 @@ double ULTRA_calcDist(S_sensor_ultra* ult)
     ult->dist = ult->coef[0];
     for(a=1;a<ROB_ULTRA_COEF_COUNT;a++)
     {
-        ult->dist += ult->nTicks * pow(ult->coef[a], a);
+        ult->dist += ult->coef[a] * pow((double)(ult->nTicks), a);
     }
     return ult->dist;
 }
 
-void ULTRA_tiggerStart(S_sensor_ultra *ult)
+void ULTRA_tiggerStart(S_sensor_ultra *u)
 {
-    gpio_set(ult->txport, ult->txpin);
+    static uint32_t t = TIM3;
+    // send 10us trigger signal
+
+    /* enable compare interrupt */
+    timer_enable_irq(t, ((TIM_DIER_CC1IE)<<(u->indx)) );
+    /* set value of compare register to produce trigger signal of given interval */
+    timer_set_oc_value(t, u->timOCX, u->interval_trigger);
+
+    gpio_set(u->txport, u->txpin);
+
+    u->nOwerflow = 0;
+    u->state = s1_sending_trigger;
 }
 
-void ULTRA_tiggerEnd(S_sensor_ultra *ult)
+void ULTRA_tiggerEnd(S_sensor_ultra *u)
 {
-    gpio_clear(ult->txport, ult->txpin);
+    static uint32_t t = TIM3;
+    gpio_clear(u->txport, u->txpin);
+    u->state = s2_waiting_for_echo;
+    u->nOwerflow = 0;
+    /* disable compare interrupt */
+    timer_disable_irq(t, ((TIM_DIER_CC1IE)<<(u->indx)) );
+    //timer_disable_oc_clear(t,tim10_isr)
 }
 
-void ULTRA_signalSend(S_sensor_ultra *ult)
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/* deprecated */
+void ULTRA_signalSend(S_sensor_ultra *u)
 {
-    gpio_set(ult->txport, ult->txpin);
-    //ult->ticksStart = timer5;
+    gpio_set(u->txport, u->txpin);
+    //u->ticksStart = timer5;
     // wait
     mswait(1);
-    gpio_clear(ult->txport, ult->txpin);
+    gpio_clear(u->txport, u->txpin);
 }
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-void ULTRA_echoStarted(S_sensor_ultra *ult)
+void ULTRA_echoStarted(S_sensor_ultra *u)
 {
     static uint32_t t = TIM3;
-    //ult->ticksStart = _tic();
-    ult->ticksStart = timer_get_counter(t);
-    ult->state = s3_waiting_for_echo_end;
+    //u->ticksStart = _tic();
+    u->ticksStart = timer_get_counter(t);
+    u->state = s3_waiting_for_echo_end;
+    u->nOwerflow = 0;
 }
 
-void ULTRA_echoEnded(S_sensor_ultra *ult)
+void ULTRA_echoEnded(S_sensor_ultra *u)
 {
     #if __PREMATURE_OPTIMALIZATION
-    ult->nTicks = (ult->ticksEnd - ult->ticksStart); //+ ult->nOverflow * ult->..; OF in 49 days ;)
+    u->nTicks = (u->ticksEnd - u->ticksStart); //+ u->nOverflow * u->..; OF in 49 days ;)
     #endif // __PREMATURE_OPTIMALIZATION
-    //ult->nTicks = _tocFrom(ult->ticksStart);
+    //u->nTicks = _tocFrom(u->ticksStart);
     static uint32_t t = TIM3;
-    ult->ticksEnd = timer_get_counter(t);
-    uint32_t period_interval = 10000;
+    u->ticksEnd = timer_get_counter(t);
+    uint32_t sum_tick_in_period = 0xFFFF;
 
-    ult->nTicks = (ult->cnt_period * period_interval) + ult->ticksEnd - ult->ticksStart;
-    ULTRA_calcDist(ult);
+    /* the echo signal should always come inside one period - that is cross maximally one timer overflow*/
+    if(u->nOwerflow <= 1)
+    {
+        u->nTicks = (u->nOwerflow * sum_tick_in_period) + u->ticksEnd - u->ticksStart;
+        ULTRA_calcDist(u);
+    }
+    else
+    {
+        /* if it doesnt - it is probably bad measurement = lost connection or distance too big*/
+        /* so skip the waiting for the lost signal and send another trigger */
+        u->state = s0_idle_before_trigger;
+    }
 
-    ult->ticksStart = 0; // for interrupt handler distinction between echoStart and echoEnd
-    ult->cnt_period = 0;
-    ult->state = s0_idle_before_trigger;
+    //u->nTicks = (u->cnt_period * sum_tick_in_period) + u->ticksEnd - u->ticksStart;
+
+    u->ticksStart = 0; // for interrupt handler distinction between echoStart and echoEnd
+    u->nOwerflow = 0;
+    u->state = s0_idle_before_trigger;
 }
 
-void ULTRA_handleEcho(S_sensor_ultra* ult)
+void ULTRA_handleEcho(S_sensor_ultra* u)
 {
-    if( exti_get_flag_status(ult->exti) )
+    if( exti_get_flag_status(u->exti) ) // this is second checking - but harmless
     { // some of the ultras responded with up or down edge
-        if(ult->ticksStart == 0)
+        u->echoState = BIT_TOGGLE(u->echoState,0);
+
+        if(u->state == s2_waiting_for_echo)
         { // start of measuring period
-            ULTRA_echoStarted(ult);
+            if(u->echoState != 0) ULTRA_echoStarted(u);
+
+
         }
-        else
+        else if(u->state == s3_waiting_for_echo_end)
         { // end of measuring period
-            ULTRA_echoEnded(ult);
+            if(u->echoState == 0) ULTRA_echoEnded(u);
         }
     }
 }

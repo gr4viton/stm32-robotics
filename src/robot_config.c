@@ -52,8 +52,11 @@ S_robot R;
 
 void ROBOT_initUltras(S_robot* r)
 {
+    uint32_t sum_tick_in_period = 65536;
+    uint32_t p = sum_tick_in_period;
+
     double coef[ROB_ULTRA_COEF_COUNT] =
-    {3, 11, 0.00};
+    {0, 1.0/(double)p, 0.00};
 
     uint8_t a = 0;
     S_robot_ultras* u = &(r->ults);
@@ -67,7 +70,7 @@ void ROBOT_initUltras(S_robot* r)
     }
 
     // connection of the PE pins may be alike the position of the sensors on the robot
-                                // trig|echo
+    // trig|echo
     u->uL  = u->u[0]; // PE0|PE1
     u->uR  = u->u[1]; // PE1
     u->uFL = u->u[2]; // PE2

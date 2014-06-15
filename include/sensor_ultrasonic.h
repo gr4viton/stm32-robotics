@@ -68,6 +68,7 @@
  ****************/
 typedef struct _S_sensor_ultra
 {
+    uint8_t indx;
     uint32_t clk;
     uint32_t txport;
     uint32_t rxport;
@@ -79,13 +80,17 @@ typedef struct _S_sensor_ultra
     uint8_t irq;   // NVIC irq
     uint8_t priority;
 
-    E_sensor_ultra_state state;
+    uint8_t echoState;          // memory for distinguishing between rising and falling edges
+    E_sensor_ultra_state state; // state in which the sensor is
+
 
     // tick counting
-    uint16_t cnt_period;
-    uint32_t ticksStart;
-    uint32_t ticksEnd;
-    uint32_t nTicks;
+    uint16_t nOwerflow; // number of periods from echoStart to echoEnd
+    uint32_t ticksStart; // ticks in timer on EchoStart
+    uint32_t ticksEnd;   // ticks in timer on EchoEnd
+    uint32_t nTicks;     // number of ticks from echoStart to echoEnd
+    enum tim_oc_id timOCX; // compare register of the ultra sensor in the timer
+    uint16_t interval_trigger; // trigger interval
 
     // distance
     double dist;
@@ -123,6 +128,18 @@ double ULTRA_calcDist(S_sensor_ultra* ult);
  ****************/
 void ULTRA_signalSend(S_sensor_ultra *dev);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+/****************
+ \brief On start of sending trigger signal
+ ****************/
+
+void ULTRA_tiggerStart(S_sensor_ultra *u);
+/****************
+ \brief On end of sending trigger signal
+ ****************/
+void ULTRA_tiggerEnd(S_sensor_ultra *u);
 
 /****************
  \brief On echo signal started

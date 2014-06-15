@@ -47,7 +47,7 @@
 
 
     //____________________________________________________
-    // interrupts request handlers = interrupt handler functions
+    // interrupts request handlers = interrupt handler functions = ISR = interrupt service routine
 void exti0_isr(void)
 {
     // btnStart was pressed or ultraL triggered
@@ -62,7 +62,7 @@ void exti0_isr(void)
         }
         else
         { // the robot is already alive - button does not work!
-            ROBOT_handleUltraEchoOnExti(actExti);
+            //ROBOT_handleUltraEchoOnExti(actExti);
         }
         exti_reset_request(actExti); // reset flag
     }
@@ -70,17 +70,30 @@ void exti0_isr(void)
 
 void exti1_isr(void)
 {
-    uint8_t actExti = EXTI0;
+    uint8_t actExti = EXTI1;
     if( exti_get_flag_status(actExti) != 0)
     {
-        //gpio_toggle(PLED,LEDBLUE3);
-
         if( R.STARTED == 1 )
         { // the robot is already alive - button does not work!
-            ROBOT_handleUltraEchoOnExti(EXTI1);
+            ROBOT_handleUltraEchoOnExti(actExti);
             // flag reseting is done in ULTRA_handleEcho(..)
         }
 
+        exti_reset_request(actExti); // reset flag
+    }
+}
+
+void exti2_isr(void)
+{
+    uint8_t actExti = EXTI2;
+    gpio_toggle(PLED,LEDGREEN0);
+    if( exti_get_flag_status(actExti) != 0)
+    {
+        if( R.STARTED == 1 )
+        { // the robot is already alive - button does not work!
+            ROBOT_handleUltraEchoOnExti(actExti);
+            // flag reseting is done in ULTRA_handleEcho(..)
+        }
         exti_reset_request(actExti); // reset flag
     }
 }
@@ -138,78 +151,53 @@ void ROBOT_initClkIsr(void)
     rcc_periph_clock_enable(RCC_SYSCFG);
 }
 
-uint32_t world_time = 0;
 uint32_t cmp = 1000;
 
 void tim3_isr()
 {
     static uint32_t t = TIM3;
-    S_robot_ultras* us = R.ults;
-    S_sensor_ultra* u = R.ults.u[0];
+    S_robot_ultras* us = &(R.ults);
+    S_sensor_ultra* u = 0;
+    uint8_t q = 0;
+    uint8_t qmax = ROB_ULTRA_MAX_COUNT;
+    uint8_t timSRccX = 0;
 
-    gpio_toggle(PLED,LEDGREEN0);
-
-        u = us->u[0];
-
-    if (timer_get_flag(t, TIM_SR_CC1IF))
+    for(q=0; q<qmax; q++)
     {
-        timer_clear_flag(t, TIM_SR_CC1IF);
-
-        switch(u->state)
+        u = us->u[q];
+        timSRccX = TIM_SR_CC1IF<<q;
+        if (timer_get_flag(t, timSRccX))
         {
-        case(s1_sending_trigger):
-            gpio_clear(PLED,LEDORANGE1);
-            u->state = s2_waiting_for_echo;
+            timer_clear_flag(t, timSRccX);
 
-            break;
-
+            if( u->state == s1_sending_trigger)
+            {
+                ULTRA_tiggerEnd(u);
+                gpio_clear(PLED, LEDORANGE1);
+            }
         }
-
-        cmp = timer_get_counter(t) + 1000;
-
-        timer_set_oc_value(t, TIM_OC1, cmp);
-
-        gpio_toggle(PLED,LEDBLUE3);
+        //gpio_toggle(PLED, LEDBLUE3);
     }
 
-    if( timer_get_flag(t,TIM_SR_UIF) != 0 )
+    if( timer_get_flag(t, TIM_SR_UIF) != 0 )
     {
         timer_clear_flag(t, TIM_SR_UIF);
 
-        switch(u->state)
+        for(q=0; q<qmax; q++)
         {
-        case(s0_idle_before_trigger):
-            // send 10us trigger signal
-            cmp = 2000;
-            u->cnt_period = 0;
-            gpio_set(PLED,LEDORANGE1);
-            u->state = s1_sending_trigger;
-
-            break;
-
+            u = us->u[q];
+            u->nOwerflow++;
+            if( u->state == s0_idle_before_trigger)
+            {
+                ULTRA_tiggerStart(u);
+                gpio_set(PLED,LEDORANGE1);
+            }
+            //world_time++; // delete later
+            //gpio_toggle(PLED,LEDRED2);
         }
-        u->cnt_period++;
-        //if(u->cnt_period)
-        //cnt_period
-
-        cmp = 1;
-        world_time++;
-        gpio_toggle(PLED,LEDRED2);
-        /*
-        nvic_clear_pending_irq(NVIC_TIM3_IRQ); // reset flag
-        */
     }
-    /*
 
-    if( nvic_get_pending_irq(NVIC_TIM3_IRQ) != 0)
-    {
-        a>10? a++: 0;
-        if(a==0) gpio_toggle(PLED,LEDORANGE1);
-
-        nvic_clear_pending_irq(NVIC_TIM3_IRQ); // reset flag
-    }
-    */
-    //timer_clear_flag(t,0xFFFF);
+    timer_clear_flag(t, 0xffff);
 }
 
 #if __NOT_IMPLEMENTED_YET

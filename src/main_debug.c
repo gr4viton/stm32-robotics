@@ -49,7 +49,7 @@ int main_debug(S_robot* r)
     _tic();
     R.STARTED = 1;
     ROBOT_initLifeDebug(r);
-    fprintf(r->flcd, "Initialization=");
+    fprintf(r->flcd, "Init=");
     _tocPrint(r->flcd);
     mswait(400);
     LCD_clear(r->lcd);
@@ -169,8 +169,16 @@ void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms)
     gpio_clear(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
 }
 
+struct _S_periph_timer
+{
+    uint32_t tim; // timer address
+    uint32_t period;
 
-extern uint32_t world_time;
+} S_periph_timer;
+
+
+//extern uint32_t world_time;
+void timtick_setup(S_robot* r);
 void timtick_setup(S_robot* r)
 {
     // initialize timer X for 1ns ticking
@@ -195,52 +203,56 @@ void timtick_setup(S_robot* r)
     // TIM_CR1_DIR_UP = counting direction up
 
     // continuous
-    timer_continuous_mode(TIM2);
-
-    // presc=30, period=65536-1
-    // == <0.37; 24,186.27> [ms] == <0.006; 417> [cm]
-
+    timer_continuous_mode(t);
+    //timer_get
     // 84Mhz / 8400 = 10kHz
-    timer_set_prescaler(t, 8400);
+    // [prsc=30, period=65536-1] == <0.37; 24186.27> [ms] == <0.006; 417> [cm]
+    // [prsc=8400, period=10k  ] == <0.1 ; 840> [ms]
+
+    timer_set_prescaler(t, 30);
 
     // Input Filter clock prescaler -
     timer_set_clock_division(t, 0);
-    // tick_interval = 1/f = (1[s]) / (84[MHz]) = 11.90[ns]
 
     // TIMx_ARR - Period in counter clock ticks.
-    //timer_set_period(t, 65536-1);
-    timer_set_period(t, 10000-1); // = <0.37; 24,186.27> [ms] = <0.006; 417> [cm]
+    timer_set_period(t, 65536-1);
 
     /* Generate TRGO on every update. */
     timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
 
-    /* Disable outputs. */
-    timer_disable_oc_output(t, TIM_OC1);
-    timer_disable_oc_output(t, TIM_OC2);
-    timer_disable_oc_output(t, TIM_OC3);
-    timer_disable_oc_output(t, TIM_OC4);
 
+    S_sensor_ultra* u = 0;
+    uint8_t q = 0;
+    uint8_t qmax = ROB_ULTRA_MAX_COUNT;
+    uint8_t timDIERccXie = 0;
+    for(q=0;q<qmax;q++)
+    {
 
-    /* -- OC1 configuration -- */
+        u = R.ults.u[q];
 
-    /* Configure global mode of line 1. */
-    timer_disable_oc_clear(t, TIM_OC1);
-    timer_disable_oc_preload(t, TIM_OC1);
-    timer_set_oc_slow_mode(t, TIM_OC1);
-    timer_set_oc_mode(t, TIM_OC1, TIM_OCM_FROZEN);
+        /* Disable outputs. */
+        timer_disable_oc_output(t, u->timOCX);
 
-    /* Set the capture compare value for OC1. */
-    timer_set_oc_value(t, TIM_OC1, 1000);
+        /* -- OC1 configuration -- */
 
-    /* Enable commutation interrupt. */
-    timer_enable_irq(t, TIM_DIER_CC1IE);
-    /* ---- */
-    #if 0
-#endif // 0
+        /* Configure global mode of line 1. */
+        timer_disable_oc_clear(t, u->timOCX);
+        timer_disable_oc_preload(t, u->timOCX);
+        timer_set_oc_slow_mode(t, u->timOCX);
+        timer_set_oc_mode(t, u->timOCX, TIM_OCM_FROZEN);
+
+        /* Set the capture compare value for OC1. */
+        timer_set_oc_value(t, u->timOCX, u->interval_trigger);
+
+        /* Enable commutation interrupt. */
+        timDIERccXie = TIM_DIER_CC1IE<<q;
+        timer_enable_irq(t, timDIERccXie);
+        /* ---- */
+    }
 
     // start
     timer_enable_counter(t);
-    uint16_t irqs = 0 ;
+    //uint16_t irqs = 0 ;
 
     timer_enable_irq(t, TIM_DIER_UIE);
     //irqs = TIM_DIER_CC1IE | TIM_DIER_BIE ;
@@ -263,19 +275,54 @@ void timtick_setup(S_robot* r)
     uint32_t last_wtime = 0;
     uint16_t cnt = 0;
 
+    uint32_t world_time = 0;
+
     uint32_t period = 100;
     uint32_t prStart = _tic();
+    //S_sensor_ultra* u
+    u = r->ults.u[0];
 	while(1)
     {
+        world_time = _tocFrom(0)/1000;
         if(world_time != last_wtime)
         {
-            fprintf(r->flcd, "%02lu:%02lu:%02lu\n", (world_time/3600), (world_time/60)%60, world_time%60);
+            char str_hhmmss[] = "%2lu:%02lu:%02lu";
+            char str_mss[] = "%2lu:%02lu";
+            char str_s[] = "%2lu";
+            uint32_t hh = (world_time/3600);
+            uint32_t mm = (world_time/60)%60;
+            uint32_t ss = world_time%60;
+            if(mm > 0)
+            {
+                if(hh>0)
+                {
+                    LCD_gotoxy(r->lcd,8,0);
+                    fprintf(r->flcd, str_hhmmss, hh, mm, ss);
+                }
+                else
+                {
+                    LCD_gotoxy(r->lcd,11,0);
+                    fprintf(r->flcd, str_mss, mm, ss);
+                }
+            }
+            else
+            {
+                LCD_gotoxy(r->lcd,14,0);
+                fprintf(r->flcd, str_s, ss);
+
+            }
             last_wtime = world_time;
         }
+
         if( _tocFrom(prStart) > period )
         {
+            gpio_toggle(PLED,LEDBLUE3);
+            LCD_gotoxy(r->lcd,0,0);
+            fprintf(r->flcd, "=%0.5f|s=%u",  u->dist, u->state  );
             LCD_gotoxy(r->lcd,0,1);
-            fprintf(r->flcd, "[%4u/%s]\n", cnt, "10k");
+            fprintf(r->flcd, "=%6lu |p=%u ",  u->nTicks, u->nOwerflow);
+            //fprintf(r->flcd, "[s=%u][%4u]", u->state, cnt);
+
             cnt = timer_get_counter(t);
             prStart = _tic();
         }
@@ -286,8 +333,8 @@ void DBG_testUltraDistance(S_robot* r,uint32_t repeats)
 {
     S_sensor_ultra* u ;
     uint8_t a =0;
-    FILE* f = r->fus;
-    //FILE* f = r->flcd;
+    FILE* f = r->fus; // for output on uart
+    //FILE* f = r->flcd; // for output on lcd
 
     timtick_setup(r);
 

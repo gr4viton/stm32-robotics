@@ -105,7 +105,8 @@ int main(void)
 
     // followin' code could not ever been executed
     INIT_leds();
-	while (1) {
+	while (1)
+    {
         gpio_toggle(PLED,LEDGREEN0|LEDORANGE1|LEDRED2|LEDBLUE3);
         mswait(500);
 	}

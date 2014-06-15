@@ -73,7 +73,8 @@
 #define ROB_LCD_DBUFSZ 1024
 // sensor count
 #define ROB_INFRA_MAX_COUNT 16
-#define ROB_ULTRA_MAX_COUNT 4
+/* #define ROB_ULTRA_MAX_COUNT 4 */
+#define ROB_ULTRA_MAX_COUNT 1
 // actuators
 #define ROB_MOTOR_COUNT 4
 //____________________________________________________
