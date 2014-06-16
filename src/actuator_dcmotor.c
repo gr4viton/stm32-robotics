@@ -39,13 +39,12 @@
 S_actuator_dcmotor dcmotor_predef[] =
 {
 //2014_06_16 - board v1
-/*0*/ {.priority=0,.clk=RCC_GPIOA,.rxport=GPIOA,.txport=GPIOA,.rxpin=GPIO3,.txpin=GPIO1,.exti=EXTI3,.irq=NVIC_EXTI3_IRQ,  .timOCX=TIM_OC1}
-/*1*/,{.priority=0,.clk=RCC_GPIOB,.rxport=GPIOD,.txport=GPIOB,.rxpin=GPIO6,.txpin=GPIO7,.exti=EXTI6,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC2}
-/*2*/,{.priority=0,.clk=RCC_GPIOA,.rxport=GPIOA,.txport=GPIOA,.rxpin=GPIO7,.txpin=GPIO5,.exti=EXTI7,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC3}
-/*3*/,{.priority=0,.clk=RCC_GPIOE,.rxport=GPIOE,.txport=GPIOE,.rxpin=GPIO5,.txpin=GPIO1,.exti=EXTI5,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC4}
+/*0*/ {.a=(predef_gpioPin[0]),.b=(predef_gpioPin[1])}
+///*0*/,{.a=&(predef_gpioPin[0]),.b=&(predef_gpioPin[1])}
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
+extern S_model_gpioPin* predef_gpioPin;
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // STATIC FUNCTION DECLARATIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -58,44 +57,9 @@ S_actuator_dcmotor dcmotor_predef[] =
     // ..
 S_actuator_dcmotor* INIT_dcmotorPredef(uint8_t index, S_timer_setup* a_tim_s)
 {
+
     S_actuator_dcmotor* d = &(dcmotor_predef[index]);
-    //S_timer_setup* tim_s d->tim_s;
-
-    rcc_periph_clock_enable(d->pclk);
-	gpio_mode_setup(d->port, GPIO_MODE_INPUT, d->pull, d->pEN);
-	gpio_mode_setup(d->port, GPIO_MODE_INPUT, d->pull, d->pPWM);
-
-    // timer setup
-    d->tim_s = a_tim_s;
-    d->TIMX = a_tim_s->TIMX;
-
-/* setup timer:
-    - external trigger start rising edge
-    - upcounting
-    - external trigger stop falling edge::
-    - good prescalers for measurining signal between <0.2; 12> [ms]
-*/
-    /* -------- timer settings -------- */
-    uint8_t q = d->indx;
-    uint32_t t = d->tim_s->TIMX;
-
-    /* Disable outputs. */
-    timer_disable_oc_output(t, d->timOCX);
-
-    /* -- OCX configuration -- */
-
-    /* Configure global mode of line 1. */
-    timer_disable_oc_clear(t, d->timOCX);
-    timer_disable_oc_preload(t, d->timOCX);
-    timer_set_oc_slow_mode(t, d->timOCX);
-    timer_set_oc_mode(t, d->timOCX, TIM_OCM_FROZEN);
-
-    /* Set the capture compare value for OC1. */
-    timer_set_oc_value(t, d->timOCX, d->nTriggerTicks);
-
-    /* Enable commutation interrupt. */
-    timer_enable_irq(t, TIM_DIER_CC1IE<<q);
-    /* ---- */
+    (void)a_tim_s;
 	return d;
 }
 

@@ -85,9 +85,9 @@ void DBG_testActuators(S_robot*r, uint32_t reps)
 
     uint32_t period = 100;
     uint32_t prStart = _tic();
-    uint8_t q=0;
-    S_robot_dcmotors* d = 0;
-    d = &(r->dcs);
+    //uint8_t q=0;
+    //S_robot_dcmotors* d = 0;
+    //d = &(r->dcs);
 
     while(reps>1)
     {
@@ -97,14 +97,15 @@ void DBG_testActuators(S_robot*r, uint32_t reps)
         {
             gpio_toggle(PLED,LEDBLUE3);
             LCD_gotoxy(r->lcd,0,0);
+            /*
             fprintf(r->flcd, "s");
                 for(q=0;q<ROB_MOTOR_COUNT;q++)
-                    fprintf(r->flcd, "%d", d->m[q]->pEN );
+                    fprintf(r->flcd, "%d", d->m[q]->A );
             fprintf(r->flcd, "p");
                 for(q=0;q<ROB_ULTRA_COUNT;q++)
-                    fprintf(r->flcd, "%lu", d->m[q]->pwm);
+                    fprintf(r->flcd, "%lu", d->m[q]->B);
             fprintf(r->flcd, "  ");
-
+*/
             LCD_gotoxy(r->lcd,0,1);
             prStart = _tic();
         }
