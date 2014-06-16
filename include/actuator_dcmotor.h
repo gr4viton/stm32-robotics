@@ -46,7 +46,7 @@
 // structs
 typedef struct _S_actuator_dcmotor
 {
-    uint32_t pclk; // actuator port RCC
+    uint32_t clk; // actuator port RCC
     uint32_t port; // actuator port address
     uint16_t pEN;  // actuator pin ENable
     uint8_t pull;  // actuator pullU/D/None settings
@@ -54,6 +54,25 @@ typedef struct _S_actuator_dcmotor
 
     uint16_t dutyCycle; // will be used?
     uint32_t pwm; // not sure yet
+
+    // pin interrupts
+    uint32_t exti; // exti line
+    uint8_t irq;   // NVIC irq
+    uint8_t priority;
+
+    // tick settings
+    S_timer_setup* tim_s;  // pointer to the timer structure for tick counting
+    uint32_t TIMX;         // address of timer for tick counting
+    uint8_t indx;          // index of compare register in timer
+    enum tim_oc_id timOCX; // compare register of the ultra sensor in the timer
+    uint16_t nTriggerTicks; // trigger interval
+
+    // tick counting
+    uint16_t nOwerflow; // number of periods from echoStart to echoEnd
+    uint32_t ticksStart; // ticks in timer on EchoStart
+    uint32_t ticksEnd;   // ticks in timer on EchoEnd
+    uint32_t nTicks;     // number of ticks from echoStart to echoEnd
+
 }S_actuator_dcmotor;
 //____________________________________________________
 // unions
@@ -71,8 +90,14 @@ extern S_actuator_dcmotor dcmotor_predef[4];
 // OTHER FUNCTION DECLARATIONS
     //____________________________________________________
     // ..
-S_actuator_dcmotor* INIT_dcmotorPredef(uint8_t index);
-
+/****************
+ @brief
+ ****************/
+S_actuator_dcmotor* INIT_dcmotorPredef(uint8_t index, S_timer_setup* a_tim_s);
+/****************
+ @brief
+ ****************/
+S_timer_setup* INIT_dcmotorTimer(uint8_t indx);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

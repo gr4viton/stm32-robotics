@@ -98,9 +98,19 @@ void ROBOT_initClkIsr(void);
 
 /****************
  @brief Common function for exti isr for echo line of ultrasonic sensors
- ultra exti on lines: 2,3,6,7
  ****************/
 void extiX_isr(uint8_t actExti);
+
+/****************
+ @brief Common function for actuator timer isr
+ ****************/
+void timActuator_isr(uint32_t t);
+
+/****************
+ @brief Common function for ultrasonic timer isr
+ ****************/
+void timUltra_isr(uint32_t t);
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

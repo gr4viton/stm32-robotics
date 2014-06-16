@@ -120,13 +120,10 @@ void ROBOT_initIsr(uint32_t port, uint32_t exti, uint8_t irqn, uint8_t priority,
 void ROBOT_handleUltraEchoOnExti(uint8_t exti)
 {
     uint8_t a=0;
-    for(a=0;a<ROB_ULTRA_MAX_COUNT; a++)
+    for(a=0;a<ROB_ULTRA_COUNT; a++)
     {
         if(exti == R.ults.u[a]->exti)
             ULTRA_handleEcho(R.ults.u[a]);
-        if(exti == 1<<6)
-            gpio_toggle(PLED,LEDRED2);
-
     }
 }
 
@@ -139,13 +136,71 @@ void ROBOT_initClkIsr(void)
 
 //uint32_t cmp = 1000;
 
-void tim3_isr()
+void tim3_isr(){ timActuator_isr(TIM3);}
+void tim4_isr(){ timUltra_isr(TIM4);}
+
+void timActuator_isr(uint32_t t)
 {
-    static uint32_t t = TIM3;
     S_robot_ultras* us = &(R.ults);
     S_sensor_ultra* u = 0;
     uint8_t q = 0;
-    uint8_t qmax = ROB_ULTRA_MAX_COUNT;
+    uint8_t qmax = ROB_ULTRA_COUNT;
+    uint8_t timSRccX = 0;
+
+    if( R.STARTED == 1 )
+    {
+        for(q=0; q<qmax; q++)
+        {
+            u = us->u[q];
+            timSRccX = TIM_SR_CC1IF<<q;
+            if (timer_get_flag(t, timSRccX))
+            {
+                timer_clear_flag(t, timSRccX);
+
+                if( u->state == s1_sending_trigger)
+                {
+                    ULTRA_tiggerEnd(u);
+                    gpio_clear(PLED, LEDORANGE1);
+                }
+            }
+            //gpio_toggle(PLED, LEDBLUE3);
+        }
+
+        if( timer_get_flag(t, TIM_SR_UIF) != 0 )
+        {
+            timer_clear_flag(t, TIM_SR_UIF);
+
+            for(q=0; q<qmax; q++)
+            {
+                u = us->u[q];
+                if( u->state == s0_idle_before_trigger)
+                {
+                    //if(u->nOwerflow >= 1) // ?? not sure //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    //{ // must wait at least one period to ensure there is enaught time between triggers
+                    ULTRA_tiggerStart(u);
+                    gpio_set(PLED,LEDORANGE1);
+                    //}
+                }
+                if(u->nOwerflow > 5)
+                { // this can happen when echo signal is not acquired for whatever reason
+                    // without this the u->state stucked in s3_waiting_for_echo_end
+                    u->state = s0_idle_before_trigger;
+                }
+                u->nOwerflow++;
+                //world_time++; // delete later
+                //gpio_toggle(PLED,LEDRED2);
+            }
+        }
+    }
+    timer_clear_flag(t, 0xffff);
+}
+
+void timUltra_isr(uint32_t t)
+{
+    S_robot_ultras* us = &(R.ults);
+    S_sensor_ultra* u = 0;
+    uint8_t q = 0;
+    uint8_t qmax = ROB_ULTRA_COUNT;
     uint8_t timSRccX = 0;
 
     if( R.STARTED == 1 )

@@ -74,7 +74,7 @@ void ROBOT_initUltras(S_robot* r)
     uint8_t a = 0;
     S_robot_ultras* u = &(r->ults);
 
-    for(a=0; a<ROB_ULTRA_MAX_COUNT; a++)
+    for(a=0; a<ROB_ULTRA_COUNT; a++)
     {
         u->u[a] = INIT_ultraPredef(a, tim_s);
 
@@ -132,10 +132,24 @@ void ROBOT_initBuzzers(S_robot* r)
 
 void ROBOT_initDcmotors(S_robot* r)
 {
-    r->dcs.mFL = INIT_dcmotorPredef(0);
-    r->dcs.mFR = INIT_dcmotorPredef(1);
-    r->dcs.mBL = INIT_dcmotorPredef(2);
-    r->dcs.mBR = INIT_dcmotorPredef(3);
+    uint8_t iTim = 0;
+    S_timer_setup* tim_s = INIT_ultraTimer(iTim);
+
+    uint8_t q = 0;
+    S_robot_dcmotors* d = &(r->dcs);
+    for(q=0; q<ROB_ULTRA_COUNT; q++)
+    {
+        d->m[q] = INIT_dcmotorPredef(q, tim_s);
+/*
+        ROBOT_initIsr(d->m[a]->rxport, d->m[a]->exti, d->m[a]->irq,
+                      d->m[a]->priority, EXTI_TRIGGER_BOTH);
+        ULTRA_setCoefs(d->m[a], coef);*/
+    }
+    q = 0;
+    d->mFL = d->m[q++];
+    d->mFR = d->m[q++];
+    d->mBL = d->m[q++];
+    d->mBR = d->m[q++];
 }
 
 void ROBOT_initLinCam(S_robot* r)

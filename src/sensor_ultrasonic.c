@@ -68,7 +68,7 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* a_tim_s)
 {
     S_sensor_ultra* u = &predef_ultras[index];
     // index of ultrasound
-    u->indx = index;
+    //u->indx = index;
 
     // states
     u->echoState = 0;
@@ -105,7 +105,7 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* a_tim_s)
     - good prescalers for measurining signal between <0.2; 12> [ms]
 */
     /* -------- timer settings -------- */
-    uint8_t q = u->indx;
+    uint8_t q = index;
     uint32_t t = u->tim_s->TIMX;
 
     /* Disable outputs. */
@@ -134,23 +134,18 @@ S_timer_setup* INIT_ultraTimer(uint8_t indx)
     // initialize timer X for 1ns ticking
     S_timer_setup* tim_s = &(predef_timers[indx]);
     uint32_t t = tim_s->TIMX;
-
     //____________________________________________________
     // clock initialization
 	rcc_periph_clock_enable(tim_s->apbclk);
 	rcc_periph_clock_enable(tim_s->clk);
     timer_reset(t);
     /* Time Base configuration */
-
-    // CK_INT = f_periph(TIM3=APB1) = 30[MHz]??          //RM0090.pdf
     //____________________________________________________
     // MODE SETTING
     // - use internal clock as a trigger
     timer_set_mode(t, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    // TIM_CR1_CKD_CK_INT = Clock Division Ratio
-    //  - set CK_PSC = CK_INT = f_periph = 84[MHz]
-    // TIM_CR1_CMS_EDGE = Center-aligned Mode Selection
-    //  - edge..??
+    // TIM_CR1_CKD_CK_INT = Clock Division Ratio - set CK_PSC = CK_INT = f_periph = 84[MHz]
+    // TIM_CR1_CMS_EDGE = Center-aligned Mode Selection  - edge..??
     // TIM_CR1_DIR_UP = counting direction up
 
     // continuous
@@ -161,16 +156,12 @@ S_timer_setup* INIT_ultraTimer(uint8_t indx)
     // [prsc=8400, period=10k  ] == <0.1 ; 840> [ms]
 
     timer_set_prescaler(t, 30);
-
     // Input Filter clock prescaler -
     timer_set_clock_division(t, 0);
-
     // TIMx_ARR - Period in counter clock ticks.
     timer_set_period(t, 0xFFFF-1);
-
     /* Generate TRGO on every update. */
     timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
-
 
     timer_enable_irq(t, TIM_DIER_UIE);
     //irqs = TIM_DIER_CC1IE | TIM_DIER_BIE ;

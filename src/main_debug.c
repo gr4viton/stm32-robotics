@@ -72,12 +72,44 @@ int main_debug(S_robot* r)
         //DBG_tryCNY70(r
         //DBG_testUltraDistance(r,0xFFFF);
         DBG_testAllUltraDistance(r,0xFFFF);
-
+        //DBG_testActuators(r,0xFFFF);
 
         //INIT_tim(r);
 	}
 
 	return 0;
+}
+
+void DBG_testActuators(S_robot*r, uint32_t reps)
+{
+
+    uint32_t period = 100;
+    uint32_t prStart = _tic();
+    uint8_t q=0;
+    S_robot_dcmotors* d = 0;
+    d = &(r->dcs);
+
+    while(reps>1)
+    {
+        CLOCK_digiPrint(r);
+
+        if( _tocFrom(prStart) > period )
+        {
+            gpio_toggle(PLED,LEDBLUE3);
+            LCD_gotoxy(r->lcd,0,0);
+            fprintf(r->flcd, "s");
+                for(q=0;q<ROB_MOTOR_COUNT;q++)
+                    fprintf(r->flcd, "%d", d->m[q]->pEN );
+            fprintf(r->flcd, "p");
+                for(q=0;q<ROB_ULTRA_COUNT;q++)
+                    fprintf(r->flcd, "%lu", d->m[q]->pwm);
+            fprintf(r->flcd, "  ");
+
+            LCD_gotoxy(r->lcd,0,1);
+            prStart = _tic();
+        }
+        reps--;
+    }
 }
 
 void DBG_touchD7blink(void)
@@ -186,18 +218,18 @@ void DBG_testAllUltraDistance(S_robot*r, uint32_t reps)
             gpio_toggle(PLED,LEDBLUE3);
             LCD_gotoxy(r->lcd,0,0);
             fprintf(r->flcd, "s");
-                for(q=0;q<ROB_ULTRA_MAX_COUNT;q++)
+                for(q=0;q<ROB_ULTRA_COUNT;q++)
                     fprintf(r->flcd, "%u", us->u[q]->state );
             fprintf(r->flcd, "p");
-                for(q=0;q<ROB_ULTRA_MAX_COUNT;q++)
+                for(q=0;q<ROB_ULTRA_COUNT;q++)
                     fprintf(r->flcd, "%u", us->u[q]->nOwerflow);
             fprintf(r->flcd, "  ");
             //fprintf(r->flcd, "p=");
             //u->nOwerflow
 
             LCD_gotoxy(r->lcd,0,1);
-            fprintf(r->flcd, "");
-                for(q=0;q<ROB_ULTRA_MAX_COUNT;q++)
+            //fprintf(r->flcd, "a");
+                for(q=0;q<ROB_ULTRA_COUNT;q++)
                 {
                     fprintf(r->flcd, "%3.0f|", us->u[q]->dist );
                     //fprintf(r->flcd, "%3.0f", us->u[q]->dist );
@@ -256,7 +288,7 @@ void DBG_testUltraDistanceOld2(S_robot* r,uint32_t repeats)
         repeats--;
         fprintf(f,"ULTRAS[0-3]:");
 
-        for(a=0;a<ROB_ULTRA_MAX_COUNT;a++)
+        for(a=0;a<ROB_ULTRA_COUNT;a++)
         {
             u = r->ults.u[a];
             if(u->ticksStart == 0)

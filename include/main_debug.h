@@ -87,23 +87,24 @@ int main_debug(S_robot* r);
 /****************
  @brief
  ****************/
-void DBG_ultraTest(void);
+// actuators
+void DBG_testActuators(S_robot*r, uint32_t reps);
+// infra
 void DBG_adc_finish(void);
 void DBG_tryADC(S_robot* r);
 void DBG_tryCNY70(S_robot* r);
-
+// waitin
 void DBG_ticTocSumoWait(S_robot* r);
-
+// button
 void DBG_touchD7blink(void);
 void DBG_testButtonState(S_robot* r, uint32_t repeats,uint32_t ms);
-//____________________________________________________
 //ultras
-
 void DBG_testAllUltraDistance(S_robot*r, uint32_t reps);
 void DBG_testUltraDistanceOld2(S_robot* r,uint32_t repeats);
 void DBG_testUltraDistanceOld(S_robot* r,uint32_t repeats);
 void DBG_testUltraDistance(S_robot* r,uint32_t repeats);
-
+void DBG_ultraTest(void);
+// other
 void DBG_flash(void);
 
 /****************

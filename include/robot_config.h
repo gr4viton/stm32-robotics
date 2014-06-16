@@ -72,8 +72,8 @@
 // LCD data buffer size
 #define ROB_LCD_DBUFSZ 1024
 // sensor count
-#define ROB_INFRA_MAX_COUNT 16
-#define ROB_ULTRA_MAX_COUNT 4
+#define ROB_INFRA_COUNT 16
+#define ROB_ULTRA_COUNT 4
 //#define ROB_ULTRA_MAX_COUNT 1
 // actuators
 #define ROB_MOTOR_COUNT 4
@@ -112,7 +112,7 @@ typedef struct _S_robot_ultras
     S_sensor_ultra* uFR; // pointer to front right ultrasonic sensor
     S_sensor_ultra* uL;  // pointer to side  left  ultrasonic sensor
     S_sensor_ultra* uR;  // pointer to side  right ultrasonic sensor
-    S_sensor_ultra* u[ROB_ULTRA_MAX_COUNT]; // array of poiners to ultra_predef
+    S_sensor_ultra* u[ROB_ULTRA_COUNT]; // array of poiners to ultra_predef
 } S_robot_ultras;
 
 /****************
@@ -147,8 +147,8 @@ typedef struct _S_robot_infras
     S_sensor_infra* iBL; // infra back left -> pointer to i[x]
     S_sensor_infra* iBR; // infra back right -> pointer to i[x]
 
-    uint8_t channelArray[ROB_INFRA_MAX_COUNT]; // array of ADC channels to measure
-    S_sensor_infra* i[ROB_INFRA_MAX_COUNT]; // array of poiners to infra_predef
+    uint8_t channelArray[ROB_INFRA_COUNT]; // array of ADC channels to measure
+    S_sensor_infra* i[ROB_INFRA_COUNT]; // array of poiners to infra_predef
 } S_robot_infras;
 
 
