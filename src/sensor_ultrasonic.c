@@ -36,10 +36,22 @@
  ****************/
 S_sensor_ultra predef_ultras[] =
 {
-/*0*/ {.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO2, .txpin=GPIO0, .irq=NVIC_EXTI2_IRQ, .exti=EXTI2, .timOCX=TIM_OC1}
-/*1*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO3, .txpin=GPIO1, .irq=NVIC_EXTI3_IRQ, .exti=EXTI3, .timOCX=TIM_OC2}
-/*2*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO6, .txpin=GPIO4, .irq=NVIC_EXTI9_5_IRQ, .exti=EXTI6, .timOCX=TIM_OC3}
-/*3*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD, .txport=GPIOD, .rxpin=GPIO7, .txpin=GPIO5, .irq=NVIC_EXTI9_5_IRQ, .exti=EXTI7, .timOCX=TIM_OC4}
+//2014_06_16 - board v1
+// with changes:  E3-->E5; C13-->H1
+/*0*/ {.priority=0,.clk=RCC_GPIOA,.rxport=GPIOA,.txport=GPIOA,.rxpin=GPIO3,.txpin=GPIO1,.exti=EXTI3,.irq=NVIC_EXTI3_IRQ,  .timOCX=TIM_OC1}
+/*1*/,{.priority=0,.clk=RCC_GPIOB|RCC_GPIOD,.rxport=GPIOD,.txport=GPIOB,.rxpin=GPIO6,.txpin=GPIO7,.exti=EXTI6,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC2}
+/*2*/,{.priority=0,.clk=RCC_GPIOA,.rxport=GPIOA,.txport=GPIOA,.rxpin=GPIO7,.txpin=GPIO5,.exti=EXTI7,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC3}
+/*3*/,{.priority=0,.clk=RCC_GPIOE,.rxport=GPIOE,.txport=GPIOE,.rxpin=GPIO5,.txpin=GPIO1,.exti=EXTI5,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC4}
+///*1*/,{.priority=0,.clk=RCC_GPIOB,.rxport=GPIOB,.txport=GPIOB,.rxpin=GPIO9,.txpin=GPIO7,.exti=EXTI9,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC2} // TAK KURVA DO PICE CO JE UZ!!
+///*1*/,{.priority=0,.clk=RCC_GPIOC,.rxport=GPIOC,.txport=GPIOC,.rxpin=GPIO15,.txpin=GPIO11,.exti=EXTI15,.irq=NVIC_EXTI15_10_IRQ,.timOCX=TIM_OC2} // just nope strope
+///*1*/,{.priority=0,.clk=RCC_GPIOC|RCC_GPIOH,.rxport=GPIOC,.txport=GPIOH,.rxpin=GPIO15,.txpin=GPIO1,.exti=EXTI15,.irq=NVIC_EXTI15_10_IRQ,.timOCX=TIM_OC2} // does not work either
+///*1*/,{.priority=0,.clk=RCC_GPIOC,.rxport=GPIOC,.txport=GPIOC,.rxpin=GPIO15,.txpin=GPIO13,.exti=EXTI15,.irq=NVIC_EXTI15_10_IRQ,.timOCX=TIM_OC2} // nope because only one pin from PC13-PC15 can be configured as GPIO at a time (BAT)
+///*3*/,{.priority=0,.clk=RCC_GPIOE,.rxport=GPIOE,.txport=GPIOE,.rxpin=GPIO5, .txpin=GPIO1, .exti=EXTI5, .irq=NVIC_EXTI9_5_IRQ,  .timOCX=TIM_OC4} // nope because two GPIO3's are selected as exti source = not possible (EXTI)
+//2014_06_16 - debug
+/*4*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO2,.txpin=GPIO0,.exti=EXTI2,.irq=NVIC_EXTI2_IRQ,  .timOCX=TIM_OC1}
+/*5*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO3,.txpin=GPIO1,.exti=EXTI3,.irq=NVIC_EXTI3_IRQ,  .timOCX=TIM_OC2}
+/*6*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO6,.txpin=GPIO4,.exti=EXTI6,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC3}
+/*7*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO7,.txpin=GPIO5,.exti=EXTI7,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC4}
 //,{.clk=RCC_GPIOE, .::rxport=GPIOE, .txport=GPIOE, .rxpin=GPIO5, .txpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI5}
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -68,22 +68,25 @@ void exti0_isr(void)
     }
 }
 
-// ultra exti on lines: 2,3,6,7
-void exti2_isr(void)
-{
-    extiX_isr(EXTI2);
-}
-void exti3_isr(void)
-{
-    extiX_isr(EXTI3);
-}
-
+void exti1_isr(void){extiX_isr(EXTI1);}
+void exti2_isr(void){extiX_isr(EXTI2);}
+void exti3_isr(void){extiX_isr(EXTI3);}
+void exti4_isr(void){extiX_isr(EXTI4);}
 void exti9_5_isr(void)
 {
     uint8_t q=0;
-    for(q=0;q<9-5+1;q++)
+    for(q=5;q<=9;q++)
     {// call common exti_isr function for lines 5 to 9
-        extiX_isr(EXTI5<<q);
+        extiX_isr(EXTI0<<q);
+    }
+}
+
+void exti15_10_isr(void)
+{
+    uint8_t q=0;
+    for(q=10;q<=15;q++)
+    {// call common exti_isr function for lines 10 to 15
+        extiX_isr(EXTI0<<q);
     }
 }
 
