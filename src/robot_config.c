@@ -77,9 +77,6 @@ void ROBOT_initUltras(S_robot* r)
     for(a=0; a<ROB_ULTRA_COUNT; a++)
     {
         u->u[a] = INIT_ultraPredef(a, tim_s);
-
-        model_gpioPin_INIT_exti2(u->u[a]->rxport, u->u[a]->exti, u->u[a]->irq,
-                      u->u[a]->priority, EXTI_TRIGGER_BOTH);
         ULTRA_setCoefs(u->u[a], coef);
     }
 

@@ -38,9 +38,9 @@
  order of pins of actuator in conarr (as in INIT_dcmotorPredef) is:
  { .echo, .trig }
  ****************/
-uint32_t ultra_conarr[][SENSOR_ULTRA_PINS_COUNT] =
+uint32_t conarr_ultra[][SENSOR_ULTRA_PINS_COUNT] =
 {
-/*<0;3>*/{PA3,PA1},{PD6,PB7},{PA7,PA5},{PE5,PE1}
+/*0,1,2,3*/{PA3,PA1},{PD6,PB7},{PA7,PA5},{PE5,PE1}
 };
 
 /****************
@@ -50,20 +50,26 @@ S_sensor_ultra predef_ultras[] =
 {
 //2014_06_16 - board v1
 // with changes:  E3-->E5; C13-->H1
-/*0*/ {.conarr=ultra_conarr[0],.timOCX=TIM_OC1}
-/*1*/,{.conarr=ultra_conarr[1],.timOCX=TIM_OC2}
-/*2*/,{.conarr=ultra_conarr[2],.timOCX=TIM_OC3}
-/*3*/,{.conarr=ultra_conarr[3],.timOCX=TIM_OC4}
+/*0*/ {.conarr=conarr_ultra[0],.timOCX=TIM_OC1}
+/*1*/,{.conarr=conarr_ultra[1],.timOCX=TIM_OC2}
+/*2*/,{.conarr=conarr_ultra[2],.timOCX=TIM_OC3}
+/*3*/,{.conarr=conarr_ultra[3],.timOCX=TIM_OC4}
+// before S_model_gpioPin
+///*0*/ {.priority=0,.clk=RCC_GPIOA,.rxport=GPIOA,.txport=GPIOA,.rxpin=GPIO3,.txpin=GPIO1,.exti=EXTI3,.irq=NVIC_EXTI3_IRQ,  .timOCX=TIM_OC1}
+///*1*/,{.priority=0,.clk=RCC_GPIOB|RCC_GPIOD,.rxport=GPIOD,.txport=GPIOB,.rxpin=GPIO6,.txpin=GPIO7,.exti=EXTI6,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC2}
+///*2*/,{.priority=0,.clk=RCC_GPIOA,.rxport=GPIOA,.txport=GPIOA,.rxpin=GPIO7,.txpin=GPIO5,.exti=EXTI7,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC3}
+///*3*/,{.priority=0,.clk=RCC_GPIOE,.rxport=GPIOE,.txport=GPIOE,.rxpin=GPIO5,.txpin=GPIO1,.exti=EXTI5,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC4}
+// board revision rerouting - bad
 ///*1*/,{.priority=0,.clk=RCC_GPIOB,.rxport=GPIOB,.txport=GPIOB,.rxpin=GPIO9,.txpin=GPIO7,.exti=EXTI9,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC2} // TAK KURVA DO PICE CO JE UZ!!
 ///*1*/,{.priority=0,.clk=RCC_GPIOC,.rxport=GPIOC,.txport=GPIOC,.rxpin=GPIO15,.txpin=GPIO11,.exti=EXTI15,.irq=NVIC_EXTI15_10_IRQ,.timOCX=TIM_OC2} // just nope strope
 ///*1*/,{.priority=0,.clk=RCC_GPIOC|RCC_GPIOH,.rxport=GPIOC,.txport=GPIOH,.rxpin=GPIO15,.txpin=GPIO1,.exti=EXTI15,.irq=NVIC_EXTI15_10_IRQ,.timOCX=TIM_OC2} // does not work either
 ///*1*/,{.priority=0,.clk=RCC_GPIOC,.rxport=GPIOC,.txport=GPIOC,.rxpin=GPIO15,.txpin=GPIO13,.exti=EXTI15,.irq=NVIC_EXTI15_10_IRQ,.timOCX=TIM_OC2} // nope because only one pin from PC13-PC15 can be configured as GPIO at a time (BAT)
 ///*3*/,{.priority=0,.clk=RCC_GPIOE,.rxport=GPIOE,.txport=GPIOE,.rxpin=GPIO5, .txpin=GPIO1, .exti=EXTI5, .irq=NVIC_EXTI9_5_IRQ,  .timOCX=TIM_OC4} // nope because two GPIO3's are selected as exti source = not possible (EXTI)
 //2014_06_16 - debug
-/*4*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO2,.txpin=GPIO0,.exti=EXTI2,.irq=NVIC_EXTI2_IRQ,  .timOCX=TIM_OC1}
-/*5*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO3,.txpin=GPIO1,.exti=EXTI3,.irq=NVIC_EXTI3_IRQ,  .timOCX=TIM_OC2}
-/*6*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO6,.txpin=GPIO4,.exti=EXTI6,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC3}
-/*7*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO7,.txpin=GPIO5,.exti=EXTI7,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC4}
+///*4*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO2,.txpin=GPIO0,.exti=EXTI2,.irq=NVIC_EXTI2_IRQ,  .timOCX=TIM_OC1}
+///*5*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO3,.txpin=GPIO1,.exti=EXTI3,.irq=NVIC_EXTI3_IRQ,  .timOCX=TIM_OC2}
+///*6*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO6,.txpin=GPIO4,.exti=EXTI6,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC3}
+///*7*/,{.priority=0,.clk=RCC_GPIOD,.rxport=GPIOD,.txport=GPIOD,.rxpin=GPIO7,.txpin=GPIO5,.exti=EXTI7,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC4}
 //,{.clk=RCC_GPIOE, .::rxport=GPIOE, .txport=GPIOE, .rxpin=GPIO5, .txpin=GPIO4, .irq=NVIC_EXTI4_IRQ, .exti=EXTI5}
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,20 +128,24 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* a_tim_s)
     // will be in an array too
 
     u->rx = u->pins[0];
-    //u->rx = &(predef_gpioPin[2]);
     u->tx = u->pins[1];
-//    u->pins[0]->mode = 14;
 
     // create configuration
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // LATER this will not be here as the pins in predef_gpioPins will be configured as wanted already -> so only
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    /*for(q=0;q<10;q++)
+    {
+        u->rx->mode = q;
+        predef_gpioPin[2].mode = q;
+    }*/
     u->rx->mode = GPIO_MODE_INPUT;
-    u->rx->mode = GPIO_PUPD_NONE;
+    u->rx->pull = GPIO_PUPD_NONE;
     u->rx->exti_enabled = true;
+    u->rx->exti_trig = EXTI_TRIGGER_BOTH;
 
     u->tx->mode = GPIO_MODE_OUTPUT;
-    u->tx->mode = GPIO_PUPD_PULLDOWN;
+    u->tx->pull = GPIO_PUPD_PULLDOWN;
 
     // insert configuration
     for(q=0;q<qmax;q++)
@@ -149,7 +159,7 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* a_tim_s)
 	rcc_periph_clock_enable(u->clk);
 	gpio_mode_setup(u->txport, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, u->txpin);
 	gpio_mode_setup(u->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, u->rxpin);
-	gpio_clear(u->txport, u->txpin);
+	model_gpioPin_clear(u->tx);
     */
 /* setup timer:
     - external trigger start rising edge
@@ -259,7 +269,7 @@ void ULTRA_tiggerStart(S_sensor_ultra *u)
     /* set value of compare register to produce trigger signal of given interval */
     timer_set_oc_value(u->TIMX, u->timOCX, u->nTriggerTicks);
 
-    gpio_set(u->txport, u->txpin);
+    model_gpioPin_set(u->tx);
 
     u->nOwerflow = 0;
     u->state = s1_sending_trigger;
@@ -267,7 +277,7 @@ void ULTRA_tiggerStart(S_sensor_ultra *u)
 
 void ULTRA_tiggerEnd(S_sensor_ultra *u)
 {
-    gpio_clear(u->txport, u->txpin);
+    model_gpioPin_clear(u->tx);
     u->state = s2_waiting_for_echo;
     u->nOwerflow = 0;
     /* disable compare interrupt */
@@ -279,11 +289,11 @@ void ULTRA_tiggerEnd(S_sensor_ultra *u)
 /* deprecated */
 void ULTRA_signalSend(S_sensor_ultra *u)
 {
-    gpio_set(u->txport, u->txpin);
+    model_gpioPin_set(u->tx);
     //u->ticksStart = timer5;
     // wait
     mswait(1);
-    gpio_clear(u->txport, u->txpin);
+    model_gpioPin_clear(u->tx);
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -321,7 +331,7 @@ void ULTRA_echoEnded(S_sensor_ultra *u)
 
 void ULTRA_handleEcho(S_sensor_ultra* u)
 {
-    if( exti_get_flag_status(u->exti) ) // this is second checking - but harmless
+    if( exti_get_flag_status(u->rx->exti) ) // this is second checking - but harmless
     { // some of the ultras responded with up or down edge
         u->echoState = BIT_TOGGLE(u->echoState, 0);
 

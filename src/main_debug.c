@@ -306,38 +306,6 @@ void DBG_testUltraDistanceOld2(S_robot* r,uint32_t repeats)
     }
 }
 
-void DBG_testUltraDistanceOld(S_robot* r,uint32_t repeats)
-{
-/*
-    uint8_t i_ultra = 0;
-    INIT_ultra(i_ultra ,0);
-*/
-    //S_dev_lcd* lcd_dev = &(lcds_predef[ilcd]);
-    S_sensor_ultra* ultra = r->ults.uL;
-
-    while(repeats>1)
-    {
-        repeats--;
-
-        ULTRA_signalSend(r->ults.uL);
-        ultra->dist = 0;
-        while( !gpio_get(ultra->rxport,ultra->rxpin) )
-        {
-            __asm__("nop");
-        }
-        while( gpio_get(ultra->rxport,ultra->rxpin) )
-        {
-            (ultra->dist)++;
-        }
-
-        //u30+4;u10+1
-        ultra->dist *= 1.1;//1.111;//1.33333333;//(1 + 4.0/30);
-
-        LCD_clear(r->lcd);
-        fprintf(r->flcd, "dist[cm]=%.2f", ultra->dist/100);//ULTRA_getDist(i_ultra));
-        mswait(500);
-    }
-}
 
 void DBG_flash(void)
 {

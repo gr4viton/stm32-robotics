@@ -112,7 +112,7 @@ void ROBOT_handleUltraEchoOnExti(uint8_t exti)
     uint8_t a=0;
     for(a=0;a<ROB_ULTRA_COUNT; a++)
     {
-        if(exti == R.ults.u[a]->exti)
+        if(exti == R.ults.u[a]->rx->exti)
             ULTRA_handleEcho(R.ults.u[a]);
     }
 }

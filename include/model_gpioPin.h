@@ -30,6 +30,9 @@
 //_________> project includes
 #include "defines.h"
 #include "waitin.h"
+#include "model_gpioPin_defines.h"
+
+
 //_________> local includes
 //_________> forward includes
 /****************
@@ -52,7 +55,7 @@ typedef struct _S_model_gpioPin
     uint8_t irq;   // NVIC irq
     uint8_t priority;
 
-    enum exti_trigger_type trig; // on which edge to trigger isr
+    enum exti_trigger_type exti_trig; // on which edge to trigger isr
 
 } S_model_gpioPin;
 
@@ -63,68 +66,6 @@ typedef struct _S_model_gpioPin
 //constants (user-defined)
 //____________________________________________________
 //constants (do not change)
-/****************
- @brief number of pins defined in predef_gpioPin array
- ****************/
-#define PREDEFCOUNT_GPIOPIN 100
-/****************
- @brief defines of predef_gpioPin array indexes
- now as the predef_gpioPin is not ordered - it is defined one by one
- later implement the next #if statements and order predef_gpioPin
- ****************/
-#define PA15    0
-#define PB3     1
-#define PA3     2
-#define PA1     3
-#define PD6     4
-#define PB7     5
-#define PA7     6
-#define PA5     7
-#define PE5     8
-#define PE1     9
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// LATER ON PRODUCE THIS , and fill the predef_gpioPin
-
-#if __NOT_IMPLEMENTED_YET
-// as the predef_gpioPin is not ordered
-#define PORTS_BASE      0x0020
-//#define PORTS_BASE      0x0000
-//will be 0
-#define PORTS_OFFSET    0x000F
-#define PORT_BASE(PORT) ((PORTS_BASE)+(PORT)*(PORTS_OFFSET))
-
-// port bases
-#define PA_BASE         PORT_BASE(0)
-#define PB_BASE         PORT_BASE(1)
-//...
-
-// pin bases
-#define PA(PIN)     ((PA_BASE)+(PIN))
-#define PB(PIN)     ((PB_BASE)+(PIN))
-//...
-
-// pin indexes
-#define PA0         PA(0)
-#define PA1         PA(1)
-#endif
-
-
-// exti multilines
-// for stm32f4
-#define NVIC_EXTI5_IRQ      NVIC_EXTI9_5_IRQ
-#define NVIC_EXTI6_IRQ      NVIC_EXTI9_5_IRQ
-#define NVIC_EXTI7_IRQ      NVIC_EXTI9_5_IRQ
-#define NVIC_EXTI8_IRQ      NVIC_EXTI9_5_IRQ
-#define NVIC_EXTI9_IRQ      NVIC_EXTI9_5_IRQ
-#define NVIC_EXTI10_IRQ     NVIC_EXTI15_10_IRQ
-#define NVIC_EXTI11_IRQ     NVIC_EXTI15_10_IRQ
-#define NVIC_EXTI12_IRQ     NVIC_EXTI15_10_IRQ
-#define NVIC_EXTI13_IRQ     NVIC_EXTI15_10_IRQ
-#define NVIC_EXTI14_IRQ     NVIC_EXTI15_10_IRQ
-#define NVIC_EXTI15_IRQ     NVIC_EXTI15_10_IRQ
-
-
 //____________________________________________________
 // macro functions (do not use often!)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,6 +87,7 @@ typedef struct _S_model_gpioPin
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // OTHER FUNCTION DECLARATIONS
     //____________________________________________________
+    // INITs
 /****************
  @brief Initialization of a pin as a whole
  -> if exti enabled -> init exti too.. etc.
@@ -163,7 +105,19 @@ S_model_gpioPin* model_gpioPin_INIT_gpio(S_model_gpioPin* p);
  ****************/
 S_model_gpioPin* model_gpioPin_INIT_exti(S_model_gpioPin* pin);
 
+/****************
+ @brief legacy
+ ****************/
 void model_gpioPin_INIT_exti2(uint32_t port, uint32_t exti, uint8_t irqn, uint8_t priority, enum exti_trigger_type trig);
+
+    //____________________________________________________
+    // gpio operations
+
+uint16_t model_gpioPin_get(S_model_gpioPin* p);
+void model_gpioPin_set(S_model_gpioPin* p);
+void model_gpioPin_clear(S_model_gpioPin* p);
+void model_gpioPin_toggle(S_model_gpioPin* p);
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

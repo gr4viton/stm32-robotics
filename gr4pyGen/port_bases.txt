@@ -1,0 +1,10 @@
+//____________________________________________________
+// port bases
+
+#define PA_BASE 		(PORT_BASE(0))
+#define PB_BASE 		(PORT_BASE(1))
+#define PC_BASE 		(PORT_BASE(2))
+#define PD_BASE 		(PORT_BASE(3))
+#define PE_BASE 		(PORT_BASE(4))
+#define PH_BASE 		(PORT_BASE(5))
+#define PI_BASE 		(PORT_BASE(6))

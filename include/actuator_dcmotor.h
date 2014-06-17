@@ -35,6 +35,10 @@
 // MACRO DEFINITIONS
 //____________________________________________________
 //constants (user-defined)
+/****************
+ @brief number of pins each dcmotor actuator has
+ ****************/
+#define SENSOR_DCMOT_PINS_COUNT     2
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________

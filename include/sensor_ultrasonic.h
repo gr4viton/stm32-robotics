@@ -42,9 +42,13 @@
 // MACRO DEFINITIONS
 //____________________________________________________
 //constants (user-defined)
-// degree of the polynomial
-
+/****************
+ @brief degree of the polynomial
+ ****************/
 #define SENSOR_ULTRA_COEF_COUNT     3
+/****************
+ @brief number of pins each ultra sensor has
+ ****************/
 #define SENSOR_ULTRA_PINS_COUNT     2
 //____________________________________________________
 //constants (do not change)
@@ -78,7 +82,7 @@ typedef struct _S_sensor_ultra
     S_model_gpioPin *pins[2];
     S_model_gpioPin* rx; // pin for recieving echo
     S_model_gpioPin* tx; // pin for sending trigger
-
+/*
     // pin settings
     uint32_t clk;
     uint32_t txport;
@@ -90,7 +94,7 @@ typedef struct _S_sensor_ultra
     uint32_t exti; // exti line
     uint8_t irq;   // NVIC irq
     uint8_t priority;
-
+*/
     uint8_t echoState;          // memory for distinguishing between rising and falling edges
     E_sensor_ultra_state state; // state in which the sensor is
 

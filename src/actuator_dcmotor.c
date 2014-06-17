@@ -41,11 +41,15 @@
 
 /****************
  @brief connection array
- pins[x] == predef_pins[dcmotor_conarr[x]]
+ pins[x] == predef_pins[conarr_dcmotor[x]]
  order of pins of actuator in conarr (as in INIT_dcmotorPredef) is:
  { .a, .b }
  ****************/
-uint32_t dcmotor_conarr[] = { PA15, PB3 };
+
+uint32_t conarr_dcmotor[][SENSOR_DCMOT_PINS_COUNT] =
+{
+/*0,1,2,3*/{PA15,PB3},{PA1,PA2},{PA3,PA4},{PA5,PA5}
+};
 
 /****************
  \brief Predefined actuator dc motor h-bridge connections ports & clocks
@@ -53,7 +57,7 @@ uint32_t dcmotor_conarr[] = { PA15, PB3 };
 S_actuator_dcmotor dcmotor_predef[] =
 {
 //2014_06_16 - board v1
-/*0*/ {.conarr=dcmotor_conarr}
+/*0*/ {.conarr=conarr_dcmotor[0]}
 ///*0*/ {.a=(predef_gpioPin[0]),.b=(predef_gpioPin[1])} // cannot initialize as initializer element is not constant - in c struct cannot be const
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

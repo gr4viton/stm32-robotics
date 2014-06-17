@@ -30,8 +30,10 @@ x] od adc -> pomoci injected a Timeru
 
 [] priority nvic - nastavit aby to nedelalo problemy!!!
 
-[] ultra_conarr -> conarr_ultra
-[] seradit predef_gpioPin
+[x] ultra_conarr -> conarr_ultra
+[x] seradit predef_gpioPin
+[] ULTRA_triggerStart --> sensor_ultra_triggerStart ?? urcite to tak chces?
+
 []ROB_ULTRA_COUNT -> ULTRA_COUNT -> should be defined in sensor_ultra.h !!! ?? or would it be bad?
 
 

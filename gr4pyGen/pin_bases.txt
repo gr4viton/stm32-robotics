@@ -1,0 +1,9 @@
+//____________________________________________________
+// pin bases
+#define PA(PIN) 		((PA_BASE)+(PIN))
+#define PB(PIN) 		((PB_BASE)+(PIN))
+#define PC(PIN) 		((PC_BASE)+(PIN))
+#define PD(PIN) 		((PD_BASE)+(PIN))
+#define PE(PIN) 		((PE_BASE)+(PIN))
+#define PH(PIN) 		((PH_BASE)+(PIN))
+#define PI(PIN) 		((PI_BASE)+(PIN))
