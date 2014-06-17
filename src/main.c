@@ -29,7 +29,13 @@ x] od adc -> pomoci injected a Timeru
 ] od adc watchdog - kdy z merenych hodnot budu menit hodnotu watchdogu?
 
 [] priority nvic - nastavit aby to nedelalo problemy!!!
-[] ultracidla - timer counter period
+
+[] ultra_conarr -> conarr_ultra
+[] seradit predef_gpioPin
+[]ROB_ULTRA_COUNT -> ULTRA_COUNT -> should be defined in sensor_ultra.h !!! ?? or would it be bad?
+
+
+[x] ultracidla - timer counter period
 [] rozchodit pwm
 
 

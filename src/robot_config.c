@@ -67,7 +67,7 @@ void ROBOT_initUltras(S_robot* r)
     {0, 1.0/(double)p, 0.00};
 */
     //data from calibration measurement for HCR04 <4;100>cm 2014_06_15
-    double coef[ROB_ULTRA_COEF_COUNT] =
+    double coef[SENSOR_ULTRA_COEF_COUNT] =
     {0.00, 6.3143133e-3, 8.0595701e-9};
     //{0.00, 158.40826, -0.0316105}; // = inverse
 
@@ -78,7 +78,7 @@ void ROBOT_initUltras(S_robot* r)
     {
         u->u[a] = INIT_ultraPredef(a, tim_s);
 
-        ROBOT_initIsr(u->u[a]->rxport, u->u[a]->exti, u->u[a]->irq,
+        model_gpioPin_INIT_exti2(u->u[a]->rxport, u->u[a]->exti, u->u[a]->irq,
                       u->u[a]->priority, EXTI_TRIGGER_BOTH);
         ULTRA_setCoefs(u->u[a], coef);
     }
@@ -104,7 +104,7 @@ void ROBOT_initButtons(S_robot* r)
 
     // Initialize IRQ for button bStart
     S_sensor_button* bb = b->bStart;
-    ROBOT_initIsr(bb->port, bb->exti, bb->irq, ROB_PRIORITY_BUTTON_START, EXTI_TRIGGER_BOTH);
+    model_gpioPin_INIT_exti2(bb->port, bb->exti, bb->irq, ROB_PRIORITY_BUTTON_START, EXTI_TRIGGER_BOTH);
 }
 
 void ROBOT_initLcd(S_robot* r)

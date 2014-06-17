@@ -118,7 +118,7 @@ void DBG_touchD7blink(void)
     // D7 - touch blink
 	rcc_periph_clock_enable(RCC_GPIOD);
     gpio_mode_setup(GPIOD, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO7);
-    ROBOT_initIsr(GPIOD,EXTI7,NVIC_EXTI9_5_IRQ,10,EXTI_TRIGGER_BOTH);
+    model_gpioPin_INIT_exti2(GPIOD,EXTI7,NVIC_EXTI9_5_IRQ,10,EXTI_TRIGGER_BOTH);
 }
 
 void DBG_tryCNY70(S_robot* r)

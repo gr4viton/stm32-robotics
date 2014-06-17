@@ -30,7 +30,9 @@
 //_________> project includes
 #include "defines.h"
 #include "waitin.h"
+#include "model_gpioPin.h"
 //_________> local includes
+
 //_________> forward includes
 
 
@@ -42,7 +44,8 @@
 //constants (user-defined)
 // degree of the polynomial
 
-#define ROB_ULTRA_COEF_COUNT 3
+#define SENSOR_ULTRA_COEF_COUNT     3
+#define SENSOR_ULTRA_PINS_COUNT     2
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -51,6 +54,7 @@
 // TYPE DEFINITIONS
 //____________________________________________________
 // enumerations
+
 /****************
  @brief Enumerator of ultra sensor states
   ****************/
@@ -61,6 +65,7 @@
      s2_waiting_for_echo,
      s3_waiting_for_echo_end
  } E_sensor_ultra_state;
+
 //____________________________________________________
 // structs
 /****************
@@ -68,6 +73,12 @@
  ****************/
 typedef struct _S_sensor_ultra
 {
+
+    uint32_t* conarr;
+    S_model_gpioPin *pins[2];
+    S_model_gpioPin* rx; // pin for recieving echo
+    S_model_gpioPin* tx; // pin for sending trigger
+
     // pin settings
     uint32_t clk;
     uint32_t txport;
@@ -99,7 +110,7 @@ typedef struct _S_sensor_ultra
 
     // distance measurement
     double dist;
-    double coef[ROB_ULTRA_COEF_COUNT];
+    double coef[SENSOR_ULTRA_COEF_COUNT];
     // dist = coef[0] + coef[1]*nTicks + coef[2]*nTicks^2 + .. + coef[N]*nTicks^N
     // .. where N = ROB_ULTRA_COEF_COUNT
 } S_sensor_ultra;
@@ -109,7 +120,7 @@ typedef struct _S_sensor_ultra
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS
-
+extern S_model_gpioPin predef_gpioPin[PREDEFCOUNT_GPIOPIN];
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DEFINITIONS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

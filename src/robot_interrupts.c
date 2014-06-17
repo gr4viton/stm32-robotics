@@ -105,16 +105,6 @@ inline void extiX_isr(uint8_t actExti)
 }
 
 
-void ROBOT_initIsr(uint32_t port, uint32_t exti, uint8_t irqn, uint8_t priority, enum exti_trigger_type trig)
-{
-    // exti
-	exti_select_source(exti, port);
-	exti_set_trigger(exti, trig);
-	exti_enable_request(exti);
-    // enable interrupt
-	nvic_enable_irq(irqn);
-	nvic_set_priority(irqn,priority);
-}
 
 
 void ROBOT_handleUltraEchoOnExti(uint8_t exti)

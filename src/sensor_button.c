@@ -33,12 +33,10 @@
 // other variables
 S_sensor_button predef_buttons[] =
 {
-/*0*/{.pin=GPIO0, .port=GPIOA, .pclk=RCC_GPIOA, .pull=GPIO_PUPD_NONE, .state=0,
- .irq=NVIC_EXTI0_IRQ, .exti=EXTI0,  .exti_triggerDir=EXTI_TRIGGER_RISING},
+/*0*/{.pin=GPIO0, .port=GPIOA, .pclk=RCC_GPIOA, .pull=GPIO_PUPD_NONE, .state=0, .irq=NVIC_EXTI0_IRQ, .exti=EXTI0,  .exti_triggerDir=EXTI_TRIGGER_RISING},
 /*1*/{.pin=GPIO7, .port=GPIOC, .pclk=RCC_GPIOC, .pull=GPIO_PUPD_PULLUP, .state=0},
 /*2*/{.pin=GPIO6, .port=GPIOC, .pclk=RCC_GPIOC, .pull=GPIO_PUPD_PULLUP, .state=0},
-/*3*/{.pin=GPIO0, .port=GPIOH, .pclk=RCC_GPIOH, .pull=GPIO_PUPD_NONE, .state=0,
- .irq=NVIC_EXTI0_IRQ, .exti=EXTI0,  .exti_triggerDir=EXTI_TRIGGER_BOTH}
+/*3*/{.pin=GPIO0, .port=GPIOH, .pclk=RCC_GPIOH, .pull=GPIO_PUPD_NONE, .state=0, .irq=NVIC_EXTI0_IRQ, .exti=EXTI0,  .exti_triggerDir=EXTI_TRIGGER_BOTH}
 };
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL VARIABLE DECLARATIONS

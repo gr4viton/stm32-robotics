@@ -47,13 +47,13 @@
 // structs
 typedef struct _S_actuator_dcmotor
 {
-
+    uint32_t* conarr;
+    S_model_gpioPin *pins[2];
     S_model_gpioPin* a; // actuator pin IN1
     S_model_gpioPin* b; // actuator pin IN2
 
     uint16_t dutyCycle; // will be used?
     uint32_t pwm; // not sure yet
-
 
     // tick settings
     S_timer_setup* tim_s;  // pointer to the timer structure for tick counting
@@ -80,7 +80,7 @@ typedef struct _S_actuator_dcmotor
 // EXTERNAL VARIABLE DECLARATIONS
 
 //extern S_actuator_dcmotor dcmotor_predef[];
-extern S_model_gpioPin predef_gpioPin[PREDEFCOUNT_GPIOPIN];
+//extern S_model_gpioPin predef_gpioPin[PREDEFCOUNT_GPIOPIN];
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // INLINE FUNCTION DECLARATIONS
