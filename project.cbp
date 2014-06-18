@@ -53,11 +53,13 @@
 		<Unit filename="include/dev_buzzer.h" />
 		<Unit filename="include/dev_serial.h" />
 		<Unit filename="include/led_f4.h" />
+		<Unit filename="include/libopencm3_add/gpio.h" />
 		<Unit filename="include/main.h" />
 		<Unit filename="include/main_debug.h" />
 		<Unit filename="include/main_line.h" />
 		<Unit filename="include/main_sumo.h" />
 		<Unit filename="include/model_gpioPin.h" />
+		<Unit filename="include/model_gpioPin_defines.h" />
 		<Unit filename="include/primitives/llist.h" />
 		<Unit filename="include/primitives/ringbuf.h" />
 		<Unit filename="include/pwm.h" />
@@ -910,6 +912,9 @@
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/main2.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/main_debug.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -922,10 +927,16 @@
 		<Unit filename="src/model_gpioPin.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/model_gpioPin_defines.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/primitives/llist.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/primitives/ringbuf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/pwm.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/robot_config.c">
@@ -947,6 +958,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/sensor_ultrasonic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/servo.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/tests.c">

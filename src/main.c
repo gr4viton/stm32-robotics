@@ -28,18 +28,32 @@ x] od timeru
 x] od adc -> pomoci injected a Timeru
 ] od adc watchdog - kdy z merenych hodnot budu menit hodnotu watchdogu?
 
-[] priority nvic - nastavit aby to nedelalo problemy!!!
 
 [x] ultra_conarr -> conarr_ultra
 [x] seradit predef_gpioPin
+
+[x] ultracidla - timer counter period
+
 [] ULTRA_triggerStart --> sensor_ultra_triggerStart ?? urcite to tak chces?
 
+[] S_timer_setup -> S_model_timer
+timer_s from wait to model_timer.c
+[] ty same definice jako maji gpioPins tak pro timery
+
+
+[] všechny clk na rcc
+[] aby se timery automaticky nacitali pri prvni initializaci -> aby nemusely byt v robot_config.. ale primo v ultra..
+-> ultra bude mit indx z predef_timers
+[] zrušit  ultra[x]->TIMX; -> nechat to jenom v tim_s->TIMX
+____________________________________________________
+later
+[] priority nvic - nastavit aby to nedelalo problemy!!!
+____________________________________________________
+maybee
 []ROB_ULTRA_COUNT -> ULTRA_COUNT -> should be defined in sensor_ultra.h !!! ?? or would it be bad?
 
 
-[x] ultracidla - timer counter period
 [] rozchodit pwm
-
 
 [x] lcd
 x] 4bit

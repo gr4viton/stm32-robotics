@@ -76,7 +76,8 @@
 #define ROB_ULTRA_COUNT 4
 //#define ROB_ULTRA_MAX_COUNT 1
 // actuators
-#define ROB_MOTOR_COUNT 4
+//#define ROB_MOTOR_COUNT 4
+#define ROB_MOTOR_COUNT 1
 //____________________________________________________
 //constants (do not change)
 #define ROB_PRIORITY_BUTTON_START 10

@@ -52,40 +52,38 @@ S_robot R;
 void ROBOT_START(S_robot* r)
 {
     r->STARTED = 1;
-    // start the timer
+    // start timers
     timer_enable_counter(r->ults.u[0]->tim_s->TIMX);
+    timer_enable_counter(r->dcs.m[0]->tim_s->TIMX);
 }
 
 void ROBOT_initUltras(S_robot* r)
 {
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% will be as gpio -> define TIM1_asdasdasdas
     uint8_t iTim = 0;
     S_timer_setup* tim_s = INIT_ultraTimer(iTim);
 
-/*
-    uint32_t p = tim_s->period;
-    double coef[ROB_ULTRA_COEF_COUNT] =
-    {0, 1.0/(double)p, 0.00};
-*/
     //data from calibration measurement for HCR04 <4;100>cm 2014_06_15
     double coef[SENSOR_ULTRA_COEF_COUNT] =
     {0.00, 6.3143133e-3, 8.0595701e-9};
     //{0.00, 158.40826, -0.0316105}; // = inverse
 
-    uint8_t a = 0;
+    uint8_t q = 0;
     S_robot_ultras* u = &(r->ults);
 
-    for(a=0; a<ROB_ULTRA_COUNT; a++)
+    for(q=0; q<ROB_ULTRA_COUNT; q++)
     {
-        u->u[a] = INIT_ultraPredef(a, tim_s);
-        ULTRA_setCoefs(u->u[a], coef);
+        u->u[q] = INIT_ultraPredef(q, tim_s);
+        ULTRA_setCoefs(u->u[q], coef);
     }
 
     // connection of the PE pins may be alike the position of the sensors on the robot
     // trig|echo
-    u->uL  = u->u[0]; // PE0|PE1
-    u->uR  = u->u[1]; // PE1
-    u->uFL = u->u[2]; // PE2
-    u->uFR = u->u[3]; // PE3
+    q = 0;
+    u->uL  = u->u[q++];
+    u->uR  = u->u[q++];
+    u->uFL = u->u[q++];
+    u->uFR = u->u[q++];
 
 }
 
@@ -129,18 +127,15 @@ void ROBOT_initBuzzers(S_robot* r)
 
 void ROBOT_initDcmotors(S_robot* r)
 {
-    uint8_t iTim = 0;
-    S_timer_setup* tim_s = INIT_ultraTimer(iTim);
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% will be as gpio -> define TIM1_asdasdasdas
+    uint8_t iTim = 2;
+    S_timer_setup* tim_s = INIT_dcmotorTimer(iTim);
 
     uint8_t q = 0;
     S_robot_dcmotors* d = &(r->dcs);
-    for(q=0; q<ROB_ULTRA_COUNT; q++)
+    for(q=0; q<ROB_MOTOR_COUNT; q++)
     {
         d->m[q] = INIT_dcmotorPredef(q, tim_s);
-/*
-        ROBOT_initIsr(d->m[a]->rxport, d->m[a]->exti, d->m[a]->irq,
-                      d->m[a]->priority, EXTI_TRIGGER_BOTH);
-        ULTRA_setCoefs(d->m[a], coef);*/
     }
     q = 0;
     d->mFL = d->m[q++];
@@ -240,7 +235,8 @@ void ROBOT_initLifeDebug(S_robot* r)
     ROBOT_initInfras(r);
     //ROBOT_initLinCam(r);
 
-    //ROBOT_initDcmotors(r);
+    ROBOT_initDcmotors(r);
+    INIT_leds();
 }
 
 void ROBOT_initLifeSumo(S_robot* r)

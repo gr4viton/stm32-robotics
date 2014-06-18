@@ -78,26 +78,14 @@
 typedef struct _S_sensor_ultra
 {
 
-    uint32_t* conarr;
-    S_model_gpioPin *pins[2];
-    S_model_gpioPin* rx; // pin for recieving echo
-    S_model_gpioPin* tx; // pin for sending trigger
-/*
-    // pin settings
-    uint32_t clk;
-    uint32_t txport;
-    uint32_t rxport;
-    uint16_t txpin;
-    uint16_t rxpin;
+    uint32_t* conArr;
+    S_model_gpioPin *pins[SENSOR_ULTRA_PINS_COUNT];
+    S_model_gpioPin *echo; // pin for recieving echo
+    S_model_gpioPin *trig; // pin for sending trigger
 
-    // pin interrupts
-    uint32_t exti; // exti line
-    uint8_t irq;   // NVIC irq
-    uint8_t priority;
-*/
+    // state automata
     uint8_t echoState;          // memory for distinguishing between rising and falling edges
     E_sensor_ultra_state state; // state in which the sensor is
-
 
     // tick settings
     S_timer_setup* tim_s;  // pointer to the timer structure for tick counting
@@ -135,6 +123,11 @@ extern S_model_gpioPin predef_gpioPin[PREDEFCOUNT_GPIOPIN];
  \brief Initializes MCU ports for ultrasensor
  ****************/
 S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* tim_s);
+
+/****************
+ @brief Initializes timer channel as defined in ultrasonic sensor (timOCX)
+ ****************/
+void ULTRA_INIT_timerChannel(S_sensor_ultra* u );
 
 /****************
  @brief Initializes timer for 4 ultrasensors

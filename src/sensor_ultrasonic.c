@@ -35,13 +35,14 @@
 /****************
  @brief connection array
  pins[x] == predef_pins[dcmotor_conarr[x]]
- order of pins of actuator in conarr (as in INIT_dcmotorPredef) is:
+ order of pins of actuator in conArr (as in INIT_dcmotorPredef) is:
  { .echo, .trig }
  ****************/
 uint32_t conarr_ultra[][SENSOR_ULTRA_PINS_COUNT] =
 {
 /*0,1,2,3*/{PA3,PA1},{PD6,PB7},{PA7,PA5},{PE5,PE1}
 };
+
 
 /****************
  \brief Predefined ultrasonic sensors ports & clocks [tx=out;rx=in]
@@ -50,10 +51,10 @@ S_sensor_ultra predef_ultras[] =
 {
 //2014_06_16 - board v1
 // with changes:  E3-->E5; C13-->H1
-/*0*/ {.conarr=conarr_ultra[0],.timOCX=TIM_OC1}
-/*1*/,{.conarr=conarr_ultra[1],.timOCX=TIM_OC2}
-/*2*/,{.conarr=conarr_ultra[2],.timOCX=TIM_OC3}
-/*3*/,{.conarr=conarr_ultra[3],.timOCX=TIM_OC4}
+/*0*/ {.conArr=conarr_ultra[0],.timOCX=TIM_OC1}
+/*1*/,{.conArr=conarr_ultra[1],.timOCX=TIM_OC2}
+/*2*/,{.conArr=conarr_ultra[2],.timOCX=TIM_OC3}
+/*3*/,{.conArr=conarr_ultra[3],.timOCX=TIM_OC4}
 // before S_model_gpioPin
 ///*0*/ {.priority=0,.clk=RCC_GPIOA,.rxport=GPIOA,.txport=GPIOA,.rxpin=GPIO3,.txpin=GPIO1,.exti=EXTI3,.irq=NVIC_EXTI3_IRQ,  .timOCX=TIM_OC1}
 ///*1*/,{.priority=0,.clk=RCC_GPIOB|RCC_GPIOD,.rxport=GPIOD,.txport=GPIOB,.rxpin=GPIO6,.txpin=GPIO7,.exti=EXTI6,.irq=NVIC_EXTI9_5_IRQ,.timOCX=TIM_OC2}
@@ -110,57 +111,38 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* a_tim_s)
     //u->nTriggerTicks = 1000;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // pin settings new
-    uint8_t q=0;
-    uint8_t qmax = SENSOR_ULTRA_PINS_COUNT;
-    //____________________________________________________
+    // pin settings
+    uint32_t nPins = SENSOR_ULTRA_PINS_COUNT;
     // fill the pins array from predef_gpioPin array and initialize the pins
-
+    //____________________________________________________
     // connection
-    for(q=0;q<qmax;q++)
-    {
-        u->pins[q] = &( predef_gpioPin[ u->conarr[q] ] );
-        // need some mechanism of collision detection! -> everything should be cli -> do not use GUI!
-    }
-
+    model_gpioMorePins_connectPins(u->pins, u->conArr, nPins);
+    //____________________________________________________
     // map pointers of pins
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // will be in an array too
-
-    u->rx = u->pins[0];
-    u->tx = u->pins[1];
-
+    u->echo = u->pins[0];
+    u->trig = u->pins[1];
+    //____________________________________________________
     // create configuration
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // LATER this will not be here as the pins in predef_gpioPins will be configured as wanted already -> so only
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    /*for(q=0;q<10;q++)
-    {
-        u->rx->mode = q;
-        predef_gpioPin[2].mode = q;
-    }*/
-    u->rx->mode = GPIO_MODE_INPUT;
-    u->rx->pull = GPIO_PUPD_NONE;
-    u->rx->exti_enabled = true;
-    u->rx->exti_trig = EXTI_TRIGGER_BOTH;
+    u->echo->mode = GPIO_MODE_INPUT;
+    u->echo->pull = GPIO_PUPD_NONE;
+    u->echo->exti_enabled = true;
+    u->echo->exti_trig = EXTI_TRIGGER_BOTH;
 
-    u->tx->mode = GPIO_MODE_OUTPUT;
-    u->tx->pull = GPIO_PUPD_PULLDOWN;
+    u->trig->mode = GPIO_MODE_OUTPUT;
+    u->trig->pull = GPIO_PUPD_PULLDOWN;
+    //____________________________________________________
+    // isntall configuration from [pins] to gpio periphery
+    model_gpioMorePins_installConfig(u->pins, nPins);
 
-    // insert configuration
-    for(q=0;q<qmax;q++)
-    {
-        model_gpioPin_INIT(u->pins[q]);
-    }
+    /* -------- timer settings -------- */
+    ULTRA_INIT_timerChannel(u);
+    return u;
+}
 
-    /*
-    // pin settings old
-
-	rcc_periph_clock_enable(u->clk);
-	gpio_mode_setup(u->txport, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, u->txpin);
-	gpio_mode_setup(u->rxport, GPIO_MODE_INPUT, GPIO_PUPD_NONE, u->rxpin);
-	model_gpioPin_clear(u->tx);
-    */
+void ULTRA_INIT_timerChannel(S_sensor_ultra* u )
+{
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /* setup timer:
     - external trigger start rising edge
     - upcounting
@@ -168,7 +150,7 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* a_tim_s)
     - good prescalers for measurining signal between <0.2; 12> [ms]
 */
     /* -------- timer settings -------- */
-    q = index;
+    uint8_t q = u->indx;
     uint32_t t = u->tim_s->TIMX;
 
     /* Disable outputs. */
@@ -186,11 +168,11 @@ S_sensor_ultra* INIT_ultraPredef(uint8_t index, S_timer_setup* a_tim_s)
     timer_set_oc_value(t, u->timOCX, u->nTriggerTicks);
 
     /* Enable commutation interrupt. */
-    timer_enable_irq(t, TIM_DIER_CC1IE<<q);
+    timer_enable_irq(t, TIM_DIER_CC1IE<<q); //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -> this is a little bad..
     /* ---- */
 
-    return u;
 }
+
 
 S_timer_setup* INIT_ultraTimer(uint8_t indx)
 {
@@ -269,7 +251,7 @@ void ULTRA_tiggerStart(S_sensor_ultra *u)
     /* set value of compare register to produce trigger signal of given interval */
     timer_set_oc_value(u->TIMX, u->timOCX, u->nTriggerTicks);
 
-    model_gpioPin_set(u->tx);
+    model_gpioPin_set(u->trig);
 
     u->nOwerflow = 0;
     u->state = s1_sending_trigger;
@@ -277,7 +259,7 @@ void ULTRA_tiggerStart(S_sensor_ultra *u)
 
 void ULTRA_tiggerEnd(S_sensor_ultra *u)
 {
-    model_gpioPin_clear(u->tx);
+    model_gpioPin_clear(u->trig);
     u->state = s2_waiting_for_echo;
     u->nOwerflow = 0;
     /* disable compare interrupt */
@@ -289,11 +271,11 @@ void ULTRA_tiggerEnd(S_sensor_ultra *u)
 /* deprecated */
 void ULTRA_signalSend(S_sensor_ultra *u)
 {
-    model_gpioPin_set(u->tx);
+    model_gpioPin_set(u->trig);
     //u->ticksStart = timer5;
     // wait
     mswait(1);
-    model_gpioPin_clear(u->tx);
+    model_gpioPin_clear(u->trig);
 }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -331,7 +313,7 @@ void ULTRA_echoEnded(S_sensor_ultra *u)
 
 void ULTRA_handleEcho(S_sensor_ultra* u)
 {
-    if( exti_get_flag_status(u->rx->exti) ) // this is second checking - but harmless
+    if( exti_get_flag_status(u->echo->exti) ) // this is second checking - but harmless
     { // some of the ultras responded with up or down edge
         u->echoState = BIT_TOGGLE(u->echoState, 0);
 

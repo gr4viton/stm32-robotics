@@ -71,23 +71,26 @@ int main_debug(S_robot* r)
         //DBG_tryADC(r);
         //DBG_tryCNY70(r
         //DBG_testUltraDistance(r,0xFFFF);
-        DBG_testAllUltraDistance(r,0xFFFF);
-        //DBG_testActuators(r,0xFFFF);
+        //DBG_testAllUltraDistance(r,0xFFFF);
+        DBG_testActuators(r,0xFFFF);
 
         //INIT_tim(r);
 	}
 
 	return 0;
 }
-
+#include "servo.h"
 void DBG_testActuators(S_robot*r, uint32_t reps)
 {
 
+
     uint32_t period = 100;
     uint32_t prStart = _tic();
-    //uint8_t q=0;
-    //S_robot_dcmotors* d = 0;
-    //d = &(r->dcs);
+    uint8_t q=0;
+    S_robot_dcmotors* ds = 0;
+    ds = &(r->dcs);
+    S_actuator_dcmotor* m = 0;
+    m = ds->m[q];
 
     while(reps>1)
     {
@@ -95,23 +98,34 @@ void DBG_testActuators(S_robot*r, uint32_t reps)
 
         if( _tocFrom(prStart) > period )
         {
+            gpio_toggle(PLED,LEDORANGE1);
             gpio_toggle(PLED,LEDBLUE3);
-            LCD_gotoxy(r->lcd,0,0);
             /*
+            // cycle dutyCycle
+            m->dutyCycle += 0.1;
+            if(m->dutyCycle >= 1) m->dutyCycle =0.0;
+
+            //count pwm
+            //m->dcTicks = m->tim_s->period * m->dutyCycle;
+
+            //m->dcTicks = 20000 * m->dutyCycle;
+            m->dcTicks = 20000 * 0.5;
+            servo_set_position(m->timOCX, m->dcTicks);
+
+            // printit
+            LCD_gotoxy(r->lcd,0,0);*/
             fprintf(r->flcd, "s");
-                for(q=0;q<ROB_MOTOR_COUNT;q++)
-                    fprintf(r->flcd, "%d", d->m[q]->A );
-            fprintf(r->flcd, "p");
-                for(q=0;q<ROB_ULTRA_COUNT;q++)
-                    fprintf(r->flcd, "%lu", d->m[q]->B);
-            fprintf(r->flcd, "  ");
-*/
+                //for(q=0;q<ROB_MOTOR_COUNT;q++)
+                    fprintf(r->flcd, "%.2f|%lu", ds->m[q]->dutyCycle*100, ds->m[q]->dcTicks );
             LCD_gotoxy(r->lcd,0,1);
+
             prStart = _tic();
+
         }
         reps--;
     }
 }
+
 
 void DBG_touchD7blink(void)
 {
@@ -347,6 +361,7 @@ void CLOCK_digiPrint(S_robot* r)
         }
         last_wtime = world_time;
     }
+
 }
 
 #if __NOT_IMPLEMENTED_YET

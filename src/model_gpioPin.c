@@ -243,6 +243,26 @@ void model_gpioPin_clear(S_model_gpioPin* p){   gpio_clear(p->port, p->pin); }
 void model_gpioPin_toggle(S_model_gpioPin* p){  gpio_toggle(p->port, p->pin);}
 
 uint16_t model_gpioPin_get(S_model_gpioPin* p){ return gpio_get(p->port, p->pin); }
+    //____________________________________________________
+    // connection
+void model_gpioMorePins_connectPins(S_model_gpioPin** pins,uint32_t* conArr, uint32_t num_of_pins)
+{
+    uint8_t q=0;
+    for(q=0;q<num_of_pins;q++)
+    {
+        pins[q] = &( predef_gpioPin[ conArr[q] ] );
+        // need some mechanism of collision detection! -> everything should be cli -> do not use GUI!
+    }
+}
 
+
+void model_gpioMorePins_installConfig(S_model_gpioPin** pins, uint32_t num_of_pins)
+{
+    uint8_t q = 0;
+    for(q=0;q<num_of_pins;q++)
+    {
+        model_gpioPin_INIT(pins[q]);
+    }
+}
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES

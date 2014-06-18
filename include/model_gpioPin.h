@@ -118,6 +118,19 @@ void model_gpioPin_set(S_model_gpioPin* p);
 void model_gpioPin_clear(S_model_gpioPin* p);
 void model_gpioPin_toggle(S_model_gpioPin* p);
 
+    //____________________________________________________
+    // connections
+/****************
+ @brief Connects pins (redistribute pointers) according to connection array [conArr]
+ later will be in separate model_gpioMorePins?
+ ****************/
+void model_gpioMorePins_connectPins(S_model_gpioPin** pins,uint32_t* conArr, uint32_t num_of_pins);
+
+/****************
+ @brief Installs gpio periphery from [pins] configuration
+ later will be in separate model_gpioMorePins?
+ ****************/
+void model_gpioMorePins_installConfig(S_model_gpioPin** pins, uint32_t num_of_pins);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

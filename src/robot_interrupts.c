@@ -92,7 +92,6 @@ void exti15_10_isr(void)
 
 inline void extiX_isr(uint8_t actExti)
 {
-    gpio_toggle(PLED,LEDGREEN0);
     if( exti_get_flag_status(actExti) != 0)
     {
         if( R.STARTED == 1 )
@@ -104,15 +103,12 @@ inline void extiX_isr(uint8_t actExti)
     }
 }
 
-
-
-
 void ROBOT_handleUltraEchoOnExti(uint8_t exti)
 {
     uint8_t a=0;
     for(a=0;a<ROB_ULTRA_COUNT; a++)
     {
-        if(exti == R.ults.u[a]->rx->exti)
+        if(exti == R.ults.u[a]->echo->exti)
             ULTRA_handleEcho(R.ults.u[a]);
     }
 }
@@ -124,64 +120,11 @@ void ROBOT_initClkIsr(void)
     rcc_periph_clock_enable(RCC_SYSCFG);
 }
 
-//uint32_t cmp = 1000;
-
 void tim3_isr(){ timActuator_isr(TIM3);}
 void tim4_isr(){ timUltra_isr(TIM4);}
 
 void timActuator_isr(uint32_t t)
 {
-    S_robot_ultras* us = &(R.ults);
-    S_sensor_ultra* u = 0;
-    uint8_t q = 0;
-    uint8_t qmax = ROB_ULTRA_COUNT;
-    uint8_t timSRccX = 0;
-
-    if( R.STARTED == 1 )
-    {
-        for(q=0; q<qmax; q++)
-        {
-            u = us->u[q];
-            timSRccX = TIM_SR_CC1IF<<q;
-            if (timer_get_flag(t, timSRccX))
-            {
-                timer_clear_flag(t, timSRccX);
-
-                if( u->state == s1_sending_trigger)
-                {
-                    ULTRA_tiggerEnd(u);
-                    gpio_clear(PLED, LEDORANGE1);
-                }
-            }
-            //gpio_toggle(PLED, LEDBLUE3);
-        }
-
-        if( timer_get_flag(t, TIM_SR_UIF) != 0 )
-        {
-            timer_clear_flag(t, TIM_SR_UIF);
-
-            for(q=0; q<qmax; q++)
-            {
-                u = us->u[q];
-                if( u->state == s0_idle_before_trigger)
-                {
-                    //if(u->nOwerflow >= 1) // ?? not sure //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                    //{ // must wait at least one period to ensure there is enaught time between triggers
-                    ULTRA_tiggerStart(u);
-                    gpio_set(PLED,LEDORANGE1);
-                    //}
-                }
-                if(u->nOwerflow > 5)
-                { // this can happen when echo signal is not acquired for whatever reason
-                    // without this the u->state stucked in s3_waiting_for_echo_end
-                    u->state = s0_idle_before_trigger;
-                }
-                u->nOwerflow++;
-                //world_time++; // delete later
-                //gpio_toggle(PLED,LEDRED2);
-            }
-        }
-    }
     timer_clear_flag(t, 0xffff);
 }
 
@@ -206,10 +149,8 @@ void timUltra_isr(uint32_t t)
                 if( u->state == s1_sending_trigger)
                 {
                     ULTRA_tiggerEnd(u);
-                    gpio_clear(PLED, LEDORANGE1);
                 }
             }
-            //gpio_toggle(PLED, LEDBLUE3);
         }
 
         if( timer_get_flag(t, TIM_SR_UIF) != 0 )
@@ -224,7 +165,6 @@ void timUltra_isr(uint32_t t)
                     //if(u->nOwerflow >= 1) // ?? not sure //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     //{ // must wait at least one period to ensure there is enaught time between triggers
                     ULTRA_tiggerStart(u);
-                    gpio_set(PLED,LEDORANGE1);
                     //}
                 }
                 if(u->nOwerflow > 5)
@@ -233,61 +173,12 @@ void timUltra_isr(uint32_t t)
                     u->state = s0_idle_before_trigger;
                 }
                 u->nOwerflow++;
-                //world_time++; // delete later
-                //gpio_toggle(PLED,LEDRED2);
             }
         }
     }
     timer_clear_flag(t, 0xffff);
 }
 
-#if __NOT_IMPLEMENTED_YET
-void exti9_5_isr(void)
-{
-    if( R.STARTED == 1 )
-    {
-        ULTRA_checkEchoOnExti(EXTI9_5);
-        exti_reset_request(EXTI9_5); // reset flag
-    }
-}
-#endif // __NOT_IMPLEMENTED_YET
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 
-
-
-#if __NOT_USED_ANYMORE
-
-    static uint16_t actPA;
-    static uint16_t actPH;
-
-    if( exti_get_flag_status(actExti) != 0)
-    {
-        actPA = GPIOA_IDR;
-        actPH = GPIOH_IDR;
-
-        if ((actPA & GPIO0) != 0)
-        { // PA0 = HI
-            gpio_set(PLED, LEDGREEN0);
-        }
-        else
-        { // PA0 = LO
-            gpio_clear(PLED, LEDGREEN0);
-        }
-
-        if ((actPH & GPIO0) != 0)
-        { // PH0 = HI
-            gpio_set(PLED, LEDBLUE3);
-        }
-        else
-        { // PH0 = LO
-            gpio_clear(PLED, LEDBLUE3);
-        }
-
-
-        gpio_toggle(PLED, LEDGREEN0);
-
-        exti_reset_request(actExti);
-    }
-
-#endif // __NOT_USED_ANYMORE

@@ -36,6 +36,10 @@ CFLAGS += -Wformat -Wformat-security -Wformat-y2k
 
 # for ignoring compiler cannot control input parameter types in printf when formating string is given by a variable
 #CFLAGS  += -Wformat-nonliteral
+
+# more include dirs
+CPPFLAGS	+= -I$(PROJECT_DIR)include/libopencm3_add
+
 ###############################################################################
 # Linker flags
 

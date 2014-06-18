@@ -38,7 +38,7 @@
 /****************
  @brief number of pins each dcmotor actuator has
  ****************/
-#define SENSOR_DCMOT_PINS_COUNT     2
+#define ACTUATOR_DCMOTOR_PINS_COUNT     2
 //____________________________________________________
 //constants (do not change)
 //____________________________________________________
@@ -51,13 +51,13 @@
 // structs
 typedef struct _S_actuator_dcmotor
 {
-    uint32_t* conarr;
+    uint32_t* conArr;
     S_model_gpioPin *pins[2];
-    S_model_gpioPin* a; // actuator pin IN1
-    S_model_gpioPin* b; // actuator pin IN2
+    S_model_gpioPin* A; // actuator pin IN1
+    S_model_gpioPin* B; // actuator pin IN2
 
-    uint16_t dutyCycle; // will be used?
-    uint32_t pwm; // not sure yet
+    float dutyCycle;
+    uint32_t dcTicks; // duty cycle tics -> counted from dutyCycle and pwm timer period
 
     // tick settings
     S_timer_setup* tim_s;  // pointer to the timer structure for tick counting
