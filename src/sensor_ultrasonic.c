@@ -168,7 +168,7 @@ void ULTRA_INIT_timerChannel(S_sensor_ultra* u )
     timer_set_oc_value(t, u->timOCX, u->nTriggerTicks);
 
     /* Enable commutation interrupt. */
-    timer_enable_irq(t, TIM_DIER_CC1IE<<q); //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -> this is a little bad..
+    timer_enable_irq(t, TIM_DIER_CC1IE<<q); //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -> this is somhow bad i know...
     /* ---- */
 
 }
@@ -200,11 +200,11 @@ S_timer_setup* INIT_ultraTimer(uint8_t indx)
     // [prsc=30, period=65536-1] == <0.37; 24186.27> [ms] == <0.006; 417> [cm]
     // [prsc=8400, period=10k  ] == <0.1 ; 840> [ms]
 
-    timer_set_prescaler(t, 30);
+    timer_set_prescaler(t, tim_s->prsc);
     // Input Filter clock prescaler -
     timer_set_clock_division(t, 0);
     // TIMx_ARR - Period in counter clock ticks.
-    timer_set_period(t, 0xFFFF-1);
+    timer_set_period(t, tim_s->period);
     /* Generate TRGO on every update. */
     timer_set_master_mode(t, TIM_CR2_MMS_UPDATE);
 
@@ -220,7 +220,7 @@ S_timer_setup* INIT_ultraTimer(uint8_t indx)
     // enable interrupt in NestedVectorInterrupt
     // -> if some of the timer interrupts is enabled -> it will call the tim isr function
 	nvic_enable_irq(tim_s->nvic);
-
+    tim_s->inited = 1;
     return tim_s;
 }
 

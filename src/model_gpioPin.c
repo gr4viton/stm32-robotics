@@ -116,6 +116,8 @@ S_model_gpioPin predef_gpioPin[] =
 /*61*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOD,.port=GPIOD,.pin=GPIO13,.exti_enabled=0,.exti=EXTI13,.irq=NVIC_EXTI13_IRQ}
 /*62*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOD,.port=GPIOD,.pin=GPIO14,.exti_enabled=0,.exti=EXTI14,.irq=NVIC_EXTI14_IRQ}
 /*63*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOD,.port=GPIOD,.pin=GPIO15,.exti_enabled=0,.exti=EXTI15,.irq=NVIC_EXTI15_IRQ}
+
+#if __IT_IS_TOO_BIG_WITH_IT //maybee
 /*64*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOE,.port=GPIOE,.pin=GPIO0,.exti_enabled=0,.exti=EXTI0,.irq=NVIC_EXTI0_IRQ}
 /*65*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOE,.port=GPIOE,.pin=GPIO1,.exti_enabled=0,.exti=EXTI1,.irq=NVIC_EXTI1_IRQ}
 /*66*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOE,.port=GPIOE,.pin=GPIO2,.exti_enabled=0,.exti=EXTI2,.irq=NVIC_EXTI2_IRQ}
@@ -132,6 +134,7 @@ S_model_gpioPin predef_gpioPin[] =
 /*77*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOE,.port=GPIOE,.pin=GPIO13,.exti_enabled=0,.exti=EXTI13,.irq=NVIC_EXTI13_IRQ}
 /*78*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOE,.port=GPIOE,.pin=GPIO14,.exti_enabled=0,.exti=EXTI14,.irq=NVIC_EXTI14_IRQ}
 /*79*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOE,.port=GPIOE,.pin=GPIO15,.exti_enabled=0,.exti=EXTI15,.irq=NVIC_EXTI15_IRQ}
+
 /*80*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOH,.port=GPIOH,.pin=GPIO0,.exti_enabled=0,.exti=EXTI0,.irq=NVIC_EXTI0_IRQ}
 /*81*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOH,.port=GPIOH,.pin=GPIO1,.exti_enabled=0,.exti=EXTI1,.irq=NVIC_EXTI1_IRQ}
 /*82*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOH,.port=GPIOH,.pin=GPIO2,.exti_enabled=0,.exti=EXTI2,.irq=NVIC_EXTI2_IRQ}
@@ -164,6 +167,7 @@ S_model_gpioPin predef_gpioPin[] =
 /*109*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOI,.port=GPIOI,.pin=GPIO13,.exti_enabled=0,.exti=EXTI13,.irq=NVIC_EXTI13_IRQ}
 /*110*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOI,.port=GPIOI,.pin=GPIO14,.exti_enabled=0,.exti=EXTI14,.irq=NVIC_EXTI14_IRQ}
 /*111*/,{.pull=GPIO_PUPD_NONE,.mode=GPIO_MODE_OUTPUT,.rcc=RCC_GPIOI,.port=GPIOI,.pin=GPIO15,.exti_enabled=0,.exti=EXTI15,.irq=NVIC_EXTI15_IRQ}
+#endif // 0
 
 };
 

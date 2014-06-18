@@ -55,6 +55,25 @@ int main_debug(S_robot* r)
 
     ROBOT_START(r);
 
+    uint32_t period = 10;
+    uint32_t prStart = _tic();
+    uint8_t q=0;
+    //uint32_t ocval = 0;
+
+    S_robot_dcmotors* ds = 0;
+    ds = &(r->dcs);
+    S_actuator_dcmotor* m = 0;
+    m = ds->m[q];
+
+    float dcadd = 0.00001;
+    mswait(1000);
+    while(1)
+    {
+        CLOCK_digiPrint(r);
+        if(m->dutyCycle >= 1.0) m->dutyCycle = 0.0;
+        DCMOT_SET_dutyCycle(m, m->dutyCycle+dcadd);
+    }
+
 	while (1)
     {
         /**
@@ -72,58 +91,121 @@ int main_debug(S_robot* r)
         //DBG_tryCNY70(r
         //DBG_testUltraDistance(r,0xFFFF);
         //DBG_testAllUltraDistance(r,0xFFFF);
-        DBG_testActuators(r,0xFFFF);
+        DBG_testActuators(r,0xFFFFFF);
 
         //INIT_tim(r);
 	}
 
 	return 0;
 }
-#include "servo.h"
-void DBG_testActuators(S_robot*r, uint32_t reps)
+
+
+void DBG_testActuators_wInit(S_robot*r, uint32_t reps)
 {
-
-
     uint32_t period = 100;
     uint32_t prStart = _tic();
     uint8_t q=0;
-    S_robot_dcmotors* ds = 0;
-    ds = &(r->dcs);
-    S_actuator_dcmotor* m = 0;
-    m = ds->m[q];
+    //uint32_t ocval = 0;
+    //init
+     rcc_clock_setup_in_hse_8mhz_out_72mhz();
+
+     /* enable GPIOC clock */
+     rcc_periph_clock_enable(RCC_GPIOC);
+
+     /*
+      * set GPIO12 at PORTC (led) to 'output alternate function push-pull'.
+      */
+    // gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO12);
+
+    gpio_mode_setup(GPIOA,GPIO_MODE_AF,GPIO_PUPD_NONE,GPIO1);
+    gpio_set_af(GPIOA,GPIO_AF1,GPIO1);
+    uint32_t *p = TIM2_CCMR1;
+    *p = 0x6800;
+    p = TIM2_CR1 ;
+    *p |= 1<<7; // ARPE
+    p = TIM2_EGR ;
+    *p |= 1<<0;
+
+    p = TIM2_CCER ;    *p |= 1<<4; //enable output
+
+
 
     while(reps>1)
     {
         CLOCK_digiPrint(r);
-
         if( _tocFrom(prStart) > period )
         {
-            gpio_toggle(PLED,LEDORANGE1);
-            gpio_toggle(PLED,LEDBLUE3);
-            /*
-            // cycle dutyCycle
-            m->dutyCycle += 0.1;
-            if(m->dutyCycle >= 1) m->dutyCycle =0.0;
 
-            //count pwm
-            //m->dcTicks = m->tim_s->period * m->dutyCycle;
-
-            //m->dcTicks = 20000 * m->dutyCycle;
-            m->dcTicks = 20000 * 0.5;
-            servo_set_position(m->timOCX, m->dcTicks);
+            //TIM_CCR1(m->TIMX) = m->OCval;
+            //ocval += 10;
+            //model_timer_SET_outputCompare(TIM2,TIM_OC2,ocval);
 
             // printit
-            LCD_gotoxy(r->lcd,0,0);*/
-            fprintf(r->flcd, "s");
-                //for(q=0;q<ROB_MOTOR_COUNT;q++)
-                    fprintf(r->flcd, "%.2f|%lu", ds->m[q]->dutyCycle*100, ds->m[q]->dcTicks );
+            LCD_gotoxy(r->lcd,0,0);
             LCD_gotoxy(r->lcd,0,1);
+            //fprintf(r->flcd, "");
+                //for(q=0;q<ROB_MOTOR_COUNT;q++)
+                    //fprintf(r->flcd, "%.0f%%=%lu/%lu", ds->m[q]->dutyCycle*100, ds->m[q]->OCval, ds->m[q]->tim_s->period );
+                    //fprintf(r->flcd, "oc=%lu=%lu", ocval, m->OCval );
 
             prStart = _tic();
 
         }
         reps--;
     }
+}
+
+
+void DBG_testActuators(S_robot*r, uint32_t reps)
+{
+    uint32_t period = 10;
+    uint32_t prStart = _tic();
+    uint8_t q=0;
+    //uint32_t ocval = 0;
+
+    S_robot_dcmotors* ds = 0;
+    ds = &(r->dcs);
+    S_actuator_dcmotor* m = 0;
+    m = ds->m[q];
+
+    float dcadd = 0.00001;
+    mswait(1000);
+    while(1)
+    {
+        CLOCK_digiPrint(r);
+        if(m->dutyCycle >= 1.0) m->dutyCycle = 0.0;
+        DCMOT_SET_dutyCycle(m, m->dutyCycle+dcadd);
+    }
+    while(reps>1)
+    {
+        CLOCK_digiPrint(r);
+        if( _tocFrom(prStart) > period )
+        {
+
+            // cycle dutyCycle
+            if(m->dutyCycle >= 1.0) m->dutyCycle = 0.0;
+
+            DCMOT_SET_dutyCycle(m, m->dutyCycle+0.02);
+
+            TIM_CCR1(m->TIMX) = m->OCval;
+            //ocval += 10;
+            //model_timer_SET_outputCompare(TIM2,TIM_OC2,ocval);
+
+            // printit
+            LCD_gotoxy(r->lcd,0,0);
+                    fprintf(r->flcd, "%.0f%%", ds->m[q]->dutyCycle*100);
+            LCD_gotoxy(r->lcd,0,1);
+            //fprintf(r->flcd, "");
+                //for(q=0;q<ROB_MOTOR_COUNT;q++)
+                    fprintf(r->flcd, "%lu/%lu|", ds->m[q]->OCval, ds->m[q]->tim_s->period );
+                    //fprintf(r->flcd, "oc=%lu=%lu", ocval, m->OCval );
+
+            prStart = _tic();
+
+        }
+        reps--;
+    }
+    gpio_toggle(PLED,LEDORANGE1);
 }
 
 
@@ -323,7 +405,7 @@ void DBG_testUltraDistanceOld2(S_robot* r,uint32_t repeats)
 
 void DBG_flash(void)
 {
-    gpio_toggle(PLED,LEDRED2);
+    gpio_toggle(PLED,LEDS);
 }
 
 

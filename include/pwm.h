@@ -64,6 +64,6 @@ void pwm_start_timer(uint32_t timer_peripheral);
  * @param[in]	pulse_widht		The pulse with for the channel. Must be between 0 (off) and the value given for period
  * 							with {@link pwm_init_timer}.
  */
-void pwm_set_pulse_width(uint32_t timer_peripheral, enum tim_oc_id oc_id, uint32_t pulse_width);
+void model_timer_SET_outputCompare(uint32_t timer_peripheral, enum tim_oc_id oc_id, uint32_t pulse_width);
 
 #endif

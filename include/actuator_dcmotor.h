@@ -57,7 +57,9 @@ typedef struct _S_actuator_dcmotor
     S_model_gpioPin* B; // actuator pin IN2
 
     float dutyCycle;
-    uint32_t dcTicks; // duty cycle tics -> counted from dutyCycle and pwm timer period
+    // should be in tim_s?
+    // some model_timerChannel !!!
+    uint32_t OCval; // Output compare register value = duty cycle tics -> counted from dutyCycle and pwm timer period
 
     // tick settings
     S_timer_setup* tim_s;  // pointer to the timer structure for tick counting
@@ -98,10 +100,28 @@ typedef struct _S_actuator_dcmotor
  @brief
  ****************/
 S_actuator_dcmotor* INIT_dcmotorPredef(uint8_t index, S_timer_setup* a_tim_s);
+
+/****************
+ @brief
+ ****************/
+void DCMOT_INIT_timerChannel(S_actuator_dcmotor* d);
+
+/****************
+ @brief
+ ****************/
+void DCMOT_SET_dutyCycle(S_actuator_dcmotor* m, float dutyCycle);
+
 /****************
  @brief
  ****************/
 S_timer_setup* INIT_dcmotorTimer(uint8_t indx);
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% will be elsewhere
+/****************
+ @brief
+ ****************/
+void model_timer_SET_outputCompare(uint32_t TIMX, enum tim_oc_id timOCX, uint32_t OCval);
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // EXTERNAL REFERENCES
 

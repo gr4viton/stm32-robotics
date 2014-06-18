@@ -25,7 +25,7 @@
 #include <libopencm3/stm32/gpio.h>
 
 #include "servo.h"
-
+#include "defines.h"
 #if __NOT_USED_ANYMORE
 /**
  * Setup the system clock to 72MHz.

@@ -55,6 +55,7 @@
  ****************/
 typedef struct _S_timer_setup
 {
+    uint8_t inited; // 0 if not initialized yet; 1 othervise
     uint32_t TIMX; // timer address
     uint32_t period;
     uint32_t full_freq; // it depends on the mode and to which apb1/2 is the timer connected

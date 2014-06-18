@@ -33,18 +33,31 @@ x] od adc -> pomoci injected a Timeru
 [x] seradit predef_gpioPin
 
 [x] ultracidla - timer counter period
+[] do jednotlivých složek!
 
+[] state u jednotlivych pinu
+- jestli už byli jednou nastaveny.. podruhy vyhodi warning
+= colision detection
+
+[] state jednotlivych sensoru etc.. aby se vedelo co bylo inicializovano.
+hlavne pro ROBOT_START
 [] ULTRA_triggerStart --> sensor_ultra_triggerStart ?? urcite to tak chces?
 
 [] S_timer_setup -> S_model_timer
 timer_s from wait to model_timer.c
 [] ty same definice jako maji gpioPins tak pro timery
 
+[] // some model_timerChannel !!!
+
+[] proc se dycky buildi secko!?? %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 [] všechny clk na rcc
 [] aby se timery automaticky nacitali pri prvni initializaci -> aby nemusely byt v robot_config.. ale primo v ultra..
 -> ultra bude mit indx z predef_timers
 [] zrušit  ultra[x]->TIMX; -> nechat to jenom v tim_s->TIMX
+[] nPins do všech ults, infs -> po inicializaci bude nastaven na velikost dle spravneho makro
+[] do init exti -> misto v ROBO_initIsr...
+    rcc_periph_clock_enable(RCC_SYSCFG);
 ____________________________________________________
 later
 [] priority nvic - nastavit aby to nedelalo problemy!!!

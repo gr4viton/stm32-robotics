@@ -118,6 +118,7 @@ void ROBOT_initClkIsr(void)
     // for enabling changing SYSCFG - exti line port selection
     // rcc_peripheral_enable_clock(&RCC_APB2ENR, RCC_APB2ENR_SYSCFGEN);// deprecated
     rcc_periph_clock_enable(RCC_SYSCFG);
+    //INIT_clk();
 }
 
 void tim3_isr(){ timActuator_isr(TIM3);}

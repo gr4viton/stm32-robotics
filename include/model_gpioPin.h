@@ -45,7 +45,7 @@ typedef struct _S_model_gpioPin
     uint32_t rcc; // gpio port RCC
     uint32_t port; // port address
     uint32_t pin; // pin selection
-    uint32_t state; // pin state - 0 1 , hiZ, etc - af??
+    uint8_t state; // pin state - 0 1 , hiZ, etc - af??
     uint8_t mode; // gpio_mode (GPIO_MODE_OUTPUT/GPIO_MODE_INPUT)
     uint8_t pull;  // pull Up/Down/None settings
 

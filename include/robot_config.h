@@ -77,7 +77,7 @@
 //#define ROB_ULTRA_MAX_COUNT 1
 // actuators
 //#define ROB_MOTOR_COUNT 4
-#define ROB_MOTOR_COUNT 1
+#define ROB_MOTOR_COUNT 2
 //____________________________________________________
 //constants (do not change)
 #define ROB_PRIORITY_BUTTON_START 10
@@ -96,6 +96,7 @@
  ****************/
 typedef struct _S_robot_buttons
 {
+    uint8_t inited; // 0 if not initialized yet; 1 othervise
     S_sensor_button* bStart;
     S_sensor_button* bSumo;
     S_sensor_button* bLine;
@@ -109,6 +110,7 @@ typedef struct _S_robot_buttons
  ****************/
 typedef struct _S_robot_ultras
 {
+    uint8_t inited; // 0 if not initialized yet; 1 othervise
     S_sensor_ultra* uFL; // pointer to front left  ultrasonic sensor
     S_sensor_ultra* uFR; // pointer to front right ultrasonic sensor
     S_sensor_ultra* uL;  // pointer to side  left  ultrasonic sensor
@@ -122,6 +124,7 @@ typedef struct _S_robot_ultras
 typedef struct _S_dev_buzzer S_dev_buzzer; // forward declaration
 typedef struct _S_robot_buzzers
 {
+    uint8_t inited; // 0 if not initialized yet; 1 othervise
     S_dev_buzzer* bz1;
 } S_robot_buzzers;
 
@@ -131,6 +134,7 @@ typedef struct _S_robot_buzzers
 typedef struct _S_actuator_dcmotor S_actuator_dcmotor; // forward declaration
 typedef struct _S_robot_dcmotors
 {
+    uint8_t inited; // 0 if not initialized yet; 1 othervise
     S_actuator_dcmotor* mFL; // motor front left
     S_actuator_dcmotor* mFR; // motor front right
     S_actuator_dcmotor* mBL; // motor back left
@@ -141,7 +145,9 @@ typedef struct _S_robot_dcmotors
 typedef struct _S_sensor_infra S_sensor_infra;
 typedef struct _S_robot_infras
 {
-    uint8_t nInfs;       // number of all infra sensors
+    uint8_t inited; // 0 if not initialized yet; 1 othervise
+
+    uint8_t nInfs;       // number of all infra sensors //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% do i really need it? or should i use it everywhere
 
     S_sensor_infra* iFL; // infra front left -> pointer to i[x]
     S_sensor_infra* iFR; // infra front right -> pointer to i[x]
@@ -158,6 +164,8 @@ typedef struct _S_robot_infras
  ****************/
 typedef struct _S_robot
 {
+    //uint8_t inited; // 0 if not initialized yet; 1 othervise
+
     // sensors
     S_robot_buttons btns;
     S_robot_ultras ults;

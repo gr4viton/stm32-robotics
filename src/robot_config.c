@@ -52,9 +52,10 @@ S_robot R;
 void ROBOT_START(S_robot* r)
 {
     r->STARTED = 1;
+    // rewrite to START_Ultra etc.
     // start timers
-    timer_enable_counter(r->ults.u[0]->tim_s->TIMX);
-    timer_enable_counter(r->dcs.m[0]->tim_s->TIMX);
+    if(r->ults.inited != 0) timer_enable_counter(r->ults.u[0]->tim_s->TIMX);
+    if(r->dcs.inited != 0) timer_enable_counter(r->dcs.m[0]->tim_s->TIMX);
 }
 
 void ROBOT_initUltras(S_robot* r)
@@ -85,6 +86,7 @@ void ROBOT_initUltras(S_robot* r)
     u->uFL = u->u[q++];
     u->uFR = u->u[q++];
 
+    r->ults.inited = 1;
 }
 
 void ROBOT_initButtons(S_robot* r)
@@ -100,6 +102,8 @@ void ROBOT_initButtons(S_robot* r)
     // Initialize IRQ for button bStart
     S_sensor_button* bb = b->bStart;
     model_gpioPin_INIT_exti2(bb->port, bb->exti, bb->irq, ROB_PRIORITY_BUTTON_START, EXTI_TRIGGER_BOTH);
+
+    r->btns.inited = 1;
 }
 
 void ROBOT_initLcd(S_robot* r)
@@ -123,6 +127,7 @@ void ROBOT_initUsart(S_robot* r)
 void ROBOT_initBuzzers(S_robot* r)
 {
     r->buzs.bz1 = INIT_buzzerPredef(0);
+    r->buzs.inited = 1;
 }
 
 void ROBOT_initDcmotors(S_robot* r)
@@ -142,12 +147,17 @@ void ROBOT_initDcmotors(S_robot* r)
     d->mFR = d->m[q++];
     d->mBL = d->m[q++];
     d->mBR = d->m[q++];
+
+    r->dcs.inited = 1;
 }
 
 void ROBOT_initLinCam(S_robot* r)
 {
     if(r->life == IAM_LINE_SNIFFER)
+    {
         r->cam = INIT_lincamPredef(0);
+    }
+    //r->cam.inited = 1;
 }
 
 void ROBOT_initInfraArrayAndChannels(S_robot* r, const uint8_t nInfras)
@@ -218,6 +228,7 @@ void ROBOT_initInfras(S_robot* r)
 
     INFRA_setupInjectedTIM2();
     INFRA_setupInjectedADC1wTIM2(in->channelArray, in->nInfs);
+    r->infs.inited = 1;
 }
 
 void ROBOT_initLifeDebug(S_robot* r)
@@ -231,8 +242,8 @@ void ROBOT_initLifeDebug(S_robot* r)
 
     // sensors
     ROBOT_initButtons(r);
-    ROBOT_initUltras(r);
-    ROBOT_initInfras(r);
+    //ROBOT_initUltras(r);
+    //ROBOT_initInfras(r);
     //ROBOT_initLinCam(r);
 
     ROBOT_initDcmotors(r);
